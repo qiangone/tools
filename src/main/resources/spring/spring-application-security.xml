@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:oauth2="http://www.springframework.org/schema/security/oauth2"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+						http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+                        http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2-1.0.xsd
+                        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+	<mvc:annotation-driven />
+	<mvc:default-servlet-handler />
+
+	<beans:import resource="spring-application-oauth.xml" />
+
+	<!-- <http pattern="/Employee/css/**" security="none"/> <http pattern="/Employee/js/**" 
+		security="none"/> -->
+
+
+
+	<http auto-config="true">
+		<!-- <intercept-url pattern="/dba/**" access="ROLE_DBA" /> <intercept-url 
+			pattern="/admin/**" access="ROLE_LOCALHR" /> <intercept-url pattern="/helpdesk/**" 
+			access="ROLE_HELPDESK" /> <intercept-url pattern="/api/seller/**" access="ROLE_USER" 
+			/> -->
+
+		<form-login login-page="/login.jsp" default-target-url="/sso"
+			authentication-failure-url="/login.jsp?error=true"
+			login-processing-url="/j_spring_security_check" />
+		<session-management invalid-session-url="/login.jsp"
+			session-authentication-error-url="/login.jsp"
+			session-fixation-protection="newSession">
+		</session-management>
+		<!-- <custom-filter ref="customLoginFilter" position="FORM_LOGIN_FILTER" 
+			/> -->
+		<logout invalidate-session="true" logout-success-url="/login.jsp"
+			logout-url="/j_spring_security_logout" />
+	</http>
+
+
+	<beans:bean id="customUserDetailsService"
+		class="com.capgemini.university.login.CustomUserDetailsService">
+
+	</beans:bean>
+
+
+
+	<!-- ldap security start -->
+
+	<beans:bean id="contextSource"
+		class="org.springframework.ldap.core.support.LdapContextSource">
+		<beans:property name="url"
+			value="ldap://wadcnhgh01.corp.capgemini.com/" />
+		<beans:property name="base" value="dc=corp,dc=capgemini,dc=com" />
+	</beans:bean>
+
+	<beans:bean id="ldapTemplate" class="org.springframework.ldap.core.LdapTemplate">
+		<beans:constructor-arg ref="contextSource" />
+		<beans:property name="ignorePartialResultException"
+			value="true" />
+	</beans:bean>
+
+	<beans:bean id="ldapUserDetailsContextMapper"
+		class="com.capgemini.university.ldap.LdapUserDetailsContextMapper">
+	</beans:bean>
+
+	<beans:bean id="adAuthenticationProvider"
+		class="com.capgemini.university.ldap.ActiveDirectoryLdapAuthenticationProvider">
+		<beans:constructor-arg value="corp.capgemini.com" />
+		<beans:constructor-arg value="ldap://wadcnhgh01.corp.capgemini.com/" />
+		<!-- <beans:property name="userDetailsContextMapper" ref="ldapUserDetailsContextMapper" /> -->
+	</beans:bean>
+	
+	
+	 <beans:bean class="com.capgemini.university.service.impl.CourseServiceImpl">  
+    	<beans:property name="ldapTemplate" ref="ldapTemplate"/>  
+	</beans:bean> 
+
+
+
+	<!-- ldap security end -->
+
+
+	<authentication-manager alias="authenticationManager">
+		<authentication-provider>
+			<user-service>
+				<user name="user" password="user" authorities="ROLE_USER" />
+				<user name="admin" password="admin" authorities="ROLE_USER, ROLE_ADMIN" />
+				<user name="india" password="india" authorities="ROLE_USER, ROLE_ADMIN" />
+
+			</user-service>
+		</authentication-provider>
+		<!-- <authentication-provider user-service-ref="customUserDetailsService" 
+			/> -->
+		<authentication-provider ref="adAuthenticationProvider" />
+	</authentication-manager>
+
+
+</beans:beans>

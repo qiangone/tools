@@ -1,0 +1,27 @@
+{
+	"info": {
+		"code": 200
+	},
+    "result": {
+		"nomineeList": [
+			{
+				"id": 1,
+				"username":"deadai",
+				"firstName": "Dean",
+				"lastName": "Dai",
+				"employee_id": "51714_FS",
+				"email": "dean.dai@capgemini.com",
+				"headImage": null
+			},
+			{
+				"id": 2,
+				"username":"scurry",
+				"firstName": "Stephen",
+				"lastName": "Curry",
+				"employee_id": "51714_FS",
+				"email": "stephen.curry@capgemini.com",
+				"headImage": null
+			}
+		]
+	}
+}

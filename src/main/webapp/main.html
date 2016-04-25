@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Our University Campus Nomination Tool</title>
+<link rel="stylesheet" href="css/bootstrap.css">
+<link rel="stylesheet" href="css/common.css">
+<link rel="stylesheet" href="css/button.css">
+<link rel="stylesheet" href="css/list.css">
+<link rel="stylesheet" href="css/table.css">
+<link rel="stylesheet" href="css/modal.css">
+</head>
+<body style="display: none;" :class="{'no-overflow': isDetailShow}">
+	<header class="navbar navbar-static-top ut-nav" id="top" role="banner">
+		<div class="navbar-header">
+			<a href="javascript:;" class="navbar-brand">
+				<img alt="Logo" src="images/logo_university.png">Our University Campus Nomination Tool
+				<span> | {{currentSbu}}</span>
+			</a>
+		</div>
+		<nav id="ut-navbar">
+			<profile-component :user="user"></profile-component>
+			<ul class="nav navbar-nav pull-right" id="moduleBar">
+				<li v-for="module in modules"><a :class="{'active': module.active}" @click.stop.prevent="gotoPage($index)">{{module.name}}</a></li>
+			</ul>
+		</nav>
+	</header>
+	
+	<div class="container-fluid content" @click="hideRight">
+		
+		<div id="dashboard" class="info dashboard-info">
+			<div class="top-part">
+				<div class="row no-margin">
+					<div class="col-md-12 col-lg-12 no-padding text-center chart-title">SBU PARTICIPANTS & PMDs</div>
+				</div>
+				<div class="row no-margin">
+					<div id="participantsChart" class="col-md-6 col-lg-6 no-padding chart-block"></div>
+					<div id="pmdsChart" class="col-md-6 col-lg-6 no-padding chart-block"></div>
+				</div>
+			</div>
+			<div class="bottom-part">
+				<div class="row no-margin">
+					<div class="col-md-12 col-lg-12 no-padding text-center chart-title">COUNTRY PARTICIPANTS & PMDs</div>
+				</div>
+				<div class="bar-tooltip row">
+					<div class="col-md-3 col-lg-3 no-padding s-used">
+						<div class="square-block"><div class="square"></div><div class="square"></div></div>
+					</div>
+					<div class="col-md-4 col-lg-4 no-padding s-available">
+						<div class="square-block"><div class="square"></div><div class="square"></div></div>
+					</div>
+					<div class="col-md-4 col-lg-4 no-padding s-lost">
+						<div class="square-block"><div class="square"></div><div class="square"></div></div>
+					</div>
+				</div>
+				<div class="country-chart">
+					<div class="chart-horizontal-box" v-for="countryChart in countryCharts">
+						<div class="left_part">
+							<div class="parti_top"><span>PARTICIPANT</span><span>{{countryChart.total}}</span></div>
+							<div class="pmds_bottom"><span>PMDs</span><span>{{countryChart.total * countryChart.days}}</span></div>
+						</div>
+						<div class="middle_part">
+							<div class="progress">
+								<div class="progress-bar progress-bar-used" v-chart-ratio="{c: countryChart.used, t: countryChart.total}"><span>{{countryChart.used}}</span></div>
+								<div class="progress-bar progress-bar-available" v-chart-ratio="{c: countryChart.available, t: countryChart.total}"><span>{{countryChart.available}}</span></div>
+								<div class="progress-bar progress-bar-lost" v-chart-ratio="{c: countryChart.lost, t: countryChart.total}"><span>{{countryChart.lost}}</span></div>
+							</div>
+							<div class="progress">
+								<div class="progress-bar progress-bar-used-pmds" v-chart-ratio="{c: countryChart.used, t: countryChart.total}"><span>{{countryChart.used*countryChart.days}}</span></div>
+								<div class="progress-bar progress-bar-available-pmds" v-chart-ratio="{c: countryChart.available, t: countryChart.total}"><span>{{countryChart.available*countryChart.days}}</span></div>
+								<div class="progress-bar progress-bar-lost-pmds" v-chart-ratio="{c: countryChart.lost, t: countryChart.total}"><span>{{countryChart.lost*countryChart.days}}</span></div>
+							</div>
+						</div>
+						<div class="right_part">{{countryChart.name}}</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Program Info -->
+		<div id="program" class="info program-info hidden">
+			<div class="row no-margin">
+				<div class="col-md-6 col-lg-6 no-padding"><h4 class="content-title">Program</h4></div>	
+				<div class="col-md-6 col-lg-6 no-padding">
+					<div class="input-group full-width">
+						<input id="query" type="text" maxlength="50" class="form-control search-input" placeholder="" v-model="query" @keyup.enter="searchProgram">
+						<i class="icon-search" @click.top="searchProgram"></i>
+					</div>
+				</div>
+				<div class="row no-padding no-margin">
+					<div class="col-md-12 col-lg-12 min-height no-padding">
+						<div class="list-group no-margin">
+							<div class="event-block" v-for="event in eventList | orderBy 'startTime'">
+								<div class="event-title">
+									<img alt="Event Logo" :src="event.eventLogo?event.eventLogo:'./images/CommunityWeekLogo.png'">
+									<span class="event-name">{{event.eventName}}</span><span class="event-divide">|</span><span class="event-period">{{[event.startTime, event.endTime] | formatDate}}</span>
+								</div>
+								<a @click.stop.prevent="showDetail(event, $index)"
+									v-for="program in event.results" class="list-group-item"
+									:class="{'active':$index==selectedProgramIndex}">
+									<h4 class="list-group-item-heading">{{program.courseName}}</h4>
+									<div class="list-group-item-text">
+										<span class="item p-day">{{[program.startTime,
+											program.endTime] | formatDate}}</span> <span class="item p-duration">{{program.duration}}
+											Days</span> <span class="item p-pmds">{{program.pmds}}</span> <span
+											class="item p-seats"> <span class="bg-progress">
+												<span class="progress-bar remaining-progress"
+												v-remaining-progress="{p: program.remainedSeats, t:program.seats}"></span>
+										</span>{{program.remainedSeats}}/{{program.seats}}
+										</span>
+									</div>
+								</a>
+							</div>
+							<div class="no-record" v-show="noRecord">No Program Found</div>
+						</div>
+						<pagination-component v-show="pagination" :page="page"></pagination-component>
+					</div>
+				</div>
+				<a class="gotop-btn" href="javascript:;" @click.prevent="gotop"></a>
+			</div>
+		</div>
+		<!-- Program Info -->
+		
+		<!-- History Info -->
+		<div id="history" class="info history-info hidden">
+			<div class="row no-margin">
+				<div class="col-md-12 col-lg-12 no-padding"><h4 class="content-title">History</h4></div>
+				<table class="table">
+					<thead><tr>
+							<th></th>
+							<th>Request Time</th>
+							<th>Take In</th>
+							<th>Give Out</th>
+							<th>Seat</th>
+							<th>Swap With</th>
+							<th>Pmd Changed</th>
+							<th>Action By</th>
+							<th></th>
+						</tr></thead>
+					<tbody>
+						<template v-for="operation in operationList">
+							<tr>
+								<td></td>
+								<td>{{operation.action_time | dateTime}}</td>
+								<td class="max-width-300">{{operation.takein_course_name}}</td>
+								<td class="max-width-300">{{operation.giveout_course_name}}</td>
+								<td>{{operation.seats}}</td>
+								<td>{{operation.to_sbu_name}}</td>
+								<td>{{(operation.takein_duration * operation.seats - 
+									  operation.giveout_duration * operation.seats)>0 ? 
+									  "+" + (operation.takein_duration * operation.seats - operation.giveout_duration * operation.seats) : 
+									  (operation.takein_duration * operation.seats - operation.giveout_duration * operation.seats)}}</td>
+								<td>{{operation.action_by}}</td>
+								<td></td>
+							</tr>
+<!-- 							<tr> -->
+<!-- 								<td></td> -->
+<!-- 								<td>{{operation.time}}</td> -->
+<!-- 								<td class="max-width-300">{{operation.returnProgram}}</td> -->
+<!-- 								<td>{{operation.targetSbu}}</td> -->
+<!-- 								<td class="max-width-300">{{operation.returnProgram}}</td> -->
+<!-- 								<td>{{-operation.detail}}</td> -->
+<!-- 								<td></td> -->
+<!-- 							</tr> -->
+						</template>
+					</tbody>
+				</table>
+				<div class="no-record" v-show="noRecord">No Swap Record</div>
+				<pagination-component v-show="pagination" :page="page"></pagination-component>
+			</div>
+		</div>
+		<!-- History Info -->
+	</div>
+	
+	<div id="allInfo" class="fixed-right" v-show="isDetailShow" transition="slideHorizontal">
+		<div class="container">
+			<div class="title">{{selectedProgram?selectedProgram.courseName:""}}</div>
+			<div class="block-info" v-show="noLimitation">
+				<div class="small-title">SBU Seat Remaining And Swap</div>
+				<ul class="list-group no-margin">
+					<li class="list-group-item no-border sbu-item" v-for="otherSbuSeats in otherSbuSeatsList">
+						<span class="name" title="{{otherSbuSeats.sbu_name}}">{{otherSbuSeats.sbu_name}}</span>
+						<span class="bg-progress" v-total-width="otherSbuSeats.seats">
+							<span class="progress-bar remaining-progress" v-remaining-progress="{p: otherSbuSeats.seats-otherSbuSeats.assign_seats, t:otherSbuSeats.seats}"></span>
+						</span>
+						<span class="value">{{otherSbuSeats.seats-otherSbuSeats.assign_seats}}/{{otherSbuSeats.seats}}</span>
+						<span class="swap-btn" @click.stop="swapSeats($index)"></span>
+					</li>
+				</ul>
+			</div>
+			<div class="block-info" v-show="noLimitation">
+				<div class="small-title no-margin-bottom">Remaining Seat 
+					<span>{{countryRemainingSeats}}</span><span>/{{countryTotalSeats}}</span>
+					<div id="errorMsgToast" class="alert alert-danger center-pos" role="alert">{{errorMsg}}</div>
+				</div>
+				<div class="rem-list">
+					<ul id="countryList" class="list-group">
+						<li class="list-group-item c-sbu-item" v-for="country in countrySeatsList">
+							<span class="c-name">{{country.sbu_name}}</span>
+							<span class="pull-right update-number">
+								<span class="icon-blue-desc-20 icon-center" @click.stop="minusCount(country)"></span>
+								<input class="form-control input-style" v-model="country.seats" number readonly>
+								<span class="icon-blue-asc-20 icon-center" @click.stop="plusCount(country)"></span>
+							</span>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="block-info no-horizon-padding">
+				<div class="small-title no-margin">Nomination</div>
+				<div class="small-title no-margin-bottom country-view" v-show="!noLimitation">Remaining Seat <span>{{countryRemainingSeats}}</span><span>/{{countryTotalSeats}}</span></div>
+				
+				<div class="rem-list" v-if="noLimitation">
+					<div class="per-country" v-for="countryInfo in countrySeatsList" v-if="countryInfo.seats">
+						<div class="small-title-bg no-margin">{{countryInfo.sbu_name}}
+							<span class="nominee-add pull-right" @click.stop="addNominee(countryInfo)">ADD</span>
+						</div>
+						<ul class="list-group">
+							<li class="list-group-item no-border nominee-item" v-for="nominee in countryInfo.participantList">
+<!-- 								<img alt="" :src="nominee.headImage?nominee.headImage:'./images/picprofilepicnull.png'"> -->
+								<span>{{nominee.email}}</span>
+								<a class="nominee-delete icon-grey-x-20" @click.stop.prevent="removeNominee(nominee)"></a>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="rem-list" v-else>
+					<div class="per-country">
+						<div class="small-title-bg no-margin">{{currentCountry.countryName}}
+							<span class="nominee-add pull-right" @click.stop="addNominee(currentCountry)">ADD</span>
+						</div>
+						<ul class="list-group">
+							<li class="list-group-item no-border nominee-item" v-for="participant in currentCountry.participantList">
+<!-- 								<img alt="" :src="participant.headImage?participant.headImage:'./images/picprofilepicnull.png'"> -->
+								<span>{{participant.displayName.split(',').reverse().join(' ').trim()}}</span>
+								<a class="nominee-delete icon-grey-x-20" @click.stop.prevent="removeNominee(participant)"></a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="modal fade" id="swapModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">
+						<span>&times;</span>
+					</button>
+					<h4 class="modal-title">swap</h4>
+				</div>
+				<div class="modal-body">
+					<div class="row no-margin swap-form">
+						<div class="col-md-6 col-lg-6 no-padding">
+							<div class="select-row-container">
+								<div class="btn-group">
+									<div class="select-btn no-border">
+										<span class="select-name">My Sbu</span>
+										<span class="select-value">{{currentSbu}}</span>
+									</div>
+								</div>
+								<div class="btn-group">
+									<div class="select-btn no-border">
+										<span class="select-name">My Event</span>
+										<span class="select-value">{{selectedProgram?selectedProgram.event_name:''}}</span>
+									</div>
+								</div>
+								<div class="btn-group">
+									<div class="select-btn no-border">
+										<span class="select-name">My Program</span>
+										<span class="select-value" title="{{selectedProgram?selectedProgram.courseName:''}}">{{selectedProgram?selectedProgram.courseName:""}}</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6 col-lg-6 no-padding">
+							<div class="select-row-container">
+								<div class="btn-group pull-right">
+									<button type="button" class="dropdown-toggle select-btn" data-toggle="dropdown">
+										<span class="select-name">Sbu</span>
+										<span class="select-value">{{selectedSwapSbu.sbu_name}}</span><i class="down-arrow"></i>
+									</button>
+									<ul class="dropdown-menu no-padding">
+										<li v-for="swapSbu in otherSbuSeatsList">
+											<a @click.prevent="selectSwapSbu($index)">{{swapSbu.sbu_name}}</a>
+										</li>
+									</ul>
+								</div>
+								<div class="btn-group pull-right">
+									<button type="button" class="dropdown-toggle select-btn" data-toggle="dropdown">
+										<span class="select-name">Event</span>
+										<span class="select-value"></span><i class="down-arrow"></i>
+									</button>
+									<ul class="dropdown-menu no-padding">
+									</ul>
+								</div>
+								<div id="getPrograms" class="btn-group pull-right">
+									<button type="button" class="dropdown-toggle select-btn" :class="{ 'modalInputAlert' : noSelectProgram }">
+										<span class="select-name">Program</span> 
+										<input class="select-value"
+											placeholder="Please Select Program"  @keyup.stop.enter="filterBlur"
+											v-model="selectedSwapProgram.courseName" @focus='filterFocus'
+											@blur='filterBlur' title="{{selectedSwapProgram.courseName}}">
+									</button>
+									<i class="down-arrow" data-toggle="dropdown" @click="clickDropdown"></i>
+									<ul id="targetProgramList" class="dropdown-menu no-padding">
+										<li v-for="targetProgram in targetSwapPrograms | filterBy selectedSwapProgram.courseName in 'courseName'">
+											<a @click.prevent="selectSwapProgram(targetProgram.courseId, targetProgram.courseName)" title="{{targetProgram.courseName}}">{{targetProgram.courseName}}</a>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="errorMsgToastModal" class="alert alert-danger center-pos modal-pos" role="alert">{{errorMsg}}</div>
+				</div>
+				<div class="modal-footer swap-seats-footer">
+					<div class="text-center">
+						<span class="confirm-swap-text">How many seats do you want to swap</span>
+						<div class="confirm-swap-seats" :class="{ 'modalInputAlert' : isZero }">
+							<span class="icon-blue-desc-20 icon-center show" @click.stop="swapSeatsCount>0 ? swapSeatsCount-- : swapSeatsCount"></span>
+							<input class="form-control select-seats" v-model="swapSeatsCount" number>
+							<span class="icon-blue-asc-20 icon-center show" @click.stop="swapSeatsCount++"></span>
+						</div>
+					</div>
+					<div class="btn-group btn-group-justified btn-action">
+						<div class="btn-group">
+							<button type="button" class="btn btn-takein" @click.stop="confirmSwap(1)">Take In</button>
+						</div>
+						<div class="btn-group">
+							<button type="button" class="btn btn-giveout" @click.stop="confirmSwap(0)">Give Out</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>		
+	</div>
+	
+	<div class="modal fade" id="addNomineeModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">
+						<span>&times;</span>
+					</button>
+					<h4 class="modal-title">Add nomination for {{currentCountry.sbu_name ? currentCountry.sbu_name : currentCountry.countryName}}</h4>
+				</div>
+				<div class="modal-body">
+					<div class="navbar-form no-padding search-form">
+						<div class="form-group input-group nominee-group">
+							<input type="text" class="form-control max-search-input" @keyup.enter="searchParticipant" v-model="employeeSearch">
+							<span class="input-group-addon" data-toggle="dropdown">{{selectedEmailAddress}}
+<!-- 								<i class="down-arrow"></i> -->
+							</span>
+<!-- 							<ul class="dropdown-menu dropdown-menu-right no-padding no-margin email-drop"> -->
+<!-- 								<li><a v-for="email in emails" @click.prevent="selectEmailSuffix($index)">{{email.text}}</a></li> -->
+<!-- 							</ul> -->
+						</div>
+						<i class="icon-grey-cross-33 add-pos" @click.stop="searchParticipant"></i>
+					</div>
+<!-- 					<error-component :warn="error"></error-component> -->
+					<div id="errorToast" class="alert alert-danger" role="alert">{{errorMsg}}</div>
+					<ul class="list-group">
+						<li class="list-group-item no-border nominee-item special" v-for="searchNominee in searchNomineeList">
+<!-- 							<img alt="" :src="searchNominee.headImage?searchNominee.headImage:'./images/picprofilepicnull.png'"> -->
+							<span>{{searchNominee.email}}</span>
+						</li>
+					</ul>
+				</div>
+				<div class="modal-footer add-nominee-footer">
+					<button type="button" class="btn btn-add-nominee" @click.stop="relateParticipant">Done</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="modal fade" id="confirmModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">
+						<span>&times;</span>
+					</button>
+					<h4 class="modal-title">Delete Nominee</h4>
+				</div>
+				<div class="modal-body">
+					<div class="warn-info">Are you sure to delete this nominee ?</div>
+				</div>
+				<div class="modal-footer confirm-footer">
+					<button type="button" class="btn btn-default btn-cancel" data-dismiss="modal">CANCEL</button>
+					<button type="button" class="btn btn-primary btn-confirm" @click.stop="doAction">CONFIRM</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<template id="profile-component-template">
+		<div class="nav navbar-nav logBtn pull-right">
+			<a class="dropdown-toggle"
+				id="logout-btn" data-toggle="dropdown">
+				<span class="profile">
+					<span class="username">Hi, {{user.name | getFirstName}}</span>
+					<img alt="picture" class="profile-photo" :src="user.logo?user.logo:'./images/picprofilepicnull.png'">
+<!-- 					<span class="profile-photo"></span> -->
+					<span class="arrow-down"></span>
+				</span>
+			</a>
+			<ul class="dropdown-menu dropdown-menu-right">
+				<li><a id="logout" href="javascript:;" @click.stop.prevent="logout"> <!-- 								<i class="fa fa-fw fa-power-off"></i>  -->
+						Log Out
+				</a></li>
+			</ul>
+		</div>
+	</template>
+	
+	<template id="pagination-component-template">
+		<div class="row pagination-btns">
+			<div class="col-lg-3 pull-right no-padding">
+				<ul class="pagination pull-right">
+					<li><a id="prePage" class="pre-page" @click.stop.prevent="gotoPrev(page.currentPage)"></a></li>
+					<li class="margin-lr-15"><span id="currentPage">{{page.currentPage}}</span><span>/</span><span id="totalPage">{{page.totalPageNum}}</span></li>
+					<li><a id="nextPage" class="next-page" @click.stop.prevent="gotoNext(page.currentPage)"></a></li>
+				</ul>
+			</div>
+		</div>
+	</template>
+	
+	<template id="error-component-template">
+		<div id="errorToast" class="alert alert-danger" role="alert">{{error.text}}</div>		
+	</template>
+	
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/echarts.js"></script>
+	<script src="js/dateFormat.min.js"></script>
+	<script src="js/vue.js"></script>
+	<script src="js/config.js"></script>
+	<script src="js/utils.js"></script>
+	<script src="js/main.js"></script>
+</body>
+</html>

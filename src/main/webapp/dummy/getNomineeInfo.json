@@ -1,0 +1,16 @@
+{
+	"info": {
+		"code": 200
+	},
+    "result": {
+		"nomineeInfo":{
+			"id": 1,
+			"username":"scurry",
+			"firstName": "Stephen",
+			"lastName": "Curry",
+			"employee_id": "66666_FS"
+			"email": "stephen.curry@capgemini.com",
+			"avatar": null			
+		}
+	}
+}

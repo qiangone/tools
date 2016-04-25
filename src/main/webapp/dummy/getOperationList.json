@@ -1,0 +1,70 @@
+{
+	"info": {
+		"code": 200
+	},
+    "result": {
+		"operationList": [
+			{
+				"id": 1,
+				"time": "2015-7-14 15:33:12",
+				"program":"Game Changers",
+				"returnProgram":"EM Advanced",
+				"programDuration": 6,
+				"returnProgramDuration": 3,
+				"targetSbu": "Apps 2",
+				"swapSeats": 6
+			},
+			{
+				"id": 2,
+				"time": "2015-7-13 12:22:34",
+				"program":"Architecture the Capgemini Way: Level 1",
+				"returnProgram":"EM Advanced",
+				"programDuration": 6,
+				"returnProgramDuration": 8,
+				"targetSbu": "BPO",
+				"swapSeats": 2
+			},
+			{
+				"id": 3,
+				"time": "2015-7-12 13:01:12",
+				"program":"EM Advanced",
+				"returnProgram":"Game Advanced",
+				"programDuration": 2,
+				"returnProgramDuration": 4,
+				"targetSbu": "CC",
+				"swapSeats": 4
+			},
+			{
+				"id": 4,
+				"time": "2015-7-14 15:33:12",
+				"program":"Game Changers",
+				"returnProgram":"EM Advanced",
+				"programDuration": 6,
+				"returnProgramDuration": 6,
+				"targetSbu": "Apps 2",
+				"swapSeats": 6
+			},
+			{
+				"id": 5,
+				"time": "2015-7-14 15:33:12",
+				"program":"Game Changers",
+				"returnProgram":"Architecture the Capgemini Way: Level 1",
+				"programDuration": 1,
+				"returnProgramDuration": 3,
+				"targetSbu": "Apps 2",
+				"swapSeats": 3
+			},
+			{
+				"id": 6,
+				"time": "2015-7-14 15:33:12",
+				"program":"Game Changers",
+				"returnProgram":"Architecture the Capgemini Way: Level 2",
+				"programDuration": 6,
+				"returnProgramDuration": 3,
+				"targetSbu": "Apps 2",
+				"swapSeats": 5
+			}
+		]
+		
+	}
+}

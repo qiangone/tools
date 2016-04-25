@@ -1,0 +1,104 @@
+.btn:active, .btn.active {
+	background-image: none;
+    outline: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.btn-group.open .dropdown-toggle {
+	-webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.input-group-btn button:hover, .input-group-btn button:focus, .open>.dropdown-toggle.btn-default:focus,
+	.open>.dropdown-toggle.btn-default:hover, .open>.dropdown-toggle.btn-default,
+	.input-group-btn>.dropdown-toggle.btn-default:focus, .input-group-btn>.dropdown-toggle.btn-default:hover {
+	background: #f5f5f5;
+    border-color: #e3e6eb;
+    outline: none;
+    box-shadow: none;
+}
+
+.dropdown-menu > li > a {
+	padding: 4px 12px;
+	cursor: pointer;
+}
+
+.modal-footer > button {
+	color: #fff;
+	height: 48px;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.modal-footer.add-nominee-footer, .modal-footer.swap-seats-footer {
+    padding-bottom: 40px;
+    padding-top: 16px;
+}
+
+.modal-footer .btn-add-nominee {
+	background-color: #359df3;
+	width: 100%;
+}
+
+.btn-add-nominee:active:hover, .btn-add-nominee:hover, .btn-add-nominee:focus {
+	background-color: #5cadf2;
+	color: #fff;
+    outline: none;
+	box-shadow: none;
+}
+
+.btn-action button:active:hover, .btn-action button:hover, .btn-action button:focus {
+	color: #fff;
+    outline: none;
+	box-shadow: none;
+	border: none;
+}
+
+.modal-footer .btn-action {
+	margin-top: 30px;
+}
+
+.modal-footer .btn-action button {
+	height: 48px;
+	font-weight: bold;
+	color: #fff;
+	text-transform: uppercase;
+	border: none;
+}
+
+.btn-action .btn-takein {
+	background-color: #6bbc59;
+}
+
+.btn-takein:hover, .btn-takein:focus {
+	background-color: #6bcc59;
+}
+
+.btn-action .btn-giveout {
+	background-color: #ea8e40;
+}
+
+.btn-giveout:hover, .btn-giveout:focus{
+	background-color: #ea7e40;
+}
+
+.btn-action>.btn-group:first-child {
+	padding-right: 24px;
+}
+
+.btn-action>.btn-group:last-child {
+	padding-left: 24px;
+}
+
+.modal-footer .btn-cancel {
+	color: #000;
+	font-weight: normal;
+	margin-right: 10px;
+}
+
+.modal-footer .btn-confirm {
+	background-color: #359df3;
+	border: 0;
+	font-weight: normal;
+}

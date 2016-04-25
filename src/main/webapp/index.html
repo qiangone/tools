@@ -1,0 +1,3742 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+<script src="./js/jquery.min.js"></script>
+
+<script type="text/javascript">
+
+var access_token;
+var host_url=window.location.host;
+
+function loginOauth3(){
+	host_url=window.location.host;
+	var userName = $("#loginusername").val();
+	
+	var passWord = $("#password").val();
+
+	var userInfo = {client_id:"mobile-client",client_secret:"mobile",grant_type:"password",scope:"read write",username:userName,password:passWord};
+	
+
+	   $.ajax({   
+	        type: 'POST', 
+	        data: userInfo,
+	        url: 'http://'+host_url+'/WDApp/oauth/token',
+	        dataType: 'json', 
+	       // contentType: "application/json; charset=utf-8",
+	        beforeSend: function(xhr)
+	        {
+	        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+		      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+	    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+	        	console.log('test');
+	        },
+	        success: function(result){ 
+	        	
+	        	access_token=result.access_token;
+	        	console.log(result);
+	        	// if result is in string type.
+	        },   
+	        error:function(){
+	        	console.log('1');
+		     }  
+	    });
+	}
+	
+	
+function getVarifyNum(){
+	var info = {
+			phoneNumber: "18682265100",
+			type:"2"
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/findPwd/getVerifyNum',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function login(){
+	var info = {
+			phoneNumber: "18682265100",
+			password:"1234562"
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/seller/login',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function getAllProvince(){
+	var info = {
+			shopId: "1"
+	}
+
+	$.ajax({
+		type : 'GET',
+		//data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/address/getAllProvince',
+		dataType : 'json',
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function getSubAreaById(){
+	var info = {
+			shopId: "1"
+	}
+
+	$.ajax({
+		type : 'GET',
+		//data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/address/getSubAreaById?id=17',
+		dataType : 'json',
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+function getDefaultAddress(){
+	var info = {
+			shopId: "1"
+	}
+
+	$.ajax({
+		type : 'GET',
+		//data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/address/getDefaultAddress?userId=1',
+		dataType : 'json',
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function getExpressCompany(){
+	var info = {
+			shopId: "1"
+	}
+
+	$.ajax({
+		type : 'GET',
+		//data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/seller/order/getExpressCompany',
+		dataType : 'json',
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+function setToDefault(){
+	var info = {
+			id:10,
+			userId:1
+
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/address/setToDefault',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+function getLogisticsInfo(){
+	var info = {
+			shopId: "1"
+	}
+
+	$.ajax({
+		type : 'GET',
+		//data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/order/getLogisticsInfo?masterId=2',
+		dataType : 'json',
+		success : function(result) {
+			console.log(result);
+			//console.log("return value 1");
+			//console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+function getAddress(){
+	var info = {
+			shopId: "1"
+	}
+
+	$.ajax({
+		type : 'GET',
+		//data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/address/getAddress?userId=1',
+		dataType : 'json',
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function getCartList(){
+	var info = {
+			shopId: "1"
+	}
+
+	$.ajax({
+		type : 'GET',
+		//data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/cart/getCartList?userId=1',
+		dataType : 'json',
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+
+function updateAddress(){
+	var info = {
+			id:1,
+			province:"update",
+			city:33,
+			district:44,
+			addressDetail:55,
+			contactName:66,
+			contactNumber:77
+
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/address/updateAddress',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+function addAddress(){
+	var info = {
+			userId:1,
+			province:"huang22333",
+			city:33111111,
+			district:44,
+			addressDetail:55,
+			contactName:66,
+			contactNumber:7222227
+
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/address/addAddress',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+function getSellerOrderList(){
+	var info = {
+			shopId:4
+			//keyword:"aaaa",
+			//status:[0,2,3]
+	        //type:6
+			
+
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/seller/order/getOrderList',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function getOrderList(){
+	var info = {
+			userId:1
+			//keyword:"16020210330623612"
+			//status:[0,2,3]
+			
+
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/order/getOrderList',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function getOrder(){
+	var info = {
+			userId:1,
+			province:22,
+			city:33,
+			district:44,
+			addressDetail:55,
+			contactName:66,
+			contactNumber:77
+
+	}
+
+	$.ajax({
+		type : 'GET',
+		//data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/order/getOrderDetail?masterId=2',
+		dataType : 'json',
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function makeOrder(){
+	var info = {
+			"userId":1,
+			"addressId":1,
+			"shopId":4,
+			"comments":"feeeeeeeeeeeeeeeeeee",
+			"charge":111,
+			"cartList":[
+						{
+						  "goodsId":3,
+						  "stockPriceId":9,
+						  "quantity":66
+						},
+						{
+						  "goodsId":4,
+						  "stockPriceId":11,
+						  "quantity":55
+						
+						}
+					]
+
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/order/makeOrder',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+
+function updateCart(){
+	var info = {
+			"userId":1,
+			"cartList":[
+						{
+						  "goodsId":3,
+						  "stockPriceId":null,
+						  "quantity":121
+						},
+						{
+						  "goodsId":null,
+						  "stockPriceId":9,
+						  "quantity":120
+						
+						},
+						{
+						  "goodsId":null,
+						  "stockPriceId":10,
+						  "quantity":122
+						
+						}
+					]
+
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/cart/updateCart',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function addCart(){
+	var info = {
+			userId:1,
+			goodsId:3,
+			stockPriceId:9,
+			quantity:55
+			
+
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/cart/addCart',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+function addAppraisal(){
+	var info = {
+			"appraisalList":[
+						{
+						  "orderDetailId":7,
+						  "level":1,
+						  "contents":"good",
+						  "goodsId":3,
+						  "userId":1
+						},
+						{
+							 "orderDetailId":8,
+							  "level":0,
+							  "contents":"sssssssssssssssssssgood",
+							  "goodsId":5,
+							  "userId":1
+						
+						},
+						{
+							 "orderDetailId":9,
+							  "level":2,
+							  "contents":"not good",
+							  "goodsId":4,
+							  "userId":1
+						
+						}
+					]
+			
+
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/appraisal/addAppraisal',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function getAppraisalList(){
+	var info = {
+			goodsId:4
+			
+			
+
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/appraisal/getAppraisal',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+
+function index(){
+	var info = {
+			shopId: "1",
+			openId:"1001",
+			pageSize:"5"
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/index/getIndex',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+function getGoodsInfoOfIndex(){
+	var info = {
+			shopId: "1",
+			openId:"1001",
+			pageSize:"5"
+	}
+
+	$.ajax({
+		type : 'get',
+		//data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/index/getGoodsInfo?goodsId=12',
+		dataType : 'json',
+		//contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+function getGoodsListforbuyer(){
+	var info = {
+			shopId: "1",
+			keyword:"aaa"
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/index/getGoodsList',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function fillLogistics(){
+	var info = {
+			orderDetailId: "1",
+			expressNumber:"1122222",
+			expressCompany:"aaa"
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/aftersale/fillLogistics',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function getAfterSale(){
+	var info = {
+			shopId: "1"
+	}
+
+	$.ajax({
+		type : 'GET',
+		//data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/aftersale/getAfterSale?orderDetailId=709',
+		dataType : 'json',
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+	
+}
+
+
+
+function getRejectReason(){
+	var info = {
+			type: "1"
+	}
+
+	$.ajax({
+		type : 'GET',
+		//data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/aftersale/getRejectReason?type=1',
+		dataType : 'json',
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+	
+}
+
+
+function getAppeal(){
+	var info = {
+			shopId: "1"
+	}
+
+	$.ajax({
+		type : 'GET',
+		//data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/aftersale/getAppeal?orderDetailId=1',
+		dataType : 'json',
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+	
+}
+
+
+
+function getAllcategoryforbuyer(){
+	var info = {
+			shopId: "1"
+	}
+
+	$.ajax({
+		type : 'GET',
+		//data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/user/index/getAllCategory?shopId=1',
+		dataType : 'json',
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+
+function getCategoryByName(){
+	var info = {
+			name: "fen"
+	}
+
+	$.ajax({
+		type : 'GET',
+		data : info,
+		url : 'http://'+host_url+'/WDApp/api/category/getCategory',
+		//dataType : 'json',
+		//contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function getCategoryById(){
+	var info = {
+			id: "2"
+	}
+
+	$.ajax({
+		type : 'GET',
+		data : info,
+		url : 'http://'+host_url+'/WDApp/api/category/getCategoryById',
+		dataType : 'json',
+		//contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function deleteCategory(){
+	var info = {
+			id: "1"
+	}
+
+	$.ajax({
+		type : 'GET',
+		data : info,
+		url : 'http://'+host_url+'/WDApp/api/category/deleteCategory',
+		dataType : 'json',
+		//contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+function addCategory(){
+	var info = {
+			shopId: "2",
+			name:"test"
+			
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/category/addCategory',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+
+
+
+function updateCategory(){
+	var info = {
+			id:"4",
+			name:"test22223333"
+			
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/category/updateCategory',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+
+
+function putGoodsOnOff(){
+	var info = {
+			id: "2",
+			isOnSale:"1"
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/goods/putGoodsOnOff',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function sendSms(){
+	var info = {
+			phoneNumber: "18682265100",
+			type:"2"
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/sms/send',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+function getGoodsById(){
+	var info = {
+			id: "2"
+	}
+
+	$.ajax({
+		type : 'GET',
+		data : info,
+		url : 'http://'+host_url+'/WDApp/api/goods/getGoodsById',
+		dataType : 'json',
+		//contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function getGoodsList(){
+	var info = {
+		//	currentPage: "1",
+			//pageSize:"2",
+			shopId:"4",
+			sortByStock:"1",
+			//sortByCreatTime:"1",
+			//isOnSale:"0"
+			categoryId:"8",
+			//goodsName:"fs"
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/goods/getGoodsList',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+function deleteGoods(){
+	var info = {
+			id: "1"
+	}
+
+	$.ajax({
+		type : 'GET',
+		data : info,
+		url : 'http://'+host_url+'/WDApp/api/goods/deleteGoods',
+		dataType : 'json',
+		//contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function getAllCategory(){
+	var info = {
+			id: "1"
+	}
+
+	$.ajax({
+		type : 'GET',
+		//data : info,
+		url : 'http://'+host_url+'/WDApp/api/category/getAllCategory',
+		dataType : 'json',
+		//contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+function getSellerInfo(){
+	var info = {
+			sellerId: "4"
+	}
+
+	$.ajax({
+		type : 'GET',
+		data : info,
+		url : 'http://'+host_url+'/WDApp/api/seller/getSellerInfo',
+		dataType : 'json',
+		//contentType:"application/json",   
+		beforeSend: function(xhr)
+	        {
+	        	console.log('access_token'+access_token);
+	        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+	        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+		      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+	    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+	        	console.log('test');
+	        },
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function getShopInfo(){
+	var info = {
+			sellerId: "1111"
+	}
+
+	$.ajax({
+		type : 'GET',
+		data : info,
+		url : 'http://'+host_url+'/WDApp/api/shop/getShopInfo',
+		dataType : 'json',
+		//contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+
+function findPassword(){
+	var info = {
+			phoneNumber: "18682265100",
+			varifyNumber:"428441",
+			password:"newpassword2233332"
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/password/findPassword',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+function updatePassword(){
+	var info = {
+			sellerId: "24",
+			verifyNumber:"324091",
+			oldPassword:"newpassword",
+		    newPassword:"Hzqfss"
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/password/updatePassword',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+	
+	
+function updateSeller(){
+	var info = {
+			id: "1",
+			phoneNumber: "13545545555",
+			email: "tes333322@qq.com"
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/seller/updateSellerInfo',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+function getRegisterVarifyNum(){
+	var info = {
+			phoneNumber: "18682265100",
+			type:"1"
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/sms/sendVerifyNum',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+}
+
+
+	
+function register(){
+	var info = {
+			username: "test03",
+			password: "123456",
+			//phoneNumber: "18682265100",
+			email: "test2222@qq.com",
+			varifyNumber:"324091"
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/WDApp/api/seller/register',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+	}
+	
+function relateParticipant(){
+	var info = {
+			sbuId: "1",
+			courseId: "88",
+			loginName: "zhihuang",
+			displayName: "zhihuang",
+			email:"zhihuang@qq.com"
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/UniversityTool/api/participant/relateParticipant',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+	}
+	
+function swapSeat(){
+	var info = {
+			fromSbuId: "2",
+			toSbuId: "1",
+			courseId1: "87",
+			courseId2: "88",
+			action:"0",
+			seats:"3"
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/UniversityTool/api/sbu/swap',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+	}
+	
+
+
+function countSeats(){
+	var loginuserName = $("#username").val();
+	var userInfo = {userName:loginuserName};		
+	   $.ajax({   
+	        type: 'GET', 
+	        //data: userInfo,
+	        url: 'http://'+host_url+'/UniversityTool/api/sbu/countSeats?sbuId=1&courseId=88',
+	        dataType: 'json', 
+	        beforeSend: function(xhr)
+	        {
+	        	console.log('access_token'+access_token);
+	        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+	        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+		      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+	    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+	        	console.log('test');
+	        },
+	        success: function(result){ 
+	        	console.log('success');
+	        	console.log(result);
+	        },   
+	        error:function(result){
+	        	console.log('error');
+	        	console.log(result);
+		     }  
+	    });
+	}
+
+
+function assignSeats(){
+	var info = {
+			sbuId: "13",
+			courseId: "88",
+			seats: "2"
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/UniversityTool/api/course/assignSeats',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+	}
+	
+	
+function listCourse(){
+	var info = {
+			sbuId: "1",
+			//courseName:"aaaa",
+			currentPage: "1",
+			pageSize: "10"
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/UniversityTool/api/sbu/courseList',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+	}
+function sendCourseMail(){
+	var loginuserName = $("#username").val();
+	var userInfo = {userName:loginuserName};		
+	   $.ajax({   
+	        type: 'POST', 
+	        //data: userInfo,
+	        url: 'http://'+host_url+'/UniversityTool/api/course/testSendMail',
+	        dataType: 'json', 
+	        beforeSend: function(xhr)
+	        {
+	        	console.log('access_token'+access_token);
+	        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+	        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+		      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+	    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+	        	console.log('test');
+	        },
+	        success: function(result){ 
+	        	console.log('success');
+	        	console.log(result);
+	        },   
+	        error:function(result){
+	        	console.log('error');
+	        	console.log(result);
+		     }  
+	    });
+	}
+
+
+function queryParticipant(){
+	var loginuserName = $("#username").val();
+	var userInfo = {userName:loginuserName};		
+	   $.ajax({   
+	        type: 'GET', 
+	        //data: userInfo,
+	        url: 'http://'+host_url+'/UniversityTool/api/participant/query?name=zhihuang',
+	        dataType: 'json', 
+	        beforeSend: function(xhr)
+	        {
+	        	console.log('access_token'+access_token);
+	        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+	        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+		      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+	    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+	        	console.log('test');
+	        },
+	        success: function(result){ 
+	        	console.log('success');
+	        	console.log(result);
+	        },   
+	        error:function(result){
+	        	console.log('error');
+	        	console.log(result);
+		     }  
+	    });
+	}
+
+function getUserInfo(){
+	var loginuserName = $("#username").val();
+	var userInfo = {userName:loginuserName};		
+	   $.ajax({   
+	        type: 'GET', 
+	        data: userInfo,
+	        url: 'http://'+host_url+'/WDApp/ws/user/userinfo',
+	        dataType: 'json', 
+	        beforeSend: function(xhr)
+	        {
+	        	console.log('access_token'+access_token);
+	        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+	        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+		      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+	    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+	        	console.log('test');
+	        },
+	        success: function(result){ 
+	        	console.log('success');
+	        	console.log(result);
+	        },   
+	        error:function(result){
+	        	console.log('error');
+	        	console.log(result);
+		     }  
+	    });
+	}
+
+function getCertificate(){
+	var loginuserName = $("#username").val();
+	var cer_type = $("#cer_type").val();
+	var start_Time = $("#startTime").val();
+	var end_Time = $("#endTime").val();
+	var userInfo = {cerType:cer_type,userName:loginuserName,startTime:start_Time,endTime:end_Time};		
+	   $.ajax({   
+	        type: 'GET', 
+	        data: userInfo,
+	        url: 'http://'+host_url+'/HRApp/ws/doc/getCertificate',
+	        dataType: 'json', 
+	        beforeSend: function(xhr)
+	        {
+	        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+	        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+		      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+	    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+	        	console.log('test');
+	        },
+	        success: function(result){ 
+	        	console.log('success');
+	        	console.log(result);
+	        },   
+	        error:function(){
+	        	console.log('error');
+		     }  
+	    });
+	}
+	
+
+function loginOut(){
+	
+	var userInfo={ userName:$("#username").val()};  
+    
+	   $.ajax({   
+	        type: 'GET', 
+	        data: userInfo,
+	        url: 'http://'+host_url+'/HRApp/ws/user/logout',
+	        dataType: 'json',  
+	        beforeSend: function(xhr)
+	        {
+	        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+	        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+		      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+	    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+	        	console.log('test');
+	        },
+	        success: function(userInfo){  
+		        console.log("return value 1");
+		        console.log(userInfo); 
+		        console.log(JSON.stringify(userInfo))
+	        	console.log("return value 2");    
+	        },   
+	        error:function(userInfo){
+	        	console.log('1');
+		     }  
+		});
+}	
+
+function faqDetail(){
+	
+ 	var faqInfo={faq_id: 7};  
+	   $.ajax({   
+	        type: 'GET', 
+	        data: faqInfo,
+	        url: 'http://'+host_url+'/HRApp/ws/faq/faqDetail',
+	        dataType: 'json',  
+	        beforeSend: function(xhr)
+	        {
+	        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+	        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+		      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+	    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+	        	console.log('test');
+	        },
+	        success: function(result){  
+		        console.log("return value 1");
+		        console.log(result); 
+		        console.log(JSON.stringify(result))
+	        	console.log("return value 2");    
+	        },   
+	        error:function(faqInfo){
+	        	console.log('1');
+		     }  
+		});
+}	
+
+function faqByTypeAndLocation(){
+	
+ 	//var faqInfo={location: 'IN', faqType: 4};  
+    //var faqInfo={location: 'IN', faqType: 2, localHot:1};
+     var faqInfo={location: 'IN', globalHot:1};
+ 	//var faqInfo={location: 'IN', faqType: 2, question:"leave"};
+ 	//var faqInfo={location: 'IN', question:"to"};
+	   $.ajax({   
+	        type: 'GET', 
+	        data: faqInfo,
+	        url: 'http://'+host_url+'/HRApp/ws/faq/faqlist',
+	        dataType: 'json',  
+	        beforeSend: function(xhr)
+	        {
+	        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+	        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+		      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+	    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+	        	console.log('test');
+	        },
+	        success: function(result){  
+		        console.log("return value 1");
+		        console.log(result); 
+		        console.log(JSON.stringify(result))
+	        	console.log("return value 2");    
+	        },   
+	        error:function(faqInfo){
+	        	console.log('1');
+		     }  
+		});
+}
+
+function topFaqByTypeAndLocation(){
+	
+ 	//var faqInfo={location: 'IN', faqType: 4};  
+    //var faqInfo={location: 'IN', faqType: 2, localHot:1};
+     var faqInfo={location: 'IN', globalHot:1};
+ 	//var faqInfo={location: 'IN', faqType: 2, question:"leave"};
+ 	//var faqInfo={location: 'IN', question:"to"};
+	   $.ajax({   
+	        type: 'GET', 
+	        data: faqInfo,
+	        url: 'http://'+host_url+'/HRApp/ws/faq/faqTopList',
+	        dataType: 'json',  
+	        beforeSend: function(xhr)
+	        {
+	        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+	        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+		      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+	    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+	        	console.log('test');
+	        },
+	        success: function(result){  
+		        console.log("return value 1");
+		        console.log(result); 
+		        console.log(JSON.stringify(result))
+	        	console.log("return value 2");    
+	        },   
+	        error:function(faqInfo){
+	        	console.log('1');
+		     }  
+		});
+}
+
+
+function certificateCategory(){
+	
+	var categoryInfo={location: 'CH'};  
+    
+	   $.ajax({   
+	        type: 'GET', 
+	        data: categoryInfo,
+	        url: 'http://'+host_url+'/HRApp/ws/faq/certificateCategory',
+	        dataType: 'json',  
+	        beforeSend: function(xhr)
+	        {
+	        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+	        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+		      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+	    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+	        	console.log('test');
+	        },
+	        success: function(result){  
+		        console.log("return value 1");
+		        console.log(result); 
+		        console.log(JSON.stringify(result))
+	        	console.log("return value 2");    
+	        },   
+	        error:function(categoryInfo){
+	        	console.log('1');
+		     }  
+		});
+}	
+
+	function getDummyData() {
+
+		$.ajax({
+			type : 'GET',
+			url : 'http://'+host_url+'/HRApp/rest/emp/dummy',
+			dataType : "jsonp",
+			jsonp : "callback",
+			jsonpCallback : "?",
+			beforeSend : function(xhr) {
+				//xhr.setRequestHeader('Authorization','bearer'+access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('test');
+			},
+			success : function(result) {
+				console.log("return value 1");
+				console.log(result);
+				//  console.log(JSON.stringify(result))
+				console.log("return value 2");
+			},
+			error : function(faqInfo) {
+				console.log('1');
+			}
+		});
+	}
+
+	function getEmpDummyData() {
+
+		$.ajax({
+			type : 'GET',
+			url : 'http://'+host_url+'/HRApp/rest/emp/9999',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				//xhr.setRequestHeader('Authorization','bearer'+access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('test');
+			},
+			success : function(result) {
+				console.log("return value 1");
+				console.log(result);
+				console.log(JSON.stringify(result))
+				console.log("return value 2");
+			},
+			error : function(faqInfo) {
+				console.log('1');
+			}
+		});
+	}
+	
+	function sendMail() {
+
+		var info = {
+				empId: "33333_FS",
+				cerFile: "WILLZHAN_EMPLOYEE_NORMAL_EN.doc",
+			 	startTime: "201503",
+			 	endTime: "201506",
+			 	cerType: "INCOME_PERIOD"
+		}
+
+		$.ajax({
+			type : 'GET',
+			data : info,
+			url : 'http://'+host_url+'/HRApp/ws/mail',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('test');
+			},
+			success : function(result) {
+				console.log("return value 1");
+				console.log(result);
+				console.log("return value 2");
+			},
+			error : function(info) {
+				console.log('1');
+			}
+		});
+
+}
+	function updateMail() {
+
+		var info = {
+				employee_id: "32222_FS",
+				email:"m@capgemini.com"
+		}
+
+		$.ajax({
+			type : 'GET',
+			data : info,
+			url : 'http://'+host_url+'/HRApp/ws/user/update/mail',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('update user mail');
+			},
+			success : function(result) {
+				console.log("return value 1");
+				console.log(result);
+				console.log("return value 2");
+			},
+			error : function(info) {
+				console.log('error');
+			}
+		});
+
+}
+	
+	function updateUser() {
+
+		var info =
+		{
+		    "employee_id": "53206_FS",
+		    "emp_address": "emp adderss",
+		    
+		    "phone": {
+		        "mobile": "11111111"
+		    }
+		}
+
+
+		$.ajax({
+			type : 'GET',
+			data : info,
+			url : 'http://'+host_url+'/HRApp/ws/user/update/user',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('update user info');
+			},
+			success : function(result) {
+				console.log("return value 1");
+				console.log(result);
+				console.log("return value 2");
+			},
+			error : function(info) {
+				console.log('error');
+			}
+		});
+
+}
+	
+	
+function listHistoryAddress() {
+
+	var info = {
+			employeeId:"11981_FS",
+			
+	}
+	$.ajax({
+		type : 'GET',
+		data : info,
+		url : 'http://'+host_url+'/HRApp/admin/user/listHistoryAddress',
+		dataType : 'json',
+		beforeSend : function(xhr) {
+			xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+			xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+			xhr.setRequestHeader("Access-Control-Max-Age", "60");
+			console.log('update user address');
+		},
+		success : function(result) {
+			console.log("return value 1");
+			console.log(result);
+			console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('error');
+		}
+	});
+
+}listHistoryAddress
+	
+function closeCertRequest() {
+		var request_id = $("#request_id").val();
+		var info = {
+				requestId:request_id
+		}
+
+		$.ajax({
+			type : 'GET',
+			data : info,
+			url : 'http://'+host_url+'/HRApp/admin/certificate/closeCertReq',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('test');
+			},
+			success : function(result) {
+				console.log("success");
+				console.log(result);
+			},
+			error : function(info) {
+				console.log('error');
+			}
+		});
+
+    }
+	
+	function getCertRequest() {
+		var request_id = $("#request_id").val();
+		var info = {
+				requestId:request_id
+		}
+
+		$.ajax({
+			type : 'GET',
+			data : info,
+			url : 'http://'+host_url+'/HRApp/admin/certificate/getCertificateByReqId',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('test');
+			},
+			success : function(result) {
+				console.log("success");
+				console.log(result);
+			},
+			error : function(info) {
+				console.log('error');
+			}
+		});
+
+    }
+	
+	function listCertReq() {
+ 		var req_status = $("#request_status").val(); 
+ 		var page_Num = $("#page_num").val(); 
+ 		var page_Size = $("#page_size").val(); 
+		var info = {
+		        status:req_status,
+				currentPage:page_Num,
+				pageSize:page_Size
+		}
+
+		$.ajax({
+			type : 'GET',
+			data : info,
+			url : 'http://'+host_url+'/HRApp/admin/certificate/listPageCertReqWithStatus',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('test');
+			},
+			success : function(result) {
+				console.log("success");
+				console.log(result);
+			},
+			error : function(info) {
+				console.log('error');
+			}
+		});
+
+    }
+	
+	function searchCertReq() {
+ 		var req_status = $("#request_status").val(); 
+ 		var page_Num = $("#page_num").val(); 
+ 		var page_Size = $("#page_size").val(); 
+ 		var con = $("#condition").val(); 
+		var info = {
+		        status:req_status,
+		        currentPage:page_Num,
+				pageSize:page_Size,
+				query:con,
+				location:"CH"
+		}
+
+		$.ajax({
+			type : 'GET',
+			data : info,
+			url : 'http://'+host_url+'/HRApp/admin/certificate/searchPageCertReqWithStatus',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('test');
+			},
+			success : function(result) {
+				console.log("success");
+				console.log(result);
+			},
+			error : function(info) {
+				console.log('error');
+			}
+		});
+
+    }
+	
+	function getCertReqCount() {
+ 		var req_status = $("#request_status").val(); 
+		var info = {
+		        status:req_status
+		}
+
+		$.ajax({
+			type : 'GET',
+			data : info,
+			url : 'http://'+host_url+'/HRApp/admin/certificate/getCertReqCountByStatus',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('test');
+			},
+			success : function(result) {
+				console.log("success");
+				console.log(result);
+			},
+			error : function(info) {
+				console.log('error');
+			}
+		});
+
+    }
+	function getUserSum() {
+		var info = {
+				location:"CH",
+		}
+		
+		$.ajax({
+
+			type: 'GET',
+			data : info,
+			url : 'http://'+host_url+'/HRApp/admin/user/getUserSum',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('test');
+			},
+			success : function(result) {
+				console.log("success");
+				console.log(result);
+			},
+			error : function(info) {
+				console.log('error');
+			}
+		});
+
+    }
+	
+	function listSearchUser() {
+ 		var query = $("#query").val(); 
+		var info = {
+				pageSize:5,
+				currentPage:1,
+				location:"CH",
+				query: query
+		}
+		
+		$.ajax({
+
+			type: 'GET',
+			data : info,
+			url : 'http://'+host_url+'/HRApp/admin/user/listUser',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('test');
+			},
+			success : function(result) {
+				console.log("success");
+				console.log(result);
+			},
+			error : function(info) {
+				console.log('error');
+			}
+		});
+
+    }
+	
+	function exportExcel() {
+ 		var loc = $("#location").val(); 
+ 		var con = $("#condition").val(); 
+		var info = {
+				location:loc,
+				condition:con
+		}
+
+		$.ajax({
+			type : 'GET',
+			data : info,
+			url : 'http://'+host_url+'/HRApp/admin/user/exportUserInfo',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('test');
+			},
+			success : function(result) {
+				console.log("success");
+				console.log(result);
+			},
+			error : function(info) {
+				console.log(info);
+			}
+		});
+
+    }
+	
+	function showUserInfo() {
+		var info = {
+				employee_id:"",
+				email:"anice@capgemini.com"
+				
+		}		
+	   $.ajax({   
+	        type: 'GET', 
+	        data: info,
+	        url: 'http://'+host_url+'/HRApp/helpdesk/user/showUserInfo',
+	        dataType: 'json', 
+	        beforeSend: function(xhr)
+	        {
+	        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+	        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+		      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+	    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+	        	console.log('test');
+	        },
+	        success: function(result){ 
+	        	console.log('success');
+	        	console.log(result);
+	        },   
+	        error:function(info){
+	        	console.log('error');
+			}  
+		});
+	}
+	
+	function getCertReqByEmpIdOrEmail() {
+
+ 		var page_Num = $("#page_num").val(); 
+ 		var page_Size = $("#page_size").val(); 
+ 		var info = {
+				employee_id:"44444_FS",
+				email:"",
+				currentPage:page_Num,
+				pageSize:page_Size
+				
+		}
+	   $.ajax({   
+	        type: 'GET', 
+	        data: info,
+	        url: 'http://'+host_url+'/HRApp/helpdesk/certificate/getCertReqByEmpIdOrEmail',
+	        dataType: 'json', 
+	        beforeSend: function(xhr)
+	        {
+	        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+	        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+		      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+	    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+	        	console.log('test');
+	        },
+	        success: function(result){ 
+	        	console.log('success');
+	        	console.log(result);
+	        },   
+	        error:function(info){
+	        	console.log('error');
+		     }  
+	    });
+	}
+	
+	function cancelCertReq() {
+		var info = {
+				request_id:"34",
+				modifiedBy:"janice"
+				
+		}		
+	   $.ajax({   
+	        type: 'GET', 
+	        data: info,
+	        url: 'http://'+host_url+'/HRApp/helpdesk/certificate/cancelCertReq',
+	        dataType: 'json', 
+	        beforeSend: function(xhr)
+	        {
+	        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+	        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+		      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+	    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+	        	console.log('test');
+	        },
+	        success: function(result){ 
+	        	console.log('success');
+	        	console.log(result);
+	        },   
+	        error:function(info){
+	        	console.log('error');
+		     }  
+	    });
+	}
+
+	function markDelete() {
+		var info = {
+				employeeId:"12999_FS",
+				approvedBy:"janice"
+				
+		}		
+	   $.ajax({   
+	        type: 'GET', 
+	        data: info,
+	        url: 'http://'+host_url+'/HRApp/admin/user/markDelete',
+	        dataType: 'json', 
+	        beforeSend: function(xhr)
+	        {
+	        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+	        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+		      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+	    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+	        	console.log('test');
+	        },
+	        success: function(result){ 
+	        	console.log('success');
+	        	console.log(result);
+	        },   
+	        error:function(info){
+	        	console.log('error');
+		     }  
+	    });
+	}
+
+	function listUpdatedBankAccount() {
+		var page_Num = $("#page_num").val(); 
+ 		var page_Size = $("#page_size").val(); 
+ 		var info = {
+				currentPage:page_Num,
+				pageSize:page_Size
+				
+		}	
+	   $.ajax({   
+	        type: 'GET', 
+	        data: info,
+	        url: 'http://'+host_url+'/HRApp/admin/user/listUpdatedBankAccount',
+	        dataType: 'json', 
+	        beforeSend: function(xhr)
+	        {
+	        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+	        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+		      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+	    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+	        	console.log('test');
+	        },
+	        success: function(result){ 
+	        	console.log('success');
+	        	console.log(result);
+	        },   
+	        error:function(info){
+	        	console.log('error');
+		     }  
+	    });
+	}
+	
+	
+	function getChatList() {
+		var searchId = $("#searchId").val();
+ 		var page_Num = $("#chatpage_num").val(); 
+ 		var page_Size = $("#chatpage_size").val(); 
+		var info = {
+				searchId:searchId,
+				currentPage:page_Num,
+				pageSize:page_Size
+		}
+
+		$.ajax({
+			type : 'GET',
+			data : info,
+			url : 'http://'+host_url+'/HRApp/helpdesk/chatHistory/getChatList',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('test');
+			},
+			success : function(result) {
+				console.log("success");
+				console.log(result);
+			},
+			error : function(info) {
+				console.log('error');
+			}
+		});
+
+    }
+	
+	function getChatDetail() {
+		var sessionId = $("#searchId").val();
+		var info = {
+				sessionId:sessionId
+		}
+
+		$.ajax({
+			type : 'GET',
+			data : info,
+			url : 'http://'+host_url+'/HRApp/helpdesk/chatHistory/getChatDetail',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('test');
+			},
+			success : function(result) {
+				console.log("success");
+				console.log(result);
+			},
+			error : function(info) {
+				console.log('error');
+			}
+		});
+
+    }
+	
+	function getUserInfoFromHR(){
+		var loginuserName = $("#HRusername").val();
+		var userInfo = {userName:loginuserName};		
+		   $.ajax({   
+		        type: 'GET', 
+		        data: userInfo,
+		        url: 'http://'+host_url+'/HRApp/admin/user/userinfo',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	
+	function getUserInfoForLeave(){
+ 		var info = {
+ 				userName:"kuyang",
+ 				userId:14,
+ 				year:2015
+				
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/userinfo',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	function getRequestDetailForLeave(){
+		
+		var userId = $("#requestIdd").val();
+ 		var info = {
+ 				requestId:userId
+				
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/detail',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	function getRequesthistoryForLeave(){
+		
+		var userId = $("#userId").val();
+ 		var year = $("#year").val(); 
+
+ 		
+ 		var info = {
+ 				userId:userId,//14
+ 				year:year
+				
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/history',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	function cancelRequestForLeave(){
+		
+		var reqId = $("#cancelRequestId").val(); 
+		
+ 		var info = {
+ 				id:reqId
+				
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/cancel',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	function generateLeaveSummaryByYear(){
+ 		var info = {
+ 				year:2015
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/generateSummaryByYear',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	function submitRequest(){
+		
+		var userId = $("#submitUserId").val();
+ 		var leaveTypeId = $("#leaveTypeId").val(); 
+		
+ 		var info = {
+ 				year:2015,
+ 				applyDate:"2015/08/13",
+ 				startDate:"2015/09/01",
+ 				startRange:0,
+ 				endDate:"2015/10/01",
+ 				endRange:0,
+ 				comment:"home leave",
+ 				certification:true,
+ 				userId:userId,
+ 				leaveTypeId:leaveTypeId//,
+ 				//uploadfile1:null
+//  				applyUser:{
+//  					user_id:14
+//  				},
+//  				leaveType:{
+//  					id:1
+//  				}
+ 				
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/submit',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	
+	function getRequestHistoryBySupervisor(){
+		
+		var userId = $("#userId").val();
+ 		var year = $("#year").val(); 
+ 		var flg = $("#flg").val(); 
+ 		
+ 		var info = {
+ 				userId:userId,//14
+ 				year:year,
+ 				flg:flg
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/superhistory',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	
+	function approveLeaveRequestBySupervisor(){
+		
+		var userId = $("#requestId").val();
+ 		var year = $("#approverComment").val(); 
+
+ 		
+ 		var info = {
+ 				requestId:userId,//14
+ 				approverComment:year
+				
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/superapprove',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	function rejectLeaveRequestBySupervisor(){
+		
+		var userId = $("#requestId").val();
+ 		var year = $("#approverComment").val(); 
+
+ 		var info = {
+ 				requestId:userId,//14
+ 				approverComment:year
+				
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/superreject',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	function isSupervisor(){
+
+		var employeeId = $("#employeeId").val();
+ 		var info = {
+ 				employeeId:employeeId,
+				
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/issupervisor',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	function getNotificationsByApplyUser(){
+		
+		var userId = $("#userId").val();
+ 		var year = $("#year").val(); 
+
+ 		
+ 		var info = {
+ 				userId:userId,//14
+ 				year:year
+				
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/employeenotifications',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	function getNotificationsBySupervisor(){
+		
+		var userId = $("#userId").val();
+ 		var year = $("#year").val(); 
+
+ 		
+ 		var info = {
+ 				userId:userId,//14
+ 				year:year
+				
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/supernotifications',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	function delNotificationsByUser(){
+		
+		var userId = $("#requestId").val();
+
+ 		var info = {
+ 				notificationId:userId//1
+				
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/delnotifications',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	function getRequestHistoryByHD(){
+		
+		var year = $("#KinIDMail").val(); 
+
+ 		var info = {
+ 				searchId:year
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/hdhistorybymail',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	function approveRequestByHelpDesk(){
+		
+		var reqId = $("#requestId").val();
+ 		var comment = $("#approverComment").val(); 
+ 		var userId = $("#userIdd").val(); 
+ 		
+ 		var info = {
+ 				requestId:reqId,
+ 				erComment:comment,
+ 				user_id:userId
+
+		}				
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/helpdeskapprove',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	function rejectRequestByHelpDesk(){
+		
+		var reqId = $("#requestId").val();
+ 		var comment = $("#approverComment").val(); 
+ 		var userId = $("#userIdd").val(); 
+ 		
+
+ 		var info = {
+ 				requestId:reqId,
+ 				erComment:comment,
+ 				user_id:userId
+
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/helpdeskreject',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	
+	
+		function getRequestHistoryByHDOPENCLOSE(){
+
+ 		var page_Num = $("#page_num1").val(); 
+ 		var page_Size = $("#page_size1").val(); 
+ 		var reqStatus = $("#reqStatus").val(); 
+		var info = {
+				currentPage:page_Num,
+				pageSize:page_Size,
+				reqStatus:reqStatus
+		}		
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/helpdesk/leave/hdhistory',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	
+	function getUserReport(){
+
+ 		var leaveTypeId = $("#leaveTypeIdReport").val(); 
+ 		var year = $("#year").val(); 
+ 		var month = $("#month").val(); 
+
+ 		var page_Num = $("#page_num2").val(); 
+ 		var page_Size = $("#page_size2").val(); 
+ 		
+ 		var info = {
+ 				year:year,
+ 				month:month,
+ 				leaveTypeId:leaveTypeId,
+				pageNum:page_Num,
+				pageSize:page_Size
+
+		}		
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/getreport',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	function getRequestDetailForPC(){
+		
+		var userId = $("#requestIdd").val();
+ 		var info = {
+ 				requestId:userId
+				
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/pcdetail',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	
+	function getLeaveSummaryByYear(){
+		
+		var userName = $("#summaryuserName").val(); 
+		var year = $("#summaryyear").val(); 
+ 		var info = {
+ 				userName:userName,
+ 				year:year
+				
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/getSummaryByYear',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	function generateSummaryByYear(){
+
+ 		var info = {
+ 				year:2015
+				
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/generateSummaryByYear',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	
+	function getrequesttypelist(){
+
+ 		var info = {
+				
+		}			
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/getrequesttypelist',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+	
+	function exportUserInfo(){
+
+ 		var leaveTypeId = $("#leaveTypeIdReport").val(); 
+ 		var year = $("#year").val(); 
+ 		var month = $("#month").val(); 
+
+ 		var page_Num = $("#page_num2").val(); 
+ 		var page_Size = $("#page_size2").val(); 
+ 		
+ 		var info = {
+ 				year:year,
+ 				month:month,
+ 				leaveTypeId:leaveTypeId,
+				pageNum:page_Num,
+				pageSize:page_Size
+
+		}		
+		   $.ajax({   
+		        type: 'GET', 
+		        data: info,
+		        url: 'http://'+host_url+'/HRApp/ws/leave/employee/exportUserInfo',
+		        dataType: 'json', 
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){ 
+		        	console.log('success');
+		        	console.log(result);
+		        },   
+		        error:function(){
+		        	console.log('error');
+			     }  
+		    });
+		}
+	
+
+	function getFAQTypeList(){
+		
+		var faqInfo={location: 'IN',id:3};  
+	    
+		   $.ajax({   
+		        type: 'GET', 
+		        data: faqInfo,
+		        url: 'http://'+host_url+'/HRApp/ws/faq/faqTypelist',
+		        dataType: 'json',  
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){  
+			        console.log("return value 1");
+			        console.log(result); 
+			        console.log(JSON.stringify(result))
+		        	console.log("return value 2");    
+		        },   
+		        error:function(faqInfo){
+		        	console.log('1');
+			     }  
+			});
+	}	
+
+	function getFAQTypeListForPC(){
+		
+		var faqInfo={location: 'IN'};  
+	    
+		   $.ajax({   
+		        type: 'GET', 
+		        data: faqInfo,
+		        url: 'http://'+host_url+'/HRApp/ws/faq/faqTypelistforPC',
+		        dataType: 'json',  
+		        beforeSend: function(xhr)
+		        {
+		        	xhr.setRequestHeader('Authorization','bearer'+access_token);
+		        	xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+			      	xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+		    	  	xhr.setRequestHeader("Access-Control-Max-Age", "60");
+		        	console.log('test');
+		        },
+		        success: function(result){  
+			        console.log("return value 1");
+			        console.log(result); 
+			        console.log(JSON.stringify(result))
+		        	console.log("return value 2");    
+		        },   
+		        error:function(faqInfo){
+		        	console.log('1');
+			     }  
+			});
+	}	
+	
+	function updatePI() {
+		 
+		var personalInfo = {
+			    employeeId: "12321_FS",
+			    addressName: "big ro street",
+			    bankName:"aaa",
+			    bankAccount:"",
+			    email:"aaaaaa@yahoo.cn",
+			    mobile:"12134435355",
+ 			    landline:"0571-6264894",
+			    emgName:"bubu",
+ 			    emgPhone:"15151515151",
+			    emgRelationship:"father",
+			    emgEmail:"fasdaas@ff.cn",
+			   	//updateTime:"2015/06/02",
+			   	//approvedTime:"201506",
+			   		adderssChangeFlg:false
+			   //,
+			    	/*
+			    	 updateTime:""
+			     approvedTime:"",
+			   , 
+			    adderssChangeFlg:""*/   
+			    
+		};
+		$.ajax({
+			type : 'GET',
+			data : personalInfo,
+			url : 'http://'+host_url+'/HRApp/ws/user/update/updatePI',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('update user address');
+			},
+			success : function(result) {
+				console.log("return value 1");
+				console.log(result);
+				console.log("return value 2");
+			},
+			error : function(info) {
+				console.log('error');
+			}
+		});
+
+}
+	
+	
+	function getEmployeesToHR() {
+		 
+		var personalInfo = {
+		    
+		};
+		$.ajax({
+			type : 'GET',
+			data : personalInfo,
+			url : 'http://'+host_url+'/HRApp/admin/user/migrateData',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('update user address');
+			},
+			success : function(result) {
+				console.log("return value 1");
+				console.log(result);
+				console.log("return value 2");
+			},
+			error : function(info) {
+				console.log('error');
+			}
+		});
+
+}
+	
+	function updateEmployeeToHR() {
+		 
+		var personalInfo = {
+		    
+		};
+		$.ajax({
+			type : 'GET',
+			data : personalInfo,
+			url : 'http://'+host_url+'/HRApp/admin/user/updateDatas',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('update user address');
+			},
+			success : function(result) {
+				console.log("return value 1");
+				console.log(result);
+				console.log("return value 2");
+			},
+			error : function(info) {
+				console.log('error');
+			}
+		});
+
+}
+	
+	
+	function updateSpecifyEmployeeToHR() {
+		 
+		var personalInfo = {
+				empId:'10051_FS',
+				roleId:1
+		};
+		$.ajax({
+			type : 'GET',
+			data : personalInfo,
+			url : 'http://'+host_url+'/HRApp/admin/user/updateSpecifyData',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('update user address');
+			},
+			success : function(result) {
+				console.log("return value 1");
+				console.log(result);
+				console.log("return value 2");
+			},
+			error : function(info) {
+				console.log('error');
+			}
+		});
+
+}
+	
+	function getAccountInfo() {
+		 
+		var personalInfo = {
+				employee_id:'10003_FS'
+		};
+		$.ajax({
+			type : 'GET',
+			data : personalInfo,
+			url : 'http://'+host_url+'/HRApp/ws/user/accountinfo',
+			dataType : 'json',
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader('Authorization', 'bearer' + access_token);
+				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+				xhr.setRequestHeader("Access-Control-Allow-Methods", "GET");
+				xhr.setRequestHeader("Access-Control-Max-Age", "60");
+				console.log('update user address');
+			},
+			success : function(result) {
+				console.log("return value 1");
+				console.log(result);
+				console.log("return value 2");
+			},
+			error : function(info) {
+				console.log('error');
+			}
+		});
+
+}
+</script>
+</head>
+<body>
+	<form action='j_spring_security_check' method="post">
+	user name:<input type="text" name="j_username">
+	password:<input type="password" name="j_password">
+	<input type="submit" name="submit" value="LoginPc" />
+	</form>
+
+	<label>choose a image:</label>
+    <input type="file" id="file" />
+	<input type="button" value="uploadPhoto" onclick="#" />
+	<div id="result" ></div>
+
+	<br>
+	user name:<input type="text" id="loginusername">
+	password:<input type="password" id="password">
+	<input type="button" onclick="loginOauth3()" value="loginOauth3" />
+	<br>
+	user name:<input type="text" id="username" placeholder="userName">
+	start date:<input type="text" id="startTime">
+	end date:<input type="text" id="endTime">
+	<br>
+	<input type="button" onclick="login()" value="login" />
+	
+	<br>
+	<input type="button" onclick="getUserInfo()" value="Get User Info" />
+	<br>
+	
+		<input type="button" onclick="queryParticipant()" value="query participant" />
+	<br>
+		
+		<input type="button" onclick="swapSeat()" value="swap participant" />
+	<br>
+	<input type="button" onclick="relateParticipant()" value="relateParticipant" />
+	<br>
+	
+	<input type="button" onclick="listCourse()" value="listCourse" />
+	<br>
+	
+	<input type="button" onclick="sendCourseMail()" value="sendCourseMail" />
+	<br>
+	
+	<input type="button" onclick="assignSeats()" value="assignSeats" />
+	<br>
+	
+	
+	<input type="button" onclick="countSeats()" value="countSeats" />
+	<br>
+	
+	
+	<input type="button" onclick="index()" value="Get index" />
+	<br>
+	<input type="button" onclick="getGoodsInfoOfIndex()" value="getGoodsInfoOfIndex" />
+	<br>
+		<input type="button" onclick="addAppraisal()" value="addAppraisal" />
+	<br>
+		<input type="button" onclick="getAppraisalList()" value="getAppraisalList" />
+	<br>
+	
+		<input type="button" onclick="addAddress()" value="add address" />
+	<br>
+	<input type="button" onclick="updateAddress()" value="update address" />
+	<br>
+	
+	
+	<input type="button" onclick="addCart()" value=" addCart" />
+	<br>
+	<input type="button" onclick="updateCart()" value=" updateCart" />
+	<br>
+	<input type="button" onclick="makeOrder()" value=" makeOrder" />
+	<br>
+	<input type="button" onclick="getOrder()" value=" getOrderdetail" />
+	<br>
+	<input type="button" onclick="getOrderList()" value=" getOrderList" />
+	<br>
+	<input type="button" onclick="getSellerOrderList()" value=" getSellerOrderList" />
+	<br>
+	
+	<input type="button" onclick="getLogisticsInfo()" value="getLogisticsInfogetLogisticsInfogetLogisticsInfogetLogisticsInfo address" />
+	<br>
+	<input type="button" onclick="getAddress()" value="get address" />
+	<br>
+	<input type="button" onclick="setToDefault()" value="setToDefault" />
+	<br>
+	
+	
+	
+	<input type="button" onclick="getDefaultAddress()" value="getDefaultAddress address" />
+	<br>
+		<input type="button" onclick="getExpressCompany()" value="getExpressCompany" />
+	<br>
+	
+	
+	<input type="button" onclick="getAllProvince()" value="get getAllProvince" />
+	<br>
+	<input type="button" onclick="getSubAreaById()" value="get getSubAreaById" />
+	<br>
+	
+	<input type="button" onclick="getCartList()" value="get getCartList" />
+	<br>
+	
+	
+	<input type="button" onclick="getGoodsListforbuyer()" value="getGoodsListforbuyer" />
+	<br>
+	<input type="button" onclick="getAllcategoryforbuyer()" value="getAllcategoryforbuyer" />
+	<br>
+	
+	
+		<input type="button" onclick="getRegisterVarifyNum()" value="getRegisterVarifyNum" />
+	
+	<br>
+		<input type="button" onclick="register()" value="register seller" />
+	<br>
+		<input type="button" onclick="updateSeller()" value="update seller" />
+	<br>	<input type="button" onclick="getSellerInfo()" value="getSellerInfo" />
+	<br>
+	
+	
+			<input type="button" onclick="getVarifyNum()" value="get varify num" />
+	<br>
+	<input type="button" onclick="findPassword()" value="findPassword" />
+	<br>
+	<input type="button" onclick="updatePassword()" value="updatePassword" />
+	<br>
+	
+		<input type="button" onclick="getShopInfo()" value="get shop info" />
+	<br>
+	
+		<br>
+	
+		<input type="button" onclick="getCategoryById()" value="get category by id" />
+	<br>
+		<input type="button" onclick="getCategoryByName()" value="get category by name" />
+	<br>
+	<input type="button" onclick="deleteCategory()" value="delete category " />
+	<br>
+	
+	
+	<input type="button" onclick="addCategory()" value="add category " />
+	<br>
+		<input type="button" onclick="updateCategory()" value="update category " />
+	<br>
+		<input type="button" onclick="deleteGoods()" value="delete Goods " />
+	<br>
+	
+			<input type="button" onclick="getGoodsById()" value="getGoodsById " />
+			
+	<br>
+	<input type="button" onclick="putGoodsOnOff()" value="putGoodsOnOff " />
+			
+	<br>
+	
+	<input type="button" onclick="sendSms()" value="sendSms " />
+			
+	<br>
+	
+	
+	
+	<input type="button" onclick="getGoodsList()" value="getGoodsList " />
+	<br>
+	<form action="/WDApp/api/goods/addGoods" method="post" enctype="multipart/form-data" id="addGoodsform" target="myIframe">
+         
+           <input type="hidden" name="name"  value="fsafsd">
+            <input type="hidden" name="shopId"  value="1">
+            <input type="hidden" name="specNameFirst"  value="first1">
+            <input type="hidden" name="specNameSecond"  value="1second">
+            <input type="hidden" name="specNameThird"  value="1third">
+            <!-- <input type="hidden" name="price"  value="12.52">
+            <input type="hidden" name="quantity"  value="100"> -->
+            <input type="hidden" name="description"  value="description">
+            <!-- goods category -->
+             <input type="hidden" name="categoryList[0].id" value="1">
+             <input type="hidden" name="categoryList[1].id" value="2">
+             
+             <!-- goods stockprice -->
+             <input type="hidden" name="stockPriceList[0].specValueFirst" value="specValueFirst">
+             <input type="hidden" name="stockPriceList[0].quantity" value="200">
+             <input type="hidden" name="stockPriceList[0].price" value="2.44">
+             <input type="hidden" name="stockPriceList[0].specValueSecond" value="fsa">
+              <input type="hidden" name="stockPriceList[0].specValueThird" value="ffdsafsd">
+              
+             
+             <input type="hidden" name="stockPriceList[1].specValueFirst" value="specValueFirst2222">
+             <input type="hidden" name="stockPriceList[1].quantity" value="400">
+             <input type="hidden" name="stockPriceList[1].price" value="2.58">
+               <input type="hidden" name="stockPriceList[1].specValueSecond" value="fsa">
+              <input type="hidden" name="stockPriceList[1].specValueThird" value="ffdsafsd">
+             
+             <!--  -->
+              <input id="logoImg1" type="file" class="fileField" name="files">
+               <input id="logoImg2" type="file" class="fileField" name="files">
+                <input id="logoImg3" type="file" class="fileField" name="files">
+
+           <input type="submit" name="submit" value="addGoods" />
+    </form>
+    	<br>
+	<form action="/WDApp/api/goods/updateGoods" method="post" enctype="multipart/form-data" target="myIframe">
+           <input type="hidden" name="id"  value="1">
+           <input type="hidden" name="name"  value="fsafsdupdate">
+            <input type="hidden" name="shopId"  value="1">
+            <input type="hidden" name="specNameFirst"  value="first1update">
+            <input type="hidden" name="specNameSecond"  value="1secondupdate">
+            <input type="hidden" name="specNameThird"  value="1thirdupdate">
+            <input type="hidden" name="price"  value="12.521">
+             <input type="hidden" name="quantity"  value="200">
+            <input type="hidden" name="description"  value="descriptionupdate">
+            
+            <input type="hidden" name="categoryList[0].id" value="1">
+             
+             <input type="hidden" name="stockPriceList[0].specValueFirst" value="specValueFirst4">
+             <input type="hidden" name="stockPriceList[0].quantity" value="200">
+             <input type="hidden" name="stockPriceList[0].price" value="2.44">
+             <input type="hidden" name="stockPriceList[1].specValueFirst" value="specValueFirst22224">
+             <input type="hidden" name="stockPriceList[1].quantity" value="400">
+             <input type="hidden" name="stockPriceList[1].price" value="2.58">
+             
+             
+             
+              <input type="hidden" name="excellentNum"  value="3">
+               <input type="hidden" name="mediumNum"  value="4">
+                <input type="hidden" name="badNum"  value="5">
+                 <input type="hidden" name="IsOnSale"  value="1">
+                 
+               <!--    <input id="logoImg1" type="file" class="fileField" name="files">
+               <input id="logoImg2" type="file" class="fileField" name="files">
+                <input id="logoImg3" type="file" class="fileField" name="files">
+ -->
+           <input type="submit" name="submit" value="updateGoods" />
+    </form>
+	<br>
+	
+	
+	
+	<input type="button" onclick="getAllCategory()" value="get all category " />
+	<br>
+	
+	
+	<form action="/WDApp/api/shop/updateShop" method="post" enctype="multipart/form-data" id="myform" target="myIframe">
+           <input id="logoImg" type="file" class="fileField" name="logoImg">
+            <input id="backgImg" type="file" class="fileField" name="backgImg">
+           <input type="hidden" name="name" id="name11" value="555555555555555">
+            <!-- <input type="hidden" name="description" id="description" value="bbbb"> -->
+             <input type="hidden" name="sellerId" id="sellerId" value="6">
+              <!-- <input type="hidden" name="token" id="token" value="token"> 
+               <input type="hidden" name="transportExpense" id="transportExpense" value="1.222">
+                <input type="hidden" name="province" id="province" value=""> -->
+                 <!--    <input type="hidden" name="city" id="city" value="bbb">
+                     <input type="hidden" name="region" id="region" value="cccc">
+                      -->
+           <input type="submit" name="submit" value="updateShopImage" />
+    </form>
+	<br>
+	
+	<form action="/WDApp/api/user/aftersale/applyAfterSale" method="post" enctype="multipart/form-data"  target="myIframe">
+           <input id="attach" type="file" class="fileField" name="attach">
+
+           <input type="hidden" name="orderDetailId" value="1">
+           <input type="hidden" name="type"  value="1">
+           <input type="hidden" name="money"  value="2.55">
+           <input type="hidden" name="isReceived"  value="0">
+           <input type="hidden" name="reason"  value="aaaaaaaaaa">
+           <input type="hidden" name="detail"  value="bbbbbbbbbbbbb">
+           
+             
+           <input type="submit" name="submit" value="applyAfterSale" />
+    </form>
+    <br>
+    	<input type="button" onclick="getAfterSale()" value="get after sale " />
+	<br>
+	<input type="button" onclick="getAppeal()" value="getAppeal " />
+	<br>
+	<input type="button" onclick="getRejectReason()" value="getRejectReason " />
+	<br>
+	
+	<input type="button" onclick="fillLogistics()" value="fillLogistics" />
+	<br>
+	
+	<input type="button" onclick="loginOut()" value="logOut for mobile" />
+	<br>
+	<select id="cer_type">
+	<option value ="3">EMPLOYEE_NORMAL</option>
+	<option value ="4">EMPLOYEE_PERSONALVISA</option>
+	<option value ="5">INCOME_MONTHLY</option>
+	<option value ="6">INCOME_YEARLY</option>
+	<option value ="8">INCOME_CALENDARYEAR</option>
+	<option value ="7">INCOME_PERIOD</option>
+	<option value ="9">Address</option>
+	<option value ="10">Employment</option>
+	
+	</select>
+	<input type="button" onclick="getCertificate()" value="Get Certificate" />
+	
+	<br>
+	
+	<br>
+	<input type="button" onclick="faqByLocation()" value="Get FAQ By Location" />
+	<br>
+	
+	<input type="button" onclick="getDummyData()" value="Get Dummy Data" />
+	<br>
+	<input type="button" onclick="getEmpDummyData()"
+		value="Get emp Dummy Data 9999" />
+	<br>
+	<input type="button" onclick="sendMail()" value="send Mail" />
+	<br>	
+		<input type="button" onclick="updateMail()" value="updateUserMail" />
+	<br>
+	<input type="button" onclick="getCertRequest()" value="Get Cert Request By EMP" />
+	<br>
+	<input type="button" onclick="getOpenCertRequest()" value="Get Open Cert Request" />
+	<br>
+	<input type="button" onclick="closeCertRequest()" value="Close Cert Request" />
+	<br>
+	
+	RequestId:<input type="text" id="request_id">
+	<input type="button" onclick="closeCertRequest()" value="Close Cert Request" />
+	<input type="button" onclick="getCertRequest()" value="Get Cert Request" />
+	<br>	
+	status:<input type="text" id="request_status">
+	page No:<input type="text" id="page_num">
+	page List Size:<input type="text" id="page_size">
+	<input type="button" onclick="listCertReq()" value="List Cert Request" />
+	<input type="button" onclick="searchCertReq()" value="Search Cert Request" />
+	<input type="button" onclick="getCertReqCount()" value="Get Cert Request Count" />
+	<br>
+	<input type="button" onclick="updateUser()" value="updateUser" />
+	updatePI:
+	<br>
+	<input type="button" onclick="updatePI()" value="updatePI" />
+	<br>
+    Location:<input type="text" id="location">
+	Condition:<input type="text" id="condition">
+	<input type="button" onclick="exportExcel()" value="Export User Excel" />
+	<br>Search:<input type="text" id="query"><br>
+	<input type="button" onclick="listSearchUser()" value="listSearchUser" />
+	<br>
+	<input type="button" onclick="listHistoryAddress()" value="listHistoryAddress" />
+	<br>
+	<input type="button" onclick="getUserSum()" value="getUserSum" />
+	<br>
+	<input type="button" onclick="showUserInfo()" value="showUserInfo" />
+	<br>
+	<input type="button" onclick="getCertReqByEmpIdOrEmail()" value="getCertReqByEmpIdOrEmail" />
+	<br>
+	<input type="button" onclick="cancelCertReq()" value="cancelCertReq" />
+	<br>
+	<input type="button" onclick="markDelete()" value="HR cancel bank change notice" />
+	<br>
+	<input type="button" onclick="listUpdatedBankAccount()" value="listUpdatedBankAccount" />
+	<br>
+    SearchId for ChatList / SessionId for ChatDetail:<input type="text" id="searchId">
+	page No:<input type="text" id="chatpage_num">
+	page List Size:<input type="text" id="chatpage_size">
+	<input type="button" onclick="getChatList()" value="ChatList" />
+	<input type="button" onclick="getChatDetail()" value="ChatDetail" />
+	<br>
+    <a href="j_spring_security_logout">LogoutPC</a>  
+	<br>
+	user name from HR search:<input type="text" id="HRusername"><input type="button" onclick="getUserInfoFromHR()" value="getUserInfoFromHR" />
+	<br>
+	Summary:<input type="text" id="HRusername"><input type="button" onclick="getUserInfoForLeave()" value="Summary" />
+	<br>
+	RequestDetail:<input type="text" id="requestIdd" placeholder="requestId">
+	<br>
+	<input type="button" onclick="getRequestDetailForLeave()" value="RequestDetail" />
+	<br>
+	<input type="button" onclick="getRequestDetailForPC()" value="RequestDetailForPC" />
+	<br>
+	Requesthistory:<input type="text" id="userId" placeholder="userId"><input type="text" id="year" placeholder="year"><input type="text" id="flg" placeholder="pending:1 | history:0"><input type="text" id="month" placeholder="month"><input type="text" id="leaveTypeIdReport" placeholder="leaveTypeId">
+	<br><input type="button" onclick="getRequesthistoryForLeave()" value="getEmployeeRequestshistory" />
+	<br><input type="button" onclick="getRequestHistoryBySupervisor()" value="getRequestHistoryBySupervisor" />
+	<br><input type="button" onclick="getNotificationsByApplyUser()" value="getNotificationsByApplyUser" />
+	<br><input type="button" onclick="getNotificationsBySupervisor()" value="getNotificationsBySupervisor" />
+	<br><input type="text" id="page_num2">page List Size:<input type="text" id="page_size2">
+	<input type="button" onclick="exportUserInfo()" value="exportUserInfo" />
+	<input type="button" onclick="getUserReport()" value="getUserReportByHD" />
+	<br><input type="button" onclick="generateSummaryByYear()" value="generateSummaryByYear" />
+	<br>
+	Summary:<input type="text" id="summaryuserName" placeholder="userName"><input type="text" id="summaryyear" placeholder="Year">
+	<br><input type="button" onclick="getLeaveSummaryByYear()" value="getLeaveSummaryByYear" />
+	<br>
+	getRequestHistoryBy_KinID or Mail:<input type="text" id="KinIDMail" placeholder="KinID or Mail">
+	<br><input type="button" onclick="getRequestHistoryByHD()" value="getRequestHistoryByHelpDesk_KinID or Mail" />	
+	<br>
+	getRequestHistoryByHD Open | Close:page No:<input type="text" id="page_num1">page List Size:<input type="text" id="page_size1">Status(Close:1 | Open:0 ):<input type="text" id="reqStatus"><input type="button" onclick="getRequestHistoryByHDOPENCLOSE()" value="getRequestHistoryByHD" />	
+	<br>
+	CancelRequest:<input type="text" id="cancelRequestId" placeholder="RequestId"><input type="button" onclick="cancelRequestForLeave()" value="CancelRequest" />
+	<br>
+	generateLeaveSummaryByYear:<input type="text" id="HRusername"><input type="button" onclick="generateLeaveSummaryByYear()" value="generateLeaveSummaryByYear" />
+	<br>
+	submitRequest:<input type="text" id="submitUserId" placeholder="userId"><input type="text" id="leaveTypeId" placeholder="leaveTypeId"><input type="button" onclick="submitRequest()" value="submitRequest" />
+	<br>
+	approve reject RequestBySupervisor | delete Notifications:
+	<input type="text" id="requestId" placeholder="requestId">
+	<input type="text" id="approverComment" placeholder="approverComment">
+	<input type="text" id="employeeIdd" placeholder="employeeId">
+	<input type="text" id="userIdd" placeholder="userId">
+	<br><input type="button" onclick="approveLeaveRequestBySupervisor()" value="approveLeaveRequestBySupervisor" />
+    <br><input type="button" onclick="rejectLeaveRequestBySupervisor()" value="rejectLeaveRequestBySupervisor" />
+    <br><input type="button" onclick="delNotificationsByUser()" value="delNotificationsByUser" />
+	<br><input type="button" onclick="approveRequestByHelpDesk()" value="approveRequestByHelpDesk" />
+    <br><input type="button" onclick="rejectRequestByHelpDesk()" value="rejectRequestByHelpDesk" />
+
+    <br><input type="button" onclick="certificateCategory()" value="certificateCategory" />
+	<br>
+	isSupervisor:<input type="text" id="employeeId" placeholder="employeeId"><input type="button" onclick="isSupervisor()" value="isSupervisor" />
+	<br>
+	<input type="button" onclick="getrequesttypelist()" value="getrequesttypelist" />
+	<input type="button" onclick="faqByTypeAndLocation()" value="getFAQList for india" />
+	<input type="button" onclick="topFaqByTypeAndLocation()" value="getTOPFAQList for india" />
+	
+	<input type="button" onclick="faqDetail()" value="getFAQDetail" />
+	<input type="button" onclick="getFAQTypeList()" value="getFAQTypeList for india" />
+	<input type="button" onclick="getFAQTypeListForPC()" value="getFAQTypeListForPC for india" />
+	<br><input type="button" onclick="getEmployeesToHR()" value="getEmployeesToHR" />
+	<br><input type="button" onclick="updateEmployeeToHR()" value="updateEmployeeToHR" />
+	<br><input type="button" onclick="updateSpecifyEmployeeToHR()" value="updateSpecifyEmployeeToHR" />
+	<br><input type="button" onclick="getAccountInfo()" value="getAccountInfo" />
+	
+	<h1>How to login</h1>
+	<h3>1. Call below link to get the access token</h3>
+	<br> http://localhost:8080/HRApp/oauth/token
+	<br>
+	<h3>2.and provider below info:</h3>
+	<br>
+	{client_id:"mobile-client",client_secret:"mobile",grant_type:"password",scope:"read
+	write",username:"user",password:"user"}
+	<br>
+	<h3>3.It will return the access token as below:</h3>
+	<br> Object {access_token: "cf8b972c-5ee0-42de-82bf-6a8cb0001f20",
+	token_type: "bearer", expires_in: 1799, scope: "read write"}
+	<br>
+	<h3>4. Then:set the aceess token in request header before you send
+		the request.('Authorization','bearer')</h3>
+	<br>
+	xhr.setRequestHeader('Authorization','bearercf8b972c-5ee0-42de-82bf-6a8cb0001f20');
+	<br>
+	
+</body>
+</html>

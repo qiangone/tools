@@ -1,0 +1,69 @@
+<span style="font-size: 11.0pt; font-family: Calibri">
+   <p style='margin-right: 0cm; margin-left: 0cm; line-height: 15.0pt; font-size: 9.0pt; font-family: "Verdana", "sans-serif"; color: #666666;'>
+		<span style="font-size: 11.0pt">THIS IS AN AUTOMATED
+			E-MAIL,PLEASE DO NOT REPLY TO THIS E-MAIL</span>
+	</p>Dear ${toName},<br /> <br />${content}<br /> <br />Here is the details:
+	<h4>Leave Request</h4>
+	<table
+		style="border-collapse: collapse; border-width: 1; font-size: 11.0pt; font-family: Calibri, sans-serif; border: 1.0pt solid #4F81BD; width: 1000px; background-color: White;">
+		<tr
+			style='border: none; background: #4F81BD; color: White; text-align: left;'>
+			<td><b>Event Name</b></td>
+			<td><b>Course Name</b></td>
+			<td><b>Start Time</b></td>
+			<!--<td><b>End Time</b></td>-->
+			<td><b>Duration</b></td>
+			<td><b>Seats</b></td>
+			<td><b>Pmds</b></td>
+			<td><b>Assign Seats</b></td>
+			<td><b>Assign Pmds</b></td>
+			<td><b>Left Seats</b></td>
+			
+		</tr>
+	
+		 #foreach($mail in $courseList)
+		<tr>
+			<td><i>${mail.event_name}</i></td>
+			<td><i>${mail.name}</i></td>
+			<td><i>${mail.start_time}</i></td>
+			<!--<td><i>${mail.end_time}</i></td>-->
+			<td><i>${mail.duration}</i></td>
+			<td><i>${mail.seats}</i></td>
+			<td><i>${mail.pmds}</i></td>
+			<td><i>${mail.assign_seats}</i></td>
+			<td><i>${mail.assign_pmds}</i></td>
+			<td style='border: none; background: #4F112D; color: White; text-align: left;'><i>${mail.remainning_seats}</i></td>
+		</tr>
+		 #end
+
+	</table>
+	<!--
+	<h4>User message</h4>
+	<table
+		style="border-collapse: collapse; border-width: 1; font-size: 11.0pt; font-family: Calibri, sans-serif; border: 1.0pt solid #4F81BD; width: 500px; background-color: White;">
+		<tr>
+			<td><i>${leaveRequest.comment}</i></td>
+		</tr>
+	</table>
+	
+
+  
+	<h4>Team Leader message</h4>
+	<table
+		style="border-collapse: collapse; border-width: 1; font-size: 11.0pt; font-family: Calibri, sans-serif; border: 1.0pt solid #4F81BD; width: 500px; background-color: White;">
+		 #foreach($mail in $courseList)
+		<tr>
+			<td><i>${mail.name}</i></td>
+			<td><i>${mail.event_name}</i></td>
+			<td><i>${mail.start_time}</i></td>
+		</tr>
+		 #end
+	</table>
+  
+	-->
+  
+	
+	 <br />Click <a href='http://chinaholidaybooking.fs.capgemini.com:8080'><b>here</b>
+</a> to log on the system.<br /> <br />Regards,<br /> <br /> <b><span
+		style="font-size: 12.0pt; font-family: Calibri, sans-serif; color: #1F497D">China
+			Holiday Booking System</span> </b> </span>

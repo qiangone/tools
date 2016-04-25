@@ -1,0 +1,139 @@
+.modal-dialog {
+	width: 1000px;	
+}
+
+#addNomineeModal .modal-dialog {
+	width: 525px;
+}
+
+#confirmModal .modal-dialog {
+	width: 600px
+}
+
+.modal-header {
+    color: #3e495b;
+    padding: 0 28px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    text-transform: uppercase;
+}
+
+.modal-header .close {
+	color: #ababab;
+    opacity: 1;
+    font-size: 34px;
+    font-weight: normal;
+    text-shadow: none;
+    margin-top: 0;
+    padding-top: 13px;
+    padding-bottom: 13px;
+    padding-left: 10px;
+    outline: none;
+}
+
+.modal-title {
+	height: 60px;
+	line-height: 60px;
+	font-size: 18px;
+	text-align: left;
+}
+
+.modal-body {
+	padding: 0 28px;
+    color: #3d4a5a;
+    font-size: 16px;
+}
+
+.select-row-container {
+	position: relative;
+	width: 100%;
+	margin-top: 30px;
+}
+
+.select-row-container .btn-group {
+	margin-bottom: 18px;
+}
+
+div.select-btn.no-border > span {
+	padding-left: 0;
+}
+
+.select-row-container .dropdown-menu{
+    margin: 0;
+	border: 1px solid #d9d9d9;
+    border-radius: 0;
+    box-shadow: none;
+    top: 98%;
+    overflow: auto;
+    width: 100%;
+    max-height: 215px;
+}
+
+.select-row-container .dropdown-menu a{
+    padding: 0 25px;
+    height: 40px;
+    line-height: 40px;
+    cursor: pointer;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    color: #000;
+}
+
+.select-row-container .dropdown-menu a:hover {
+	text-decoration: none;
+    background: #D3D9E0;
+}
+
+.select-row-container .select-btn, .regular-container .select-btn {
+	position: relative;
+    border: 1px solid #dbdee2;
+    border-radius: 4px;
+    background: #fff;
+    height: 48px;
+    line-height: 48px;
+    outline: none;
+	display: inline-block;
+    vertical-align: middle;
+    padding: 0;
+}
+
+.regular-container .select-btn {
+	height: 40px;
+	line-height: 40px;
+}
+
+.select-btn > span {
+	display: inline-block;	
+	float: left;
+	text-align: left;
+	padding-left: 20px;
+}
+
+.select-name {
+    min-width: 110px;
+    color: #7f919f;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+.select-value {
+    font-size: 16px;
+    padding: 0 40px 0 20px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+	height: 100%;
+    width: 318px;
+    color: #3F495C;
+    border: 0;
+    border-radius: 4px;
+}
+
+.modal-footer {
+	padding: 28px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-top: none;
+    margin-top: 30px;
+}

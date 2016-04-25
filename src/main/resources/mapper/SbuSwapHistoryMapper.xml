@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.capgemini.university.dao.SbuSwapHistoryDao">
+
+	
+<insert id="addSbuSwapHistory" parameterType="com.capgemini.university.model.SbuSwapHistory">
+
+		insert into sbu_swap_history
+		(
+		
+	    from_sbu_id,
+	    to_sbu_id,
+	    giveout_course_id,
+	    takein_course_id,
+	    giveout_duration,
+	    takein_duration,
+	    seats,
+	    action_by,
+	    action_time
+		)
+		values(
+		#{fromSbuId},
+		#{toSbuId},
+		#{giveoutCourseId},
+		#{takeinCourseId},
+		#{giveoutDuration},
+		#{takeinDuration},
+		#{seats},
+		#{actionBy},
+		#{actionTime}
+
+		)
+		<selectKey resultType="int" order="AFTER" keyProperty="id">
+			select LAST_INSERT_ID() AS id
+		</selectKey>
+
+	</insert>
+
+
+	<select id="getSbuSwapHistory" parameterType="map" resultType="map">
+
+			SELECT 
+			    a.id,
+			    a.from_sbu_id,
+			    e.sbu_name from_sbu_name,
+			    a.to_sbu_id,
+                b.sbu_name to_sbu_name,
+			    a.giveout_course_id,
+                c.name giveout_course_name,
+			    a.takein_course_id,
+                d.name takein_course_name,
+			    a.giveout_duration,
+			    a.takein_duration,
+			    a.seats,
+			    a.action_by,
+			    a.action_time
+                
+		      FROM sbu_swap_history a left join sbu b on a.to_sbu_id=b.id 
+              left join course c on a.giveout_course_id=c.id
+			  left join course d on a.takein_course_id=d.id
+			  left join sbu e on a.from_sbu_id=e.id
+			  where 1=1
+			<if test="sbuId != null">
+				and (a.from_sbu_id = #{sbuId} or a.to_sbu_id = #{sbuId} )
+			</if>
+			order by a.action_time desc
+			<if test="showpage != null">
+				limit #{startIndex},#{pageSize}
+			</if>
+			
+		
+		
+
+	</select>
+
+
+		<resultMap id="sbuSwapHistoryMap" type="com.capgemini.university.model.SbuSwapHistory">
+		<result property="id" column="id" />
+		<result property="fromSbuId" column="from_sbu_id" />
+		<result property="toSbuId" column="to_sbu_id" />
+		<result property="giveoutCourseId" column="giveout_course_id" />
+		<result property="takeinCourseId" column="takein_course_id" />
+		<result property="giveoutDuration" column="giveout_duration" />
+		<result property="takeinDuration" column="takein_duration" />
+		<result property="seats" column="seats" />
+		<result property="actionBy" column="action_by" />
+		<result property="actionTime" column="action_time" />
+		
+	</resultMap>
+	
+	
+
+	
+
+
+</mapper>

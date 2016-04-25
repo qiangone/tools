@@ -1,0 +1,69 @@
+{
+	"info": {
+		"code": 200
+	},
+    "result": {
+		"nomineeList": [
+			{
+				"countryName": "China",
+				"countryNominees": [
+					{
+						"id": 1,
+						"username":"deadai",
+						"firstName": "Dean",
+						"lastName": "Dai",
+						"employee_id": "51714_FS",
+						"email": "dean.dai@capgemini.com",
+						"headImage": null
+					},
+					{
+						"id": 2,
+						"username":"scurry",
+						"firstName": "Stephen",
+						"lastName": "Curry",
+						"employee_id": "51714_FS",
+						"email": "stephen.curry@capgemini.com",
+						"headImage": null
+					}
+				]
+			},
+			{
+				"countryName": "India",
+				"countryNominees": [
+					{
+						"id": 1,
+						"username":"scurry",
+						"firstName": "Stephen",
+						"lastName": "Curry",
+						"employee_id": "51714_FS",
+						"email": "stephen.curry@capgemini.com",
+						"headImage": null
+					},
+					{
+						"id": 2,
+						"username":"ljames",
+						"firstName": "Lebron",
+						"lastName": "James",
+						"employee_id": "51714_FS",
+						"email": "lebron.james@capgemini.com",
+						"headImage": null
+					}
+				]
+			},
+			{
+				"countryName": "Manila",
+				"countryNominees": [
+					{
+						"id": 1,
+						"username":"ljames",
+						"firstName": "Lebron",
+						"lastName": "James",
+						"employee_id": "51714_FS",
+						"email": "lebron.james@capgemini.com",
+						"headImage": null
+					}
+				]
+			}
+		]
+	}
+}

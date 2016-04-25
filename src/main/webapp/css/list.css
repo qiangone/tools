@@ -1,0 +1,132 @@
+/* Program list */
+a.list-group-item {
+	padding: 30px 30px 14px 60px;
+	background-color: #fff;
+	border: 1px solid #e6e6e6;
+	cursor: pointer;
+}
+
+.list-group-item.no-border {
+	border: 0;
+}
+
+a.list-group-item:hover, a.list-group-item:active, a.list-group-item.active,
+	a.list-group-item.active:hover, a.list-group-item.active:focus {
+	color: #555;
+	text-decoration: none;
+	background-color: #f5f5f5;
+	border: 1px solid #e6e6e6;
+}
+
+a.list-group-item.active .list-group-item-text, a.list-group-item.active:hover .list-group-item-text,
+	a.list-group-item.active:focus .list-group-item-text {
+	color: #555;
+}
+
+.list-group-item-heading {
+	margin-bottom: 5px;
+}
+
+.list-group-item-text .item {
+	position: relative;
+	display: inline-block;
+	text-transform: uppercase;
+	margin-right: 35px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 10px 0;
+}
+
+.list-group-item-text .item:first-child {
+    padding-left: 36px;
+}
+
+span.item:before {
+	color: #bdbdbd;
+	margin-right: 14px;
+}
+
+span.p-day {
+	min-width: 230px;
+	max-width: 240px;
+}
+
+span.p-duration {
+	min-width: 142px;
+	max-width: 150px;
+}
+
+span.p-pmds {
+	min-width: 80px;
+	max-width: 150px;
+}
+
+span.p-seats {
+	min-width: 270px;
+    max-width: 300px;
+}
+
+span.p-day:before {
+	content: "";
+    background: url(../images/ic_calender.png) no-repeat center;
+    width: 21px;
+    height: 22px;
+    background-size: cover;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    left: 0;
+}
+
+span.p-duration:before {
+	content: "Duration";
+}
+
+span.p-pmds:before {
+	content: "PMDs";
+	text-transform: initial;
+}
+
+span.p-seats:before {
+	content: "Remaining Seat";
+}
+
+.bg-progress {
+    height: 10px;
+    width: 100px;
+    background: #e2f0f1;
+    display: inline-block;
+    border-radius: 5px;
+    margin-right: 14px;
+    position: relative;
+}
+
+.remaining-progress {
+    line-height: 10px;
+    background: #6f9ad7;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    box-shadow: none;
+}
+
+.input-group-addon {
+	text-align: left;
+	border: 1px solid #dbdee2;
+	border-left: 0;
+	cursor: pointer;
+}
+
+.email-drop {
+	min-width: 168px;
+    border: 1px solid #dbdee2;
+    border-radius: 0;
+    border-top: 0;
+}
+
+.dropdown-menu.email-drop>li>a {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}

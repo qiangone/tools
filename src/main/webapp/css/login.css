@@ -1,0 +1,159 @@
+html, body {
+	height: 100%;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+}
+
+body {
+	background: -webkit-gradient(linear, 0 100%, 100% 100%, from(#7787a2),
+		to(#31394c));
+	background: -moz-linear-gradient(right, #31394c, #7787a2);
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 1, startColorstr = #7787a2, endColorstr = #31394c); 
+}
+
+
+/**
+* If input/text area tag has required attribute;
+* If not type any value, there will be a red border on the input box;
+* Add this to disable the red border
+*/
+input:required:invalid, input:focus:invalid, textarea:required:invalid, textarea:focus:invalid {
+	box-shadow: none;
+	-moz-box-shadow: none;
+}
+
+.login-container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+	background: url(../images/bg2.png) no-repeat center;
+	background-size: cover;
+}
+
+#form-container {
+	position: relative;
+	width: 479px;
+	height: 512px;
+	margin-left: auto;
+	margin-right: auto;
+	top: 51%;
+	margin-top: -230.4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	background-clip: padding-box;
+}
+
+@media screen and (max-width:1600px) {
+	#form-container {
+		margin-top: -230.4px;
+	}
+}
+
+.validate-input{
+	height: 46px;
+	width: 100%;
+	margin-top: 11px;
+	border-radius: 2px;
+	border: none;
+	color: #fff;
+	padding: 10px 20px;
+	font-size: 14px;
+	outline: none;
+	opacity: .8;
+	background: transparent;
+	border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.validate-input:focus, .validate-input:active {
+	background: transparent;
+	border-color: #fff;
+}
+
+.validate-input::-webkit-input-placeholder {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.validate-input:-moz-placeholder {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.validate-input::-moz-placeholder {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.validate-input:-ms-input-placeholder {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.btn-login {
+	display: block;
+	width: 100%;
+	height: 46px;
+	line-height: 46px;
+	color: #fff;
+	padding: 0;
+	background-color: #359bf3;
+	margin-top: 0;
+	border: none;
+	font-size: 15px;
+	outline: none;
+	box-shadow: none;
+}
+
+.btn-login:link, .btn-login:visited, .btn-login:hover, .btn-login:active, .btn-login:focus {
+	color: #fff;
+	border: none;
+	outline: none;
+	box-shadow: none;
+	background-color: #359bf3;
+}
+
+.btn-login:active, .btn-login:focus {
+	background-color: #327ab7;
+}
+
+#errorMsg {
+	text-align: center;
+	color: #d7695a;
+	margin: 9px 0 17px 0;
+	height: 20px;
+	line-height: 14px;
+	font-size: 13px
+}
+
+.logo_icon {
+	color: #fff;
+	font-size: 21px;
+	text-align: center;
+	margin-bottom: 50px;
+}
+
+input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill
+	{
+	-webkit-box-shadow: 0 0 0 1000px #405373 inset;
+	-webkit-text-fill-color: #fff;
+}
+
+.icon_login {
+/* 	margin: 0 auto 20px auto; */
+	margin: 0 auto;
+	display: block;
+	width: 449px;
+	height: 173px;
+/* 	background-size: cover; */
+	background: url(../images/logo_university_big.png) no-repeat center;
+	background-size: 70%;
+}
+
+.logo-text {
+	text-align: center;
+    color: #fff;
+    font-size: 19px;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+}

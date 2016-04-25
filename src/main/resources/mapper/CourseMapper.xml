@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.capgemini.university.dao.CourseDao">
+	<insert id="addParticipant" parameterType="com.capgemini.university.model.Participant">
+
+		insert into course_participant
+		(
+		course_id,
+		sbu_id,
+		participant_login_name,
+		participant_email,
+		participant_dispaly_name
+		)
+		values(
+		#{courseId},
+		#{sbuId},
+		#{cnName},
+		#{email},
+		#{displayName}
+
+		)
+		<selectKey resultType="int" order="AFTER" keyProperty="id">
+			select LAST_INSERT_ID() AS id
+		</selectKey>
+
+	</insert>
+	
+	<insert id="addCourse" parameterType="com.capgemini.university.model.Course">
+
+		INSERT INTO course
+		(
+		event_name,
+		name,
+		url,
+		start_time,
+		end_time,
+		duration)
+		values(
+		#{eventName},
+		#{name},
+		#{url},
+		#{startTime},
+		#{endTime},
+		#{duration}
+
+		)
+		<selectKey resultType="int" order="AFTER" keyProperty="id">
+			select LAST_INSERT_ID() AS id
+		</selectKey>
+
+	</insert>
+	
+
+	<insert id="addSbuCourse" parameterType="List">
+
+		insert into sbu_course
+		(
+		sbu_id,
+		course_id,
+		duration,
+		seats,
+		pmds
+		)
+		values(
+		#{sbuId},
+		#{courseId},
+		#{duration},
+		#{seats},
+		#{pmds}
+
+		)
+		<selectKey resultType="int" order="AFTER" keyProperty="id">
+			select LAST_INSERT_ID() AS id
+		</selectKey>
+
+	</insert>
+	
+	<insert id="addSbuCourseList" parameterType="List">
+		insert into sbu_course
+		(
+		sbu_id,
+		course_id,
+		duration,
+		seats,
+		pmds
+		)
+		VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+
+			(
+			#{item.sbuId},
+			#{item.courseId},
+			#{item.duration},
+			#{item.seats},
+			#{item.pmds}
+			)
+		</foreach>
+
+	</insert>
+	
+
+	<update id="updateSbuCourse" parameterType="com.capgemini.university.model.SbuCourse">
+		update sbu_course
+
+		<set>
+			<if test="assignSeats != null">
+				assign_seats=#{assignSeats},
+			</if>
+			<if test="assignPmds != null">
+				assign_pmds=#{assignPmds},
+			</if>
+
+			<if test="seats != null">
+				seats=#{seats},
+			</if>
+
+			<if test="duration != null">
+				duration=#{duration},
+			</if>
+
+			<if test="pmds != null">
+				pmds=#{pmds},
+			</if>
+
+		</set>
+
+		where 1=1
+
+		<if test="id != null">
+			and id = #{id}
+		</if>
+
+
+	</update>
+	
+	<delete id="removeParticipant" parameterType="Map">
+		delete from course_participant where 1=1
+		<if test="courseId != null">
+				and course_id = #{courseId}
+		</if>
+		<if test="sbuId != null">
+				and sbu_id = #{sbuId}
+		</if>
+		<if test="email != null">
+				and participant_email = #{email}
+		</if>
+		
+	</delete>
+	
+	
+	<select id="getAllCourseToBegin" parameterType="map" resultMap="courseMailMap">
+
+		
+		select 
+		a.event_name,
+		a.name,
+		a.start_time,
+		a.end_time,
+		a.duration,
+		b.seats,
+		b.pmds,
+		b.assign_seats,
+		 (b.seats-b.assign_seats) remainning_seats,
+		b.assign_pmds,
+		d.name sbu_name,
+		d.email
+		from course a left join sbu_course b on a.id = b.course_id
+		left join sbu_lbps c on b.sbu_id = c.sbu_id
+		left join lbps d on c.lbps_id=d.id
+		left join sbu e on b.sbu_id=e.id
+		
+		where TIMESTAMPDIFF(WEEK,a.start_time,NOW())>3
+		and d.name is not null 
+		and d.email is not null
+		and b.assign_seats != b.seats
+		and e.parent_id=0
+		
+
+
+	</select>
+	
+	<select id="queryParticipantList" parameterType="map" resultMap="participantMap">
+
+		SELECT 
+	    id,
+	    course_id,
+	    sbu_id,
+	    participant_login_name,
+	    participant_email,
+	    participant_dispaly_name
+	    FROM course_participant where 1=1
+		<if test="id != null">
+			and id = #{id}
+		</if>
+		<if test="sbuId != null">
+			and sbu_id = #{sbuId}
+		</if>
+		<if test="courseId != null">
+			and course_id = #{courseId}
+		</if>
+		<if test="email != null">
+			and participant_email = #{email}
+		</if>
+
+	</select>
+	<select id="getSbuCourse" parameterType="map" resultMap="sbuCourseMap">
+
+		SELECT
+		id,
+		sbu_id,
+		course_id,
+		duration,
+		seats,
+		pmds,
+		assign_seats,
+		assign_pmds
+		FROM sbu_course where 1=1
+		<if test="id != null">
+			and id = #{id}
+		</if>
+		<if test="sbuId != null">
+			and sbu_id = #{sbuId}
+		</if>
+		<if test="courseId != null">
+			and course_id = #{courseId}
+		</if>
+
+	</select>
+
+
+
+	<select id="getCourseListByPage" parameterType="map" resultType="map">
+
+		select
+		c.event_name,
+		d.logo event_logo,
+		b.id sbuId,
+		c.id courseId,
+		c.name courseName,
+		c.start_time
+		startTime,
+		c.end_time endTime,
+		c.duration duration,
+		a.seats,
+		a.pmds,
+		(a.seats-a.assign_seats) remainedSeats,
+		(a.pmds-a.assign_pmds)remainedPmds
+		from sbu_course a left join sbu b on
+		a.sbu_id=b.id
+		left join course c on a.course_id=c.id
+		left join event_logo d on c.event_name=d.event_name
+		where 1=1
+		<if test="id != null">
+			and a.sbu_id = #{id}
+		</if>
+		<if test="courseName != null">
+			and c.name like CONCAT('%','${courseName}','%' )  
+		</if>
+		
+		<if test="type != null and type == 1">
+			and end_time <![CDATA[  < ]]> sysdate()
+		</if>
+		<if test="type != null and type == 2">
+			and start_time<![CDATA[  < ]]> sysdate()
+			and end_time <![CDATA[  > ]]> sysdate()
+		</if>
+		<if test="type != null and type == 3">
+			and start_time <![CDATA[  > ]]> sysdate()
+		</if>
+		
+		order by c.start_time
+		<if test="showpage != null">
+			limit #{startIndex},#{pageSize}
+		</if>
+	</select>
+
+
+	<select id="getCourse" parameterType="map" resultMap="courseMap">
+
+		SELECT
+		id,
+		event_name,
+		name,
+		url,
+		start_time,
+		end_time,
+		duration
+		FROM course where 1=1
+		<if test="id != null">
+			and id = #{id}
+		</if>
+		<if test="eventName != null">
+			and event_name = #{eventName}
+		</if>
+		<if test="type != null and type == 1">
+			and end_time <![CDATA[  < ]]> sysdate()
+		</if>
+		<if test="type != null and type == 2">
+			and start_time<![CDATA[  < ]]> sysdate()
+			and end_time <![CDATA[  > ]]> sysdate()
+		</if>
+		<if test="type != null and type == 3">
+			and start_time <![CDATA[  > ]]> sysdate()
+		</if>
+
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+	<resultMap id="courseMap" type="com.capgemini.university.model.Course">
+		<result property="id" column="id" />
+		<result property="eventName" column="event_name" />
+		<result property="name" column="name" />
+		<result property="url" column="url" />
+		<result property="startTime" column="start_time" />
+		<result property="endTime" column="end_time" />
+		<result property="duration" column="duration" />
+
+	</resultMap>
+
+
+	<resultMap id="sbuCourseMap" type="com.capgemini.university.model.SbuCourse">
+		<result property="id" column="id" />
+		<result property="sbuId" column="sbu_id" />
+		<result property="courseId" column="course_id" />
+		<result property="duration" column="duration" />
+		<result property="seats" column="seats" />
+		<result property="pmds" column="pmds" />
+		<result property="assignSeats" column="assign_seats" />
+		<result property="assignPmds" column="assign_pmds" />
+
+	</resultMap>
+	
+	<resultMap id="participantMap" type="com.capgemini.university.model.Participant">
+		<result property="id" column="id" />
+		<result property="sbuId" column="sbu_id" />
+		<result property="courseId" column="course_id" />
+		<result property="cnName" column="participant_login_name" />
+		<result property="email" column="participant_email" />
+		<result property="displayName" column="participant_dispaly_name" />
+	
+
+	</resultMap>
+	
+	
+		<resultMap id="courseMailMap" type="com.capgemini.university.model.CourseMail">
+		<result property="name" column="sbu_name" />
+		<result property="email" column="email" />
+		 <collection property="courseList" ofType="map">
+		   <result property="name" column="name" />
+		   <result property="event_name" column="event_name" />
+		    <result property="start_time" column="start_time" />
+		     <result property="end_time" column="end_time" />
+		      <result property="duration" column="duration" />
+		      <result property="seats" column="seats" />
+		       <result property="pmds" column="pmds" />
+		        <result property="assign_seats" column="assign_seats" />
+		        <result property="assign_pmds" column="assign_pmds" />
+		        <result property="remainning_seats" column="remainning_seats" />
+		        
+		  </collection>
+	
+
+	</resultMap>
+	
+
+
+
+
+
+
+
+</mapper>

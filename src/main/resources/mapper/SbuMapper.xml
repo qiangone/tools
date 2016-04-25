@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.capgemini.university.dao.SbuDao">
+
+	<select id="getSbu" parameterType="map" resultMap="sbuMap">
+
+		select
+		a.id,
+		a.sbu_name,
+		a.parent_id,
+		c.name l_name,
+        c.email l_email,
+        c.logo l_logo
+		from sbu a left join sbu_lbps b on
+		a.id=b.sbu_id
+		left join lbps c on b.lbps_id=c.id
+		where 1=1
+
+
+		<if test="id != null">
+			and a.id = #{id}
+		</if>
+		<if test="lbps != null">
+			and c.name=#{lbps}
+		</if>
+		<if test="email != null">
+			and c.email=#{email}
+		</if>
+
+		<if test="parentId != null">
+			and a.parent_id = #{parentId}
+		</if>
+	</select>
+
+
+
+
+
+
+	<select id="countSeatsOfOtherSbu" parameterType="map"
+		resultType="map">
+
+		select
+		a.id,
+		a.sbu_name,
+		b.course_id,
+		b.seats,
+		b.assign_seats
+		from sbu a left join sbu_course
+		b on a.id=b.sbu_id
+		where 1=1
+
+		and
+		b.course_id = #{courseId}
+
+		and a.id != #{sbuId}
+		and a.parent_id=0
+		order by
+		a.id
+
+	</select>
+
+
+	<select id="countSeatsOfSubSbu" parameterType="map" resultType="map">
+
+		select
+		a.id,
+		a.sbu_name,
+		#{courseId} courseId,
+		ifnull(b.seats,0) seats
+		from sbu a left join sbu_course b on a.id=b.sbu_id and b.course_id=
+		#{courseId}
+		where 1=1
+
+		and a.parent_id = #{sbuId}
+
+
+
+	</select>
+
+
+
+
+
+	<resultMap id="sbuMap" type="com.capgemini.university.model.Sbu">
+		<result property="id" column="id" />
+		<result property="subName" column="sbu_name" />
+		<!-- <result property="lbps" column="lbps" /> <result property="email" 
+			column="email" /> -->
+		<result property="parentId" column="parent_id" />
+
+		<association property="lbps"
+			javaType="com.capgemini.university.model.Lbps">
+			<result property="name" column="l_name" />
+			<result property="email" column="l_email" />
+			<result property="logo" column="l_logo" />
+			
+		</association>
+
+
+	</resultMap>
+
+
+
+
+
+
+
+
+</mapper>

@@ -1,0 +1,73 @@
+{
+	"info": {
+		"code": 200
+	},
+    "result": {
+		"otherSbuSeatsStatus": [
+			{
+				"id": 1,
+				"programId": 1,
+				"sbuName":"Apps 2",
+				"totalSeats": 20,
+				"remainingSeats": 6
+			},
+			{
+				"id": 2,
+				"programId": 1,
+				"sbuName":"BPO",
+				"totalSeats": 30,
+				"remainingSeats": 6
+			},
+			{
+				"id": 3,
+				"programId": 1,
+				"sbuName":"CC",
+				"totalSeats": 8,
+				"remainingSeats": 6
+			},
+			{
+				"id": 4,
+				"programId": 1,
+				"sbuName":"Infra",
+				"totalSeats": 20,
+				"remainingSeats": 8
+			},
+			{
+				"id": 5,
+				"programId": 1,
+				"sbuName":"Latam",
+				"totalSeats": 20,
+				"remainingSeats": 2
+			},
+			{
+				"id": 6,
+				"programId": 1,
+				"sbuName":"I&D",
+				"totalSeats": 8,
+				"remainingSeats": 6
+			},
+			{
+				"id": 7,
+				"programId": 1,
+				"sbuName":"Sogeti",
+				"totalSeats": 14,
+				"remainingSeats": 1
+			},
+			{
+				"id": 8,
+				"programId": 1,
+				"sbuName":"FS",
+				"totalSeats": 9,
+				"remainingSeats": 8
+			},
+			{
+				"id": 9,
+				"programId": 1,
+				"sbuName":"Other",
+				"totalSeats": 3,
+				"remainingSeats": 1
+			}
+		]
+		
+	}
+}

@@ -1,0 +1,32 @@
+{
+	"info": {
+		"code": 200
+	},
+    "result": {
+    	"total": {
+    		"totalPmds": 20,
+    		"spentPmds": 12
+    	},
+		"countryPmdsList": [
+			{
+				"index": 1,
+				"name":"North America",
+				"totalPmds": "7",
+				"spentPmds": "4"
+			},
+			{
+				"index": 1,
+				"name":"APAC",
+				"totalPmds": "3",
+				"spentPmds": "2"
+			},
+			{
+				"index": 1,
+				"name":"China",
+				"totalPmds": "10",
+				"spentPmds": "6"
+			}
+		]
+		
+	}
+}
