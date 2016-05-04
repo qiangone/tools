@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,6 +26,7 @@ import com.capgemini.university.api.exception.DataAccessDeniedException;
 import com.capgemini.university.common.JsonParamObj;
 import com.capgemini.university.common.PageResults;
 import com.capgemini.university.common.Pagination;
+import com.capgemini.university.model.Lbps;
 import com.capgemini.university.model.Participant;
 import com.capgemini.university.model.Sbu;
 import com.capgemini.university.model.SbuCourse;
@@ -93,29 +97,25 @@ public class SbuController {
 			return ResponseUtil.apiError("1001", "Missing parameter!");
 		}
 
-		if (param.getCourseId1() == null) {
-			return ResponseUtil.apiError("1002", "courseId1 is null");
+		if (param.getMySbuId() == null) {
+			return ResponseUtil.apiError("1002", "mySbuId is null");
 		}
-		if (param.getFromSbuId() == null) {
-			return ResponseUtil.apiError("1003", "fromSbuId is null");
+		if (param.getGiveoutCourseId() == null) {
+			return ResponseUtil.apiError("1003", "giveoutCourseId is null");
 		}
-		if (param.getToSbuId() == null) {
-			return ResponseUtil.apiError("1004", "toSbuId is null");
+		if (param.getSwapSbuId() == null) {
+			return ResponseUtil.apiError("1004", "swapSbuId is null");
 		}
-		if (param.getAction() == null) {
-			return ResponseUtil.apiError("1005", "action is null");
+		if (param.getSwapCourseId() == null) {
+			return ResponseUtil.apiError("1005", "swapCourseId is null");
 		}
-		if (param.getSeats() == null) {
-			return ResponseUtil.apiError("1006", "seats is null");
+		if (param.getSwapSeats() == null) {
+			return ResponseUtil.apiError("1006", "swapSeats is null");
 		}
-		if (param.getCourseId2() == null) {
-			return ResponseUtil.apiError("1007", "courseId2 is null");
-		}
+		
 
 		try {
-			courseService.swap(param.getCourseId1(), param.getFromSbuId(),
-					param.getToSbuId(), param.getAction(), param.getSeats(),
-					param.getCourseId2());
+			courseService.swap(param.getMySbuId(),param.getGiveoutCourseId(),param.getSwapSbuId(),param.getSwapSbuId(),param.getSwapSeats());
 
 			return ResponseUtil.apiSuccess("swapSeats", "swapSeats successful");
 		} catch (DataAccessDeniedException de) {
@@ -162,6 +162,37 @@ public class SbuController {
 		}
 
 	}
+	
+	@RequestMapping(value = "/getSwapHistoryForAdmin", method = RequestMethod.POST)
+	public @ResponseBody WDResponse getSwapHistoryForAdmin(@RequestBody JsonParamObj query) {
+		if (query == null) {
+			return ResponseUtil.apiError("1001", "Missing parameter!");
+		}
+		
+
+		try {
+			Map map = new HashMap();
+			
+			Integer currentPage = query.getCurrentPage();
+			Integer pageSize = query.getPageSize();
+
+			Pagination page = new Pagination();
+			if (currentPage != null) {
+				page.setCurrentPage(currentPage);
+			}
+			if (pageSize != null) {
+				page.setPageSize(pageSize);
+			}
+
+			PageResults<Map> ret = historyService.getAllSbuSwapHistory(map, page);
+
+			return ResponseUtil.apiSuccess(ret, "getSwapHistoryForAdmin successful");
+		} catch (Exception e) {
+			logger.error("getSwapHistoryForAdmin exception: ", e);
+			return ResponseUtil.apiError("1100", "未知错误");
+		}
+
+	}
 
 	@RequestMapping(value = "/getSwapHistory", method = RequestMethod.POST)
 	public @ResponseBody WDResponse getSwapHistory(@RequestBody JsonParamObj query) {
@@ -197,5 +228,217 @@ public class SbuController {
 		}
 
 	}
+	
+	
+	@RequestMapping(value = "/updateSwapSeats", method = RequestMethod.POST)
+	public @ResponseBody WDResponse updateSwapSeats(@RequestBody SbuCourse param) {
+		if (param == null) {
+			return ResponseUtil.apiError("1001", "Missing parameter!");
+		}
+		
+		if(param.getSbuId()==null){
+			return ResponseUtil.apiError("1002", "sbuId is null");
+		}
+		if(param.getCourseId() == null){
+			return ResponseUtil.apiError("1003", "courseId is null");
+		}
+		if(param.getSwapSeats() == null){
+			return ResponseUtil.apiError("1004", "swapSeats is null");
+		}
+		
+		try {
+			 SbuCourse sc = courseService.getSbuCourse(param.getSbuId(), param.getCourseId());
+			 if(sc != null){
+				 int leftSeat = sc.getSeats()-sc.getAssignSeats();
+				 int swapSeat = param.getSwapSeats();
+				 if(leftSeat < swapSeat){
+					 return ResponseUtil.apiSuccess("no left seats to swap.", "no left seats to swap.");
+				 }
+				 sc.setSwapSeats(swapSeat);
+			 }
+			 
+			 courseService.updateSbuCourse(sc);
+
+			return ResponseUtil.apiSuccess("updateSwapSeats", "updateSwapSeats successful");
+		} catch (Exception e) {
+			logger.error("updateSwapSeats exception: ", e);
+			return ResponseUtil.apiError("1100", "未知错误");
+		}
+
+	}
+	
+	
+	@RequestMapping(value = "/sbuList", method = RequestMethod.POST)
+	public @ResponseBody WDResponse sbuList(@RequestBody JsonParamObj param) {
+		try {
+			
+			if (param == null) {
+				return ResponseUtil.apiError("1001", "Missing parameter!");
+			}
+			
+			if(param.getParentSbuId()==null){
+				return ResponseUtil.apiError("1002", "parentSbuId is null");
+			}
+			
+			
+
+			List<Sbu> list = sbuService.getSbuListByParentId(param.getParentSbuId());
+
+			return ResponseUtil.apiSuccess(list, "sbuList successful");
+		} catch (Exception e) {
+			logger.error("sbuList exception: ", e);
+			return ResponseUtil.apiError("1100", "未知错误");
+		}
+
+	}
+	
+	@RequestMapping(value = "/updateSbu", method = RequestMethod.POST)
+	public @ResponseBody WDResponse updateSbu(@RequestBody Sbu sbu) {
+		try {
+			
+			if (sbu == null) {
+				return ResponseUtil.apiError("1001", "Missing parameter!");
+			}
+			
+			if(sbu.getId()==null){
+				return ResponseUtil.apiError("1002", "id is null");
+			}
+			
+			if(sbu.getSubName()==null){
+				return ResponseUtil.apiError("1003", "sbuName is null");
+			}
+			
+			
+
+			sbuService.updateSbu(sbu);
+
+			return ResponseUtil.apiSuccess("updateSbu", "updateSbu successful");
+		} catch (Exception e) {
+			logger.error("updateSbu exception: ", e);
+			return ResponseUtil.apiError("1100", "未知错误");
+		}
+
+	}
+	
+	@RequestMapping(value = "/deleteSbu", method = RequestMethod.POST)
+	public @ResponseBody WDResponse deleteSbu(@RequestBody Sbu sbu) {
+		try {
+			
+			if (sbu == null) {
+				return ResponseUtil.apiError("1001", "Missing parameter!");
+			}
+			
+			if(sbu.getId()==null){
+				return ResponseUtil.apiError("1002", "id is null");
+			}
+			
+			sbuService.deleteSbu(sbu.getId());
+
+			return ResponseUtil.apiSuccess("deleteSbu", "deleteSbu successful");
+		} catch (Exception e) {
+			logger.error("deleteSbu exception: ", e);
+			return ResponseUtil.apiError("1100", "未知错误");
+		}
+
+	}
+	
+	@RequestMapping(value = "/addSbu", method = RequestMethod.POST)
+	public @ResponseBody WDResponse addSbu(@RequestBody Sbu sbu) {
+		try {
+			
+			if (sbu == null) {
+				return ResponseUtil.apiError("1001", "Missing parameter!");
+			}
+			
+			if(sbu.getParentId()==null){
+				return ResponseUtil.apiError("1002", "parentId is null");
+			}
+			
+			if(sbu.getSubName()==null){
+				return ResponseUtil.apiError("1003", "sbuName is null");
+			}
+			sbuService.addSbu(sbu);
+
+			return ResponseUtil.apiSuccess("addSbu", "addSbu successful");
+		} catch (Exception e) {
+			logger.error("addSbu exception: ", e);
+			return ResponseUtil.apiError("1100", "未知错误");
+		}
+
+	}
+	
+	@RequestMapping(value = "/addSbuLbps", method = RequestMethod.POST)
+	public @ResponseBody WDResponse addSbuLbps(@RequestBody JsonParamObj param) {
+		try {
+			
+			if (param == null) {
+				return ResponseUtil.apiError("1001", "Missing parameter!");
+			}
+			
+			if(param.getSbuId()==null){
+				return ResponseUtil.apiError("1002", "sbuId is null");
+			}
+			
+			if(param.getDisplayName()==null){
+				return ResponseUtil.apiError("1003", "displayName is null");
+			}
+			if(param.getEmail()==null){
+				return ResponseUtil.apiError("1004", "email is null");
+			}
+			
+			
+			sbuService.addSbuLbps(param.getSbuId(), param.getDisplayName(), param.getEmail());
+
+			return ResponseUtil.apiSuccess("addSbuLbps", "addSbuLbps successful");
+		} catch (Exception e) {
+			logger.error("addSbuLbps exception: ", e);
+			return ResponseUtil.apiError("1100", "未知错误");
+		}
+
+	}
+	
+	
+	@RequestMapping(value = "/updateSbuLbps", method = RequestMethod.POST)
+	public @ResponseBody WDResponse updateSbuLbps(@RequestBody Lbps lbps) {
+		try {
+			
+			if (lbps == null) {
+				return ResponseUtil.apiError("1001", "Missing parameter!");
+			}
+		
+			if(lbps.getId()==null){
+				return ResponseUtil.apiError("1002", "id is null");
+			}
+			if(lbps.getName()==null){
+				return ResponseUtil.apiError("1003", "name is null");
+			}
+			if(lbps.getEmail()==null){
+				return ResponseUtil.apiError("1004", "email is null");
+			}
+			
+			sbuService.updateLbps(lbps);
+
+			return ResponseUtil.apiSuccess("updateSbuLbps", "updateSbuLbps successful");
+		} catch (Exception e) {
+			logger.error("updateSbuLbps exception: ", e);
+			return ResponseUtil.apiError("1100", "未知错误");
+		}
+
+	}
+	
+	@RequestMapping(value="/exportNomination",method = RequestMethod.GET)
+    public void exportNomination(@RequestParam(required=false) String sbuId, HttpServletResponse response){
+        try {
+        	int i=0;
+        	if(!StringUtils.isEmpty(sbuId)){
+        		i = Integer.parseInt(sbuId);
+        	}
+		
+        	List<Map> list = sbuService.countParticipantsOfSbu(i);
+        	sbuService.exportNomination(list, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

@@ -3,14 +3,21 @@ package com.capgemini.university.common;
 import java.util.List;
 
 import com.capgemini.university.model.Participant;
+import com.capgemini.university.model.SbuCourse;
 
 
 
 public class JsonParamObj {
 	
+	private Integer id;
+	
 	private Integer sbuId;
 	
+	private Integer parentSbuId;
+	
 	private Integer courseId;
+	
+	private String sbuName;
 	
 	private String loginName;
 	
@@ -20,14 +27,27 @@ public class JsonParamObj {
 	
 	private String courseName;
 	
+	private String eventName;
+	
 	private String type;
 	
+	private String name;
 	
-	private Integer courseId1;
-	private Integer courseId2;
-	private Integer fromSbuId;
-	private Integer toSbuId;
-	private Integer action;
+	private String logo;
+	
+	private String url;
+	
+	private String startTime;
+	private String endTime;
+	
+	private Float duration;
+	
+	
+	private Integer mySbuId;
+	private Integer giveoutCourseId;
+	private Integer swapSbuId;
+	private Integer swapCourseId;
+	private Integer swapSeats;
 	private Integer seats;
 	
 	private Integer currentPage;
@@ -35,12 +55,168 @@ public class JsonParamObj {
 	
 	private List<Participant> participantList;
 	
+	private List<SbuCourse> sbuList;
+	
 	
 	
 	
 	
 
 	
+
+	/**
+	 * @return the logo
+	 */
+	public String getLogo() {
+		return logo;
+	}
+
+	/**
+	 * @param logo the logo to set
+	 */
+	public void setLogo(String logo) {
+		this.logo = logo;
+	}
+
+	/**
+	 * @return the sbuName
+	 */
+	public String getSbuName() {
+		return sbuName;
+	}
+
+	/**
+	 * @param sbuName the sbuName to set
+	 */
+	public void setSbuName(String sbuName) {
+		this.sbuName = sbuName;
+	}
+
+	/**
+	 * @return the parentSbuId
+	 */
+	public Integer getParentSbuId() {
+		return parentSbuId;
+	}
+
+	/**
+	 * @param parentSbuId the parentSbuId to set
+	 */
+	public void setParentSbuId(Integer parentSbuId) {
+		this.parentSbuId = parentSbuId;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public Integer getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @return the url
+	 */
+	public String getUrl() {
+		return url;
+	}
+
+	/**
+	 * @param url the url to set
+	 */
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	/**
+	 * @return the startTime
+	 */
+	public String getStartTime() {
+		return startTime;
+	}
+
+	/**
+	 * @param startTime the startTime to set
+	 */
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
+
+	/**
+	 * @return the endTime
+	 */
+	public String getEndTime() {
+		return endTime;
+	}
+
+	/**
+	 * @param endTime the endTime to set
+	 */
+	public void setEndTime(String endTime) {
+		this.endTime = endTime;
+	}
+
+	/**
+	 * @return the duration
+	 */
+	public Float getDuration() {
+		return duration;
+	}
+
+	/**
+	 * @param duration the duration to set
+	 */
+	public void setDuration(Float duration) {
+		this.duration = duration;
+	}
+
+	/**
+	 * @return the sbuList
+	 */
+	public List<SbuCourse> getSbuList() {
+		return sbuList;
+	}
+
+	/**
+	 * @param sbuList the sbuList to set
+	 */
+	public void setSbuList(List<SbuCourse> sbuList) {
+		this.sbuList = sbuList;
+	}
+
+	/**
+	 * @return the eventName
+	 */
+	public String getEventName() {
+		return eventName;
+	}
+
+	/**
+	 * @param eventName the eventName to set
+	 */
+	public void setEventName(String eventName) {
+		this.eventName = eventName;
+	}
 
 	/**
 	 * @return the type
@@ -112,74 +288,76 @@ public class JsonParamObj {
 		this.pageSize = pageSize;
 	}
 
+	
+
 	/**
-	 * @return the courseId1
+	 * @return the mySbuId
 	 */
-	public Integer getCourseId1() {
-		return courseId1;
+	public Integer getMySbuId() {
+		return mySbuId;
 	}
 
 	/**
-	 * @param courseId1 the courseId1 to set
+	 * @param mySbuId the mySbuId to set
 	 */
-	public void setCourseId1(Integer courseId1) {
-		this.courseId1 = courseId1;
+	public void setMySbuId(Integer mySbuId) {
+		this.mySbuId = mySbuId;
 	}
 
 	/**
-	 * @return the courseId2
+	 * @return the giveoutCourseId
 	 */
-	public Integer getCourseId2() {
-		return courseId2;
+	public Integer getGiveoutCourseId() {
+		return giveoutCourseId;
 	}
 
 	/**
-	 * @param courseId2 the courseId2 to set
+	 * @param giveoutCourseId the giveoutCourseId to set
 	 */
-	public void setCourseId2(Integer courseId2) {
-		this.courseId2 = courseId2;
+	public void setGiveoutCourseId(Integer giveoutCourseId) {
+		this.giveoutCourseId = giveoutCourseId;
 	}
 
 	/**
-	 * @return the fromSbuId
+	 * @return the swapSbuId
 	 */
-	public Integer getFromSbuId() {
-		return fromSbuId;
+	public Integer getSwapSbuId() {
+		return swapSbuId;
 	}
 
 	/**
-	 * @param fromSbuId the fromSbuId to set
+	 * @param swapSbuId the swapSbuId to set
 	 */
-	public void setFromSbuId(Integer fromSbuId) {
-		this.fromSbuId = fromSbuId;
+	public void setSwapSbuId(Integer swapSbuId) {
+		this.swapSbuId = swapSbuId;
 	}
 
 	/**
-	 * @return the toSbuId
+	 * @return the swapCourseId
 	 */
-	public Integer getToSbuId() {
-		return toSbuId;
+	public Integer getSwapCourseId() {
+		return swapCourseId;
 	}
 
 	/**
-	 * @param toSbuId the toSbuId to set
+	 * @param swapCourseId the swapCourseId to set
 	 */
-	public void setToSbuId(Integer toSbuId) {
-		this.toSbuId = toSbuId;
+	public void setSwapCourseId(Integer swapCourseId) {
+		this.swapCourseId = swapCourseId;
 	}
 
 	/**
-	 * @return the action
+	 * @return the swapSeats
 	 */
-	public Integer getAction() {
-		return action;
+	public Integer getSwapSeats() {
+		return swapSeats;
 	}
 
 	/**
-	 * @param action the action to set
+	 * @param swapSeats the swapSeats to set
 	 */
-	public void setAction(Integer action) {
-		this.action = action;
+	public void setSwapSeats(Integer swapSeats) {
+		this.swapSeats = swapSeats;
 	}
 
 	/**

@@ -35,7 +35,49 @@ public class Participant {
     
     private Integer courseId;
     
+    private Integer attend;
     
+    private byte[] thumbnailPhoto;
+    
+    
+    
+    
+    
+
+
+	
+
+
+	/**
+	 * @return the thumbnailPhoto
+	 */
+	public byte[] getThumbnailPhoto() {
+		return thumbnailPhoto;
+	}
+
+
+	/**
+	 * @param thumbnailPhoto the thumbnailPhoto to set
+	 */
+	public void setThumbnailPhoto(byte[] thumbnailPhoto) {
+		this.thumbnailPhoto = thumbnailPhoto;
+	}
+
+
+	/**
+	 * @return the attend
+	 */
+	public Integer getAttend() {
+		return attend;
+	}
+
+
+	/**
+	 * @param attend the attend to set
+	 */
+	public void setAttend(Integer attend) {
+		this.attend = attend;
+	}
 
 
 	/**

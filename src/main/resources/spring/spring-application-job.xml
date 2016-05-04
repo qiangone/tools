@@ -9,9 +9,9 @@
     
  
   
-  <!-- 
+ 
     <task:scheduled-tasks>  
-        <task:scheduled ref="autoHandleOrderStatusService" method="handleAllStatus" cron="${autoSyncTime}" />    
+        <task:scheduled ref="mailService" method="notifyLbpsMail" cron="${mail.autoNotifyTime}" />    
     </task:scheduled-tasks>
-     -->
+    
 </beans>

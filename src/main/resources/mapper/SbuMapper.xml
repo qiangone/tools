@@ -10,12 +10,14 @@
 		a.id,
 		a.sbu_name,
 		a.parent_id,
+		c.id l_id,
 		c.name l_name,
-        c.email l_email,
-        c.logo l_logo
+		c.email l_email,
+		c.role l_role
 		from sbu a left join sbu_lbps b on
 		a.id=b.sbu_id
-		left join lbps c on b.lbps_id=c.id
+		left join lbps c
+		on b.lbps_id=c.id
 		where 1=1
 
 
@@ -32,10 +34,32 @@
 		<if test="parentId != null">
 			and a.parent_id = #{parentId}
 		</if>
+		and a.tag=0
 	</select>
 
+	<select id="getLbps" parameterType="map" resultMap="lbpsMap">
+
+		select
+		id,
+		name,
+		email,
+		role
+		
+		from lbps 
+	
+		where 1=1
 
 
+		<if test="id != null">
+			and id = #{id}
+		</if>
+		
+		<if test="email != null">
+			and email=#{email}
+		</if>
+
+		
+	</select>
 
 
 
@@ -57,8 +81,38 @@
 
 		and a.id != #{sbuId}
 		and a.parent_id=0
+		and
+		a.tag=0
 		order by
 		a.id
+
+	</select>
+
+
+
+	<select id="countSwapSeatsOfOtherSbu" parameterType="map"
+		resultType="map">
+
+		select
+		a.id sbu_id,
+		a.sbu_name,
+		b.course_id,
+		b.swap_seats
+		from
+		sbu a left join sbu_course
+		b on a.id=b.sbu_id
+		where 1=1
+
+		and
+		b.course_id =
+		#{courseId}
+
+		and a.id != #{sbuId}
+		and a.parent_id=0
+		and b.swap_seats>0
+		and
+		a.tag=0
+		order by a.id
 
 	</select>
 
@@ -75,11 +129,130 @@
 		where 1=1
 
 		and a.parent_id = #{sbuId}
+		and a.tag=0
 
 
 
 	</select>
 
+	<select id="countParticipantsOfSbu" parameterType="map"
+		resultType="map">
+
+		select
+		c.sbu_name,
+		d.name course_name,
+		b.participant_email email,
+		b.participant_dispaly_name display_name
+		from
+		sbu_course a left join course_participant b on a.sbu_id= b.sbu_id and
+		a.course_id=b.course_id
+		left join sbu c on a.sbu_id=c.id
+		left join
+		course d on a.course_id=d.id
+		where 1=1
+		<if test="sbuId != null">
+			and a.sbu_id=#{sbuId}
+		</if>
+		order by a.sbu_id,a.course_id
+
+
+
+	</select>
+
+
+
+	<update id="updateSbu" parameterType="com.capgemini.university.model.Sbu">
+		update sbu
+
+		<set>
+			<if test="subName != null">
+				sbu_name=#{subName},
+			</if>
+			<if test="tag != null">
+				tag=#{tag},
+			</if>
+		</set>
+
+		where id = #{id}
+
+
+
+	</update>
+
+	<update id="updateLbps" parameterType="com.capgemini.university.model.Lbps">
+		update lbps
+
+		<set>
+			<if test="name != null">
+				name=#{name},
+			</if>
+			<if test="email != null">
+				email=#{email},
+			</if>
+			
+		</set>
+
+		where id = #{id}
+
+
+
+	</update>
+
+
+
+	<insert id="addSbu" parameterType="com.capgemini.university.model.Sbu">
+
+		insert into sbu
+		(
+		sbu_name,
+		parent_id
+		)
+		values(
+		#{subName},
+		#{parentId}
+
+		)
+		<selectKey resultType="int" order="AFTER" keyProperty="id">
+			select LAST_INSERT_ID() AS id
+		</selectKey>
+
+	</insert>
+
+	<insert id="addLbps" parameterType="com.capgemini.university.model.Lbps">
+
+		insert into lbps
+		(
+		name,
+		email
+		)
+		values(
+		#{name},
+		#{email}
+
+		)
+		<selectKey resultType="int" order="AFTER" keyProperty="id">
+			select LAST_INSERT_ID() AS id
+		</selectKey>
+
+	</insert>
+
+	<insert id="addSbuLbps" parameterType="com.capgemini.university.model.SbuLbps">
+
+		insert into sbu_lbps
+		(
+		sbu_id,
+		lbps_id
+		)
+		values(
+		#{sbuId},
+		#{lbpsId}
+
+		)
+		<selectKey resultType="int" order="AFTER" keyProperty="id">
+			select LAST_INSERT_ID() AS id
+		</selectKey>
+
+	</insert>
 
 
 
@@ -93,10 +266,10 @@
 
 		<association property="lbps"
 			javaType="com.capgemini.university.model.Lbps">
+			<result property="id" column="l_id" />
 			<result property="name" column="l_name" />
 			<result property="email" column="l_email" />
-			<result property="logo" column="l_logo" />
-			
+			<result property="role" column="l_role" />
 		</association>
 
 
@@ -104,6 +277,13 @@
 
 
 
+	<resultMap id="lbpsMap" type="com.capgemini.university.model.Lbps">
+		<result property="id" column="l_id" />
+			<result property="name" column="l_name" />
+			<result property="email" column="l_email" />
+			<result property="role" column="l_role" />
+
+	</resultMap>
 
 
 

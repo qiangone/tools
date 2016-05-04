@@ -1337,6 +1337,28 @@ function assignSeats(){
 	});
 	}
 	
+function exportNomination(){
+	var info = {
+			sbuId: "1"
+			
+	}
+
+	$.ajax({
+		type : 'POST',
+		data : JSON.stringify(info),
+		url : 'http://'+host_url+'/UniversityTool/api/sbu/exportNomination',
+		dataType : 'json',
+		contentType:"application/json",    
+		success : function(result) {
+			//console.log("return value 1");
+			console.log(JSON.stringify(result));
+			//console.log("return value 2");
+		},
+		error : function(info) {
+			console.log('1');
+		}
+	});
+	}
 	
 function listCourse(){
 	var info = {
@@ -3338,6 +3360,11 @@ function closeCertRequest() {
 	
 	<input type="button" onclick="listCourse()" value="listCourse" />
 	<br>
+	<input type="button" onclick="exportNomination()" value="exportNominationexportNominationexportNominationexportNomination" />
+	<a href="api/sbu/exportNomination?sbuId=13">dddddddddddddddddddddddddddddddddddddddd</a>
+	<br>
+	
+	
 	
 	<input type="button" onclick="sendCourseMail()" value="sendCourseMail" />
 	<br>

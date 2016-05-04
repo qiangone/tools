@@ -20,7 +20,7 @@ public class UTConstant {
 	public static final Integer SBUID_SOGETI = 8;
 	public static final Integer SBUID_FS = 9;
 	public static final Integer SBUID_OTHER = 10;
-	public static final Integer SBUID_SWAP = 11;
+//	public static final Integer SBUID_SWAP = 11;
 
 	
 	

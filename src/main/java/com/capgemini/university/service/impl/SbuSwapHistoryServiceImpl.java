@@ -108,6 +108,28 @@ public class SbuSwapHistoryServiceImpl implements ISbuSwapHistoryService {
 
 		return result;
 	}
+	
+	public PageResults<Map> getAllSbuSwapHistory(Map map, Pagination page){
+		
+		if (null == page || !page.isValidPage()) {
+			return null;
+		}
+		List<Map> list = historyDao.getSbuSwapHistory(map);
+		if (list == null || list.size() == 0) {
+			return null;
+		}
+		
+		int totalCount = list.size();
+		page.setTotalCount(totalCount);
+
+		map.put("showpage", 1);
+		map.put(Pagination.STARTINDEX, page.getStartIndex());
+		map.put(Pagination.PAGESIZE, page.getPageSize());
+		List<Map> list2 = historyDao.getSbuSwapHistory(map);
+		PageResults<Map> result = new PageResults<Map>(page, list2);
+
+		return result;
+	}
 	  
 
 }

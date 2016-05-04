@@ -25,8 +25,62 @@ public class CourseMail {
 
     private String email;
     
+    private String sbuName;
+    
     
     private List<Map> courseList;
+    
+    private int totalRemainSeats = 0;
+	private int totalRemainPmds = 0;
+
+
+    
+	/**
+	 * @return the totalRemainSeats
+	 */
+	public int getTotalRemainSeats() {
+		return totalRemainSeats;
+	}
+
+
+	/**
+	 * @param totalRemainSeats the totalRemainSeats to set
+	 */
+	public void setTotalRemainSeats(int totalRemainSeats) {
+		this.totalRemainSeats = totalRemainSeats;
+	}
+
+
+	/**
+	 * @return the totalRemainPmds
+	 */
+	public int getTotalRemainPmds() {
+		return totalRemainPmds;
+	}
+
+
+	/**
+	 * @param totalRemainPmds the totalRemainPmds to set
+	 */
+	public void setTotalRemainPmds(int totalRemainPmds) {
+		this.totalRemainPmds = totalRemainPmds;
+	}
+
+
+	/**
+	 * @return the sbuName
+	 */
+	public String getSbuName() {
+		return sbuName;
+	}
+
+
+	/**
+	 * @param sbuName the sbuName to set
+	 */
+	public void setSbuName(String sbuName) {
+		this.sbuName = sbuName;
+	}
 
 
 	/**

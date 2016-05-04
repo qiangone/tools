@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import com.capgemini.university.api.exception.DataAccessDeniedException;
@@ -51,23 +53,35 @@ public interface ICourseService {
   
   public List<Course> getCourseListByEvent(String eventName);
   
-  public List<Course> getAllEvent(int type);
+  public List<Map> getEventList(String type);
   
   public SbuCourse getSbuCourse(Integer sbuId, Integer courseId);
   
   
-  public void swap(Integer course1, Integer fromSbu, Integer toSbu, Integer action, Integer seats, Integer course2) throws DataAccessDeniedException;
+  public void swap_bak(Integer course1, Integer fromSbu, Integer toSbu, Integer action, Integer seats, Integer course2) throws DataAccessDeniedException;
   
+  public void swap(Integer mySbuId , Integer giveoutCourseId, Integer swapSbuId,
+	         Integer swapCourseId, Integer swapSeats);
   
   public PageResults<Map> getCourseListByPage(Map map, Pagination page) ;
   
+  public PageResults<Course> getAdminCourseListByPage(Map map, Pagination page) ;
   
-  public List<CourseMail> getAllCourseToBegin();
+  public Course getAdminCourse(Integer id);
+  
+  
+  public List<CourseMail> getAllCourseBeforeStarting(int week);
   
   
   public void uploadCourse(InputStream in, boolean append) throws DataAccessDeniedException;
   
   public void saveCourse(List<Course> list);
+  
+  public void updateCourse(Course c);
+  
+  public void updatedAttend(int participantId, int attend);
+  
+  
 	
 
 }

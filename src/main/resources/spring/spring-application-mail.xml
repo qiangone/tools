@@ -36,7 +36,8 @@
 	<bean id="mailService" class="com.capgemini.university.service.impl.MailServiceImpl">
 		<property name="mailSender" ref="mailSenderCG" />
 		<property name="velocityEngine" ref="velocityEngine" />
-		<property name="mailTemplate" value="spring/email-template.vm" /> 
+		<property name="mailTemplateOf3week" value="mail/mailTemplateOf3week.vm" /> 
+		<property name="mailTemplateOf2week" value="mail/mailTemplateOf2week.vm" /> 
 		 <!--<property name="from" value="hrappsystem.fsgbu@capgemini.com " /> -->
 	    <property name="from" value="${mail.from} " />
 	</bean>

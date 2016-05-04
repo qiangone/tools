@@ -1,0 +1,44 @@
+{
+	"info": {
+		"code": 200
+	},
+    "result": {
+		"sbuList": [
+			{
+				"id": 1,
+				"name":"AppsOne",
+				"lbps": "Demo"
+			},
+			{
+				"id": 2,
+				"name":"AppsTwo",
+				"lbps": "Demo"
+			},
+			{
+				"id": 3,
+				"name":"Bpo",
+				"lbps": "Demo"
+			},
+			{
+				"id": 4,
+				"name":"CC",
+				"lbps": "Demo"
+			},
+			{
+				"id": 5,
+				"name":"INFRA",
+				"lbps": "Demo"
+			},
+			{
+				"id": 6,
+				"name":"Insights & Data",
+				"lbps": "Demo"
+			},
+			{
+				"id": 7,
+				"name":"SBU LBP Financial Services",
+				"lbps": "Demo"
+			}
+		]
+	}
+}

@@ -13,6 +13,19 @@ body {
 	font-family: opensans, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+input[type="number"] {
+	-moz-appearance: textfield;
+}
+
+.form-control[readonly] {
+	background-color: #fff;
+}
+
 a:hover, a:focus {
 	text-decoration: none;
 }
@@ -102,6 +115,10 @@ a:hover, a:focus {
 	visibility: hidden;
 }
 
+.hide-border {
+    border-style: hidden !important;
+}
+
 .margin-lr-15 {
 	margin-left: 15px;
 	margin-right: 15px;
@@ -117,6 +134,11 @@ a:hover, a:focus {
 
 .top-level {
 	z-index: 100;
+}
+
+.col-md-6 {
+	width: 50%;
+  	float: left;
 }
 
 .down-arrow {
@@ -294,6 +316,7 @@ a:hover, a:focus {
     top: 18px;
     right: 5px;
     z-index: 3;
+    cursor: pointer;
 }
 
 .info {
@@ -552,18 +575,35 @@ a:hover, a:focus {
 	border-radius: 50%;
 }
 
-.program-info {
+.program-info, .history-info, .admin-info {
     width: 1140px;
     margin-top: 20px;
 }
 
-.program-info > div.row{
+.program-info > div.row, .history-info > div.row, .admin-info > div.row{
 	position: relative;
     margin: 0 50px;
 }
 
+@media (min-width: 768px) {
+	.admin-info{
+		width: 750px;
+	}
+	
+	.col-md-6 {
+		width: 50%;
+    	float: left;
+    }
+}
+
+@media (min-width: 992px) {
+	.admin-info{
+		width: 970px;
+	}
+}
+
 @media (min-width: 1200px) {
-	.program-info {
+	.program-info{
 		width: 1000px;
 	}
 	
@@ -571,14 +611,13 @@ a:hover, a:focus {
 	    margin: 0;
 	}
 	
+	.admin-info {
+		width: 1140px;
+	}
+	
 	.navbar-nav > li {
 		margin-right: 60px;
 	}
-}
-
-.history-info {
-    width: 75%;
-    margin-top: 20px;
 }
 
 /* Right slide content style */
@@ -592,7 +631,7 @@ a:hover, a:focus {
     top: 80px;
     padding-bottom: 50px;
     overflow-y: auto;
-    z-index: 10;
+    z-index: 200;
 }
 
 .fixed-right .container {
@@ -896,18 +935,21 @@ a:hover, a:focus {
 	cursor: pointer;
 }
 
-.nominee-add {
-    background: url("../images/ico_add.png") no-repeat left;
+.icon-add {
+	background: url("../images/ico_add.png") no-repeat left;
     cursor: pointer;
     color: #6abb59;
-	margin-left: 30px;
-	margin-right: 15px;
-    width: 55px;
     text-align: right;
 }
 
-.nominee-add:active {
+.icon-add:active {
 	background: url("../images/ico_add_press.png") no-repeat left;
+}
+
+.nominee-add {
+	margin-left: 30px;
+	margin-right: 15px;
+    width: 55px;
 }
 
 /* Add nominee */
@@ -936,8 +978,29 @@ a:hover, a:focus {
 	width: 86%;
 }
 
+.form-group.sbu-group {
+	width: 100%;
+}
 
 /* Modal info */
+.swap-title {
+	text-align: center;
+    color: #fff;
+    text-transform: uppercase;
+    height: 40px;
+    line-height: 40px;
+}
+
+.giveout-title {
+	background: #ea7e40;
+	margin-right: 40px;
+}
+
+.takein-title {
+	background: #6bcc59;
+	margin-left: 40px;
+}
+
 .confirm-swap-text {
 	color: #7f919f;
 	text-transform: capitalize;
@@ -962,6 +1025,10 @@ a:hover, a:focus {
 .warn-info {
     padding-top: 30px;
     padding-bottom: 0px;
+}
+
+.desc-info {
+	padding-bottom: 30px;
 }
 
 .modalInputAlert {
@@ -994,8 +1061,8 @@ a:hover, a:focus {
 .alert-danger {
 	position: absolute;
     margin: 0;
-    top: 70px;
-    padding: 5px;
+    top: 0;
+    padding: 5px 0;
     font-size: 14px;
     margin-top: -20px;
     background: none;
@@ -1022,6 +1089,15 @@ a:hover, a:focus {
     transform: translateX(50%);
 }
 
+.no-swap-event {
+	position: absolute;
+    top: 50%;
+    left: 75%;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+}
+
 .no-record {
 	width: 100%;
     height: 250px;
@@ -1033,6 +1109,150 @@ a:hover, a:focus {
     padding-top: 60px;
     background: #fff;
 }
+
+.no-swap-seat {
+	height: 50px;
+    padding-top: 0;
+    text-align: left;
+}
+
+/* Panel Style */
+.panel-group .panel{
+	margin-bottom: 30px;
+}
+
+.panel-sbu-mgt .panel-body {
+	padding: 0 50px 30px;
+}
+
+.panel-title {
+	text-transform: uppercase;	
+}
+
+.panel-title > a {
+	display: block;
+}
+
+.add-sbu {
+    float: right;
+    margin-right: 0;
+    height: 40px;
+    line-height: 40px;
+    text-transform: uppercase;
+    padding-left: 24px;
+}
+
+.icon-delete {
+	background: url(../images/btn_delete.png) no-repeat center;
+	height: 20px;
+    width: 20px;
+    cursor: pointer;
+}
+
+.icon-delete:active {
+	background: url(../images/btn_delete_press.png) no-repeat center;
+}
+
+.delete-sbu {
+	display: inline-block;
+	line-height: 20px;
+	text-align: center;
+}
+
+.icon-edit {
+	height: 15px;
+    width: 20px;
+    background: url(../images/btn_edit.png) no-repeat center;
+    cursor: pointer;
+}
+
+.edit-sbu {
+	margin-left: 13px;
+}
+
+.rename-text {
+	color: #28303d;
+	margin-left: -9px;
+	padding: 0 7px;
+	height: 30px;
+	line-height: 30px;
+	width: 200px;
+	outline: none;
+}
+
+.btn-rename {
+	background: #369cf5;
+	border: 1px solid #008ef2;
+	color: #fff;
+	height: 30px;
+	position: absolute;
+	width: 40px;
+	text-align: center;
+	outline: none;
+	font-size: 14px;}
+
+.icon-edit:hover {
+	background: url(../images/btn_edit_focus.png) no-repeat center;
+}
+
+.icon-edit:active {
+	background: url(../images/btn_edit_press.png) no-repeat center;
+}
+
+.select-row-container.attendee-container {
+	display: inline-block;
+	margin-top: 0;
+	margin-bottom: 16px;
+	width: initial;
+}
+
+.panel-body .text {
+	display: inline-block;
+	font-size: 16px;
+	font-weight: bold;
+	vertical-align: middle;
+	text-transform: uppercase;
+	margin-right: 16px;
+}
+
+.panel-body .no-record {
+	border: 1px solid #dedee3;
+	border-top: 0;
+}
+
+.attendee-container .select-value {
+	min-width: 160px;
+    width: inherit;
+}
+
+.radio {
+	display: inline-block;
+	font-size: 14px;
+}
+
+.radio input[type="radio"] {
+    -webkit-appearance: initial;
+    appearance: initial;
+    -moz-appearance: initial;
+    width: 22px;
+    height: 22px;
+    position: relative;
+    top: 6px;
+    background: url(../images/ico_radio.png) no-repeat center;
+    background-size: cover;
+    margin: 0;
+    margin-right: 10px;
+    outline: none;
+}
+
+.radio input[type="radio"]:checked {
+	background: url(../images/ico_radio_press.png) no-repeat center;
+}
+
+.radio + .radio {
+	margin-left: 40px;
+}
+/* Panel Style */
 
 /* Mask background*/
 .mask {
@@ -1128,3 +1348,29 @@ a:hover, a:focus {
 	visibility: visible;
 	opacity: 1;
 }
+
+/* Loading Bar */
+.loading-bar {
+	position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    right: 0;
+    height: .2em;
+}
+
+.loading-bar .progress {
+    height: 100%;
+    background: #fff;
+    transition: none;
+	transform: translateX(0);
+	-webkit-transform: translateX(0);
+	-moz-transform: translateX(0);
+	width: 0;
+}
+
+.loading-bar .progress.done {
+	transition: all 1.2s;
+	width: 100%;
+}
+

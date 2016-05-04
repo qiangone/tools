@@ -1,0 +1,30 @@
+<span style="font-size: 11.0pt; font-family: Calibri">
+
+	
+	Dear ${toName},<br /> <br />
+	We are three weeks before a Learning Event, and we see that you still have <strong>${totalRemainSeats}</strong> places not allocated. Please submit the names, otherwise in a week time, all your not allocated seats have been converted to free seats. 
+	<br /> <br />What is not allocated yet:
+	
+	<ul>
+		 #foreach($mail in $courseList)
+		<li>
+		${mail.name} and number of places ${mail.remainning_seats} , number of PMDs ${mail.remainning_pmds}  
+	   </li>
+		 #end
+    </ul>
+ 
+ 	Total not allocated PMD <strong>${totalRemainPmds}</strong>  <br/><br/>
+	
+	Please use University Registration tool to submit your nominations  <LINK>  <br/><br/>
+	
+	Note: Course description and duration – please use ISC http://talent.capgemini.com/university/<br/><br/>
+	
+	University hopes you can make good use of those places. <br/>
+	Kind regards, <br/>
+	Our University <br/>
+	
+	
+	
+ 
+
+	

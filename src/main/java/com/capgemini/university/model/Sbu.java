@@ -28,9 +28,25 @@ public class Sbu {
     
     private Lbps lbps;
     
+    private Integer tag;
     
     
     
+    
+
+	/**
+	 * @return the tag
+	 */
+	public Integer getTag() {
+		return tag;
+	}
+
+	/**
+	 * @param tag the tag to set
+	 */
+	public void setTag(Integer tag) {
+		this.tag = tag;
+	}
 
 	/**
 	 * @return the lbps

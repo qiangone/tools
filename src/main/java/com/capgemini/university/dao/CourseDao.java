@@ -18,6 +18,8 @@ public interface CourseDao {
 
 	public int addParticipant(Participant part);
 	
+	public int updateParticipant(Participant part);
+	
 	public int addSbuCourse(SbuCourse sc);
 	
 	public int addSbuCourseList(List<SbuCourse> list);
@@ -33,11 +35,19 @@ public interface CourseDao {
 	
 	public List<Course> getCourse(Map map);
 	
+	public List<Map> getEventList(Map map);
+	
 	public List<Map> getCourseListByPage(Map map);
+	
+	public List<Course> getAdminCourseListByPage(Map map);
 	
 	
 	public List<CourseMail> getAllCourseToBegin(Map map);
 	
 	public int addCourse(Course c);
+	
+	public int updateCourse(Course c);
+	
+	public List<Map> getCourseDetail(Map map);
 
 }

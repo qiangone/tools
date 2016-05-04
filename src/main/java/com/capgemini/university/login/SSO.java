@@ -1,9 +1,12 @@
 package com.capgemini.university.login;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
+import com.capgemini.university.model.Lbps;
 import com.capgemini.university.model.Participant;
 import com.capgemini.university.model.Sbu;
 import com.capgemini.university.response.ResponseUtil;
@@ -38,7 +42,7 @@ public class SSO {
 	public @ResponseBody WDResponse getUserInfo() {
 		try {
 			UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			Map map = new HashMap();
+			
 			String loginName = detail.getUsername();
 			List<Participant> list = participantService.queryParticipantByName(loginName);
 			if(list != null && list.size()>0){
@@ -48,22 +52,34 @@ public class SSO {
 //				if(list2 == null || list2.size()==0){
 //					return ResponseUtil.apiSuccess("you have no persmisson to login.", "you have no persmisson to login.");
 //				}
-				
-				Sbu sbu = sbuService.getSbuByMail(part.getEmail());
-				if(sbu == null){
+				Map map = new HashMap();
+				Lbps lbps = sbuService.getLbpsByEmail(part.getEmail());
+				if(lbps == null){
 					return ResponseUtil.apiSuccess("you have no persmisson to login.", "you have no persmisson to login.");
 				}
 				
-//				Sbu sbu = list2.get(0);
-				if(sbu != null){
-					int parentId = sbu.getParentId();
-					if(parentId != 0){
-						Sbu par = sbuService.getSbuById(parentId);
-						sbu.setParentSbu(par);
-					}
+				byte[] logoByte = part.getThumbnailPhoto();
+				if(logoByte != null){
+					String logoImg = new String(Base64.encodeBase64(logoByte));  
+//					map.put("logoImg", logoImg);
+					lbps.setLogo(logoImg);
 				}
-				//map.put("sbu", sbu);
-				return ResponseUtil.apiSuccess(sbu, "login successful");
+				
+				int role = lbps.getRole();
+				List<Sbu> sbuList = null;
+				
+				if(role == 1){//admin role
+					sbuList = sbuService.getSbuListByParentId(0);
+					map.put("role", "admin");
+				}else{
+					sbuList = sbuService.getSbuByMail(part.getEmail());
+					map.put("role", "lbps");
+				}
+				
+				map.put("sbuList", sbuList);
+				 
+				map.put("lbps", lbps);
+				return ResponseUtil.apiSuccess(map, "login successful");
 			}
 
 			return ResponseUtil.apiError("search people exception by ldap", "search people exception by ldap");

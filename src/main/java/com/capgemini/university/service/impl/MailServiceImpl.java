@@ -29,7 +29,8 @@ public class MailServiceImpl implements IMailService {
  
 	private JavaMailSender mailSender;
     private String from;
-    private String mailTemplate;
+    private String mailTemplateOf3week;
+    private String mailTemplateOf2week;
     private VelocityEngine velocityEngine;
     @Autowired
     private ICourseService courseService;
@@ -44,22 +45,46 @@ public class MailServiceImpl implements IMailService {
     @Override
 	public void notifyLbpsMail() {
 	
-    	List<CourseMail> list = courseService.getAllCourseToBegin();
+    	String simulatorTag = ConfigUtil.getPropertyValue("mail.simulator");
+    	String subject3week = ConfigUtil.getPropertyValue("mail.3week.subject");
+    	String subject2week = ConfigUtil.getPropertyValue("mail.2week.subject");
+    	
+    	
+		boolean simulator = simulatorTag != null && simulatorTag != "" && simulatorTag.equals("true")?true:false;
+		
+    	List<CourseMail> list = courseService.getAllCourseBeforeStarting(3);//3 weeks 
     	if(list != null && list.size()>0){
-    		String simulatorTag = ConfigUtil.getPropertyValue("mail.simulator");
-    		boolean simulator = simulatorTag != null && simulatorTag != "" && simulatorTag.equals("true")?true:false;
+    	
+    		
     		for(CourseMail cm : list){
-    			sendMail(simulator, cm);
+    			List<Map> courseList = cm.getCourseList();
+    			int totalSeats = 0;
+    			int totalPmds = 0;
+    			for(Map map : courseList){
+    				int remainSeats = Integer.parseInt(map.get("remainning_seats").toString());
+    				int remainPmds = Integer.parseInt(map.get("remainning_pmds").toString());
+    				totalSeats += remainSeats;
+    				totalPmds += remainPmds;
+    			}
+    			cm.setTotalRemainSeats(totalSeats);
+    			cm.setTotalRemainPmds(totalPmds);
+    			
+    			sendMail(simulator, cm, mailTemplateOf3week, subject3week);
+    			break;//for test;
     		}
     	}
-		
-		
-		
-        
+    	
+    	
+    	List<CourseMail> list2 = courseService.getAllCourseBeforeStarting(2);//2 weeks 
+    	if(list2 != null && list2.size()>0){
+    		for(CourseMail cm : list2){
+    			sendMail(simulator, cm, mailTemplateOf2week, subject2week);
+    		}
+    	}
        
 	}
     
-    private void sendMail(boolean simulator, CourseMail cm){
+    private void sendMail(boolean simulator, CourseMail cm, String mailTemplate, String subject){
     	MimeMessagePreparator preparator = new MimeMessagePreparator()
         {
             public void prepare(MimeMessage mimeMessage) throws Exception
@@ -68,7 +93,7 @@ public class MailServiceImpl implements IMailService {
              
             	String email = cm.getEmail();
                 
-                message.setSubject("you have below seats not signed");
+                message.setSubject(subject);
                 if(simulator){
                 	message.setTo(from);
                 }else{
@@ -80,6 +105,9 @@ public class MailServiceImpl implements IMailService {
                 Map<String, Object> model = new HashMap<String, Object>();
                 model.put("courseList", cm.getCourseList());
                 model.put("toName", cm.getName());
+                model.put("totalRemainSeats", cm.getTotalRemainSeats());
+                model.put("totalRemainPmds", cm.getTotalRemainPmds());
+                
 //                model.put("content", getMailContent(cerFile, userFirstName, contextUrl));
                 
                 String encoding = "UTF-8";
@@ -136,14 +164,34 @@ public class MailServiceImpl implements IMailService {
         this.velocityEngine = velocityEngine;
     }
 
-    public String getMailTemplate()
-    {
-        return mailTemplate;
-    }
+	/**
+	 * @return the mailTemplateOf3week
+	 */
+	public String getMailTemplateOf3week() {
+		return mailTemplateOf3week;
+	}
 
-    public void setMailTemplate(String mailTemplate)
-    {
-        this.mailTemplate = mailTemplate;
-    }
+	/**
+	 * @param mailTemplateOf3week the mailTemplateOf3week to set
+	 */
+	public void setMailTemplateOf3week(String mailTemplateOf3week) {
+		this.mailTemplateOf3week = mailTemplateOf3week;
+	}
+
+	/**
+	 * @return the mailTemplateOf2week
+	 */
+	public String getMailTemplateOf2week() {
+		return mailTemplateOf2week;
+	}
+
+	/**
+	 * @param mailTemplateOf2week the mailTemplateOf2week to set
+	 */
+	public void setMailTemplateOf2week(String mailTemplateOf2week) {
+		this.mailTemplateOf2week = mailTemplateOf2week;
+	}
+
+   
 
 }

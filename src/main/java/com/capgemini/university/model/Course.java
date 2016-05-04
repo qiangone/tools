@@ -26,6 +26,7 @@ public class Course {
     private Date endTime;
     private Float duration;
     
+    
     private List<SbuCourse> sbuList;
     
     

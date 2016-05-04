@@ -27,6 +27,23 @@
 
 	</insert>
 	
+	
+	<update id="updateParticipant" parameterType="com.capgemini.university.model.Participant">
+		update course_participant
+
+		<set>
+			<if test="attend != null">
+				attend=#{attend}
+			</if>
+
+		</set>
+
+		where id=#{id}
+
+
+	</update>
+	
+
 	<insert id="addCourse" parameterType="com.capgemini.university.model.Course">
 
 		INSERT INTO course
@@ -51,9 +68,9 @@
 		</selectKey>
 
 	</insert>
-	
 
-	<insert id="addSbuCourse" parameterType="List">
+
+	<insert id="addSbuCourse" parameterType="com.capgemini.university.model.SbuCourse">
 
 		insert into sbu_course
 		(
@@ -76,7 +93,7 @@
 		</selectKey>
 
 	</insert>
-	
+
 	<insert id="addSbuCourseList" parameterType="List">
 		insert into sbu_course
 		(
@@ -100,7 +117,44 @@
 		</foreach>
 
 	</insert>
-	
+
+
+
+	<update id="updateCourse" parameterType="com.capgemini.university.model.Course">
+		update course
+
+		<set>
+			<if test="eventName != null">
+				event_name=#{eventName},
+			</if>
+			<if test="name != null">
+				name=#{name},
+			</if>
+
+			<if test="url != null">
+				url=#{url},
+			</if>
+
+			<if test="startTime != null">
+				start_time=#{startTime},
+			</if>
+			<if test="endTime != null">
+				end_time=#{endTime},
+			</if>
+			<if test="duration != null">
+				duration=#{duration},
+			</if>
+
+		</set>
+
+		where 1=1
+
+		<if test="id != null">
+			and id = #{id}
+		</if>
+
+
+	</update>
 
 	<update id="updateSbuCourse" parameterType="com.capgemini.university.model.SbuCourse">
 		update sbu_course
@@ -112,14 +166,16 @@
 			<if test="assignPmds != null">
 				assign_pmds=#{assignPmds},
 			</if>
-
-			<if test="seats != null">
-				seats=#{seats},
-			</if>
-
 			<if test="duration != null">
 				duration=#{duration},
 			</if>
+			<if test="seats != null">
+				seats=#{seats},
+			</if>
+			<if test="swapSeats != null">
+				swap_seats=#{swapSeats},
+			</if>
+			
 
 			<if test="pmds != null">
 				pmds=#{pmds},
@@ -135,26 +191,29 @@
 
 
 	</update>
-	
+
 	<delete id="removeParticipant" parameterType="Map">
 		delete from course_participant where 1=1
 		<if test="courseId != null">
-				and course_id = #{courseId}
+			and course_id = #{courseId}
 		</if>
 		<if test="sbuId != null">
-				and sbu_id = #{sbuId}
+			and sbu_id = #{sbuId}
 		</if>
 		<if test="email != null">
-				and participant_email = #{email}
+			and participant_email = #{email}
 		</if>
-		
+
 	</delete>
-	
-	
+
+
 	<select id="getAllCourseToBegin" parameterType="map" resultMap="courseMailMap">
 
-		
-		select 
+
+		select
+		d.name lbps_name,
+		d.email,
+		e.sbu_name sbu_name,
 		a.event_name,
 		a.name,
 		a.start_time,
@@ -163,35 +222,42 @@
 		b.seats,
 		b.pmds,
 		b.assign_seats,
-		 (b.seats-b.assign_seats) remainning_seats,
+		(b.seats-b.assign_seats) remainning_seats,
 		b.assign_pmds,
-		d.name sbu_name,
-		d.email
-		from course a left join sbu_course b on a.id = b.course_id
-		left join sbu_lbps c on b.sbu_id = c.sbu_id
-		left join lbps d on c.lbps_id=d.id
-		left join sbu e on b.sbu_id=e.id
-		
-		where TIMESTAMPDIFF(WEEK,a.start_time,NOW())>3
-		and d.name is not null 
-		and d.email is not null
+		(b.pmds-b.assign_pmds) remainning_pmds	
+		from course a
+		left join sbu_course
+		b on a.id = b.course_id
+		left join sbu_lbps c on
+		b.sbu_id = c.sbu_id
+		left
+		join lbps d on c.lbps_id=d.id
+		left join sbu e
+		on b.sbu_id=e.id
+
+		where
+		TIMESTAMPDIFF(WEEK,a.start_time,NOW())=#{week}
+		and d.name is not null
+		and
+		d.email is not null
 		and b.assign_seats != b.seats
-		and e.parent_id=0
 		
+
 
 
 	</select>
-	
+
 	<select id="queryParticipantList" parameterType="map" resultMap="participantMap">
 
-		SELECT 
-	    id,
-	    course_id,
-	    sbu_id,
-	    participant_login_name,
-	    participant_email,
-	    participant_dispaly_name
-	    FROM course_participant where 1=1
+		SELECT
+		id,
+		course_id,
+		sbu_id,
+		participant_login_name,
+		participant_email,
+		participant_dispaly_name,
+		attend
+		FROM course_participant where 1=1
 		<if test="id != null">
 			and id = #{id}
 		</if>
@@ -216,7 +282,8 @@
 		seats,
 		pmds,
 		assign_seats,
-		assign_pmds
+		assign_pmds,
+		swap_seats
 		FROM sbu_course where 1=1
 		<if test="id != null">
 			and id = #{id}
@@ -238,7 +305,9 @@
 		c.event_name,
 		d.logo event_logo,
 		b.id sbuId,
-		c.id courseId,
+		c.url url,
+		c.id
+		courseId,
 		c.name courseName,
 		c.start_time
 		startTime,
@@ -246,36 +315,73 @@
 		c.duration duration,
 		a.seats,
 		a.pmds,
-		(a.seats-a.assign_seats) remainedSeats,
+		(a.seats-a.assign_seats)
+		remainedSeats,
 		(a.pmds-a.assign_pmds)remainedPmds
-		from sbu_course a left join sbu b on
+		from sbu_course a left
+		join sbu b on
 		a.sbu_id=b.id
 		left join course c on a.course_id=c.id
-		left join event_logo d on c.event_name=d.event_name
+		left
+		join event_logo d on c.event_name=d.event_name
 		where 1=1
 		<if test="id != null">
 			and a.sbu_id = #{id}
 		</if>
 		<if test="courseName != null">
-			and c.name like CONCAT('%','${courseName}','%' )  
+			and c.name like CONCAT('%','${courseName}','%' )
 		</if>
-		
-		<if test="type != null and type == 1">
-			and end_time <![CDATA[  < ]]> sysdate()
+		<if test="eventName != null">
+			and c.event_name=#{eventName}
 		</if>
-		<if test="type != null and type == 2">
-			and start_time<![CDATA[  < ]]> sysdate()
-			and end_time <![CDATA[  > ]]> sysdate()
+
+		<if test="type != null and type == 1"><!-- closed course -->
+			and c.end_time <![CDATA[  < ]]>
+			sysdate()
 		</if>
-		<if test="type != null and type == 3">
-			and start_time <![CDATA[  > ]]> sysdate()
+		<if test="type != null and type == 2"><!-- ongoing course -->
+			and c.start_time<![CDATA[  < ]]>
+			TIMESTAMPADD(WEEK,2, sysdate())
+			and c.end_time>sysdate()
 		</if>
-		
+		<if test="type != null and type == 3"><!-- upcomming course -->
+			and c.start_time<![CDATA[  > ]]>
+			TIMESTAMPADD(WEEK,2, sysdate())
+
+		</if>
+
 		order by c.start_time
 		<if test="showpage != null">
 			limit #{startIndex},#{pageSize}
 		</if>
 	</select>
+
+
+
+	<select id="getEventList" parameterType="map" resultType="map">
+
+		SELECT
+		distinct event_name
+		FROM course where 1=1
+		<if test="type != null and type == 1"><!-- closed course -->
+			and end_time <![CDATA[  < ]]>
+			sysdate()
+		</if>
+		<if test="type != null and type == 2"><!-- ongoing course -->
+			and start_time<![CDATA[  < ]]>
+			TIMESTAMPADD(WEEK,2, sysdate())
+			and end_time>sysdate()
+		</if>
+		<if test="type != null and type == 3"><!-- upgoing course -->
+			and start_time<![CDATA[  > ]]>
+			TIMESTAMPADD(WEEK,2, sysdate())
+
+		</if>
+
+
+	</select>
+
+
 
 
 	<select id="getCourse" parameterType="map" resultMap="courseMap">
@@ -288,29 +394,52 @@
 		start_time,
 		end_time,
 		duration
-		FROM course where 1=1
+		FROM course
+		where 1=1
 		<if test="id != null">
 			and id = #{id}
 		</if>
 		<if test="eventName != null">
 			and event_name = #{eventName}
 		</if>
-		<if test="type != null and type == 1">
-			and end_time <![CDATA[  < ]]> sysdate()
-		</if>
-		<if test="type != null and type == 2">
-			and start_time<![CDATA[  < ]]> sysdate()
-			and end_time <![CDATA[  > ]]> sysdate()
-		</if>
-		<if test="type != null and type == 3">
-			and start_time <![CDATA[  > ]]> sysdate()
-		</if>
+
 
 	</select>
 
 
 
+	<select id="getAdminCourseListByPage" parameterType="map"
+		resultMap="courseWithSbuMap">
 
+		select t.*,
+		b.id s_id,
+		b.sbu_id sbu_id,
+		c.sbu_name sbu_name,
+		b.course_id
+		s_course_id,
+		b.duration s_duration,
+		b.seats s_seats,
+		b.pmds s_pmds,
+		b.assign_seats s_assign_seats,
+		b.assign_pmds s_assign_pmds
+		from
+		(
+		select a.* from course a
+		where 1=1
+		<if test="id != null">
+			and a.id = #{id}
+		</if>
+		<if test="eventName != null">
+			and a.event_name = #{eventName}
+		</if>
+		<if test="showpage != null">
+			limit #{startIndex},#{pageSize}
+		</if>
+		)t left join sbu_course b on t.id = b.course_id
+		left join sbu c on
+		b.sbu_id = c.id
+
+	</select>
 
 
 
@@ -329,6 +458,30 @@
 
 	</resultMap>
 
+	<resultMap id="courseWithSbuMap" type="com.capgemini.university.model.Course">
+		<result property="id" column="id" />
+		<result property="eventName" column="event_name" />
+		<result property="name" column="name" />
+		<result property="url" column="url" />
+		<result property="startTime" column="start_time" />
+		<result property="endTime" column="end_time" />
+		<result property="duration" column="duration" />
+		<collection property="sbuList"
+			ofType="com.capgemini.university.model.SbuCourse">
+			<result property="id" column="s_id" />
+			<result property="sbuId" column="sbu_id" />
+			<result property="sbuName" column="sbu_name" />
+			<result property="courseId" column="s_course_id" />
+			<result property="duration" column="s_duration" />
+			<result property="seats" column="s_seats" />
+			<result property="pmds" column="s_pmds" />
+			<result property="assignSeats" column="s_assign_seats" />
+			<result property="assignPmds" column="s_assign_pmds" />
+
+		</collection>
+
+	</resultMap>
+
 
 	<resultMap id="sbuCourseMap" type="com.capgemini.university.model.SbuCourse">
 		<result property="id" column="id" />
@@ -339,9 +492,11 @@
 		<result property="pmds" column="pmds" />
 		<result property="assignSeats" column="assign_seats" />
 		<result property="assignPmds" column="assign_pmds" />
+		<result property="swapSeats" column="swap_seats" />
+		
 
 	</resultMap>
-	
+
 	<resultMap id="participantMap" type="com.capgemini.university.model.Participant">
 		<result property="id" column="id" />
 		<result property="sbuId" column="sbu_id" />
@@ -349,31 +504,34 @@
 		<result property="cnName" column="participant_login_name" />
 		<result property="email" column="participant_email" />
 		<result property="displayName" column="participant_dispaly_name" />
-	
+		<result property="attend" column="attend" />
+
 
 	</resultMap>
-	
-	
-		<resultMap id="courseMailMap" type="com.capgemini.university.model.CourseMail">
-		<result property="name" column="sbu_name" />
+
+
+	<resultMap id="courseMailMap" type="com.capgemini.university.model.CourseMail">
+		<result property="name" column="lbps_name" />
 		<result property="email" column="email" />
-		 <collection property="courseList" ofType="map">
-		   <result property="name" column="name" />
-		   <result property="event_name" column="event_name" />
-		    <result property="start_time" column="start_time" />
-		     <result property="end_time" column="end_time" />
-		      <result property="duration" column="duration" />
-		      <result property="seats" column="seats" />
-		       <result property="pmds" column="pmds" />
-		        <result property="assign_seats" column="assign_seats" />
-		        <result property="assign_pmds" column="assign_pmds" />
-		        <result property="remainning_seats" column="remainning_seats" />
-		        
-		  </collection>
-	
+		<result property="sbuName" column="sbu_name" />
+		
+		<collection property="courseList" ofType="map">
+			<result property="name" column="name" />
+			<result property="event_name" column="event_name" />
+			<result property="start_time" column="start_time" />
+			<result property="end_time" column="end_time" />
+			<result property="duration" column="duration" />
+			<result property="seats" column="seats" />
+			<result property="pmds" column="pmds" />
+			<result property="assign_seats" column="assign_seats" />
+			<result property="assign_pmds" column="assign_pmds" />
+			<result property="remainning_seats" column="remainning_seats" />
+			<result property="remainning_pmds" column="remainning_pmds" />
+		</collection>
+
 
 	</resultMap>
-	
+
 
 
 

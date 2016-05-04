@@ -24,6 +24,10 @@ public class ParticipantMapper implements AttributesMapper{
 			par.setEmail((String)attrs.get("mail").get());
 		}
 		
+		if(attrs.get("thumbnailPhoto")!=null){
+			par.setThumbnailPhoto((byte[])attrs.get("thumbnailPhoto").get());
+		}
+		
 		
 		return par;
 	}

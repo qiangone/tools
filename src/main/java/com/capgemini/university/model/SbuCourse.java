@@ -38,10 +38,45 @@ public class SbuCourse {
     private Integer assignSeats;
     
     private Integer assignPmds;
+    
+    private Integer swapSeats;
+    
+    private String sbuName;
+    
+    
+    
 
     
     
 	
+
+	/**
+	 * @return the swapSeats
+	 */
+	public Integer getSwapSeats() {
+		return swapSeats;
+	}
+
+	/**
+	 * @param swapSeats the swapSeats to set
+	 */
+	public void setSwapSeats(Integer swapSeats) {
+		this.swapSeats = swapSeats;
+	}
+
+	/**
+	 * @return the sbuName
+	 */
+	public String getSbuName() {
+		return sbuName;
+	}
+
+	/**
+	 * @param sbuName the sbuName to set
+	 */
+	public void setSbuName(String sbuName) {
+		this.sbuName = sbuName;
+	}
 
 	/**
 	 * @return the duration

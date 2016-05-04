@@ -8,7 +8,7 @@
 <meta name="description" content="">
 <meta name="author" content="">
 
-<title>UniversityTool</title>
+<title>Our University Campus Nomination Tool</title>
 <!-- <link rel="SHORTCUT ICON" href="lib/img/title.png" /> -->
 <!-- Bootstrap Core CSS -->
 <link href="css/bootstrap.min.css" rel="stylesheet">

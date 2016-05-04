@@ -1,6 +1,7 @@
 (function () {
 	'use strict';
 	var selectItem = false;
+	var refreshAdminPrograms = false;
 	Vue.transition('slideHorizontal', {
 		css: false,
 		enter : function(el, done){
@@ -49,6 +50,9 @@
 					this.$parent.getProgramList();
 				}else if(this.$parent.currentIndex === 3) {
 					this.$parent.getOperationList();
+				}else if(this.$parent.currentIndex === 4) {
+					refreshAdminPrograms = true;
+					this.$parent.getAdminProgramList();
 				}
 			},
 			gotoNext: function(currentPage) {
@@ -63,6 +67,9 @@
 					this.$parent.getProgramList();
 				}else if(this.$parent.currentIndex === 3) {
 					this.$parent.getOperationList();
+				}else if(this.$parent.currentIndex === 4) {
+					refreshAdminPrograms = true;
+					this.$parent.getAdminProgramList();
 				}
 			}
 		}
@@ -109,8 +116,26 @@
 		return startFormatDate + " - " + endFormatDate;
 	});
 	
-	Vue.filter('dateTime', function(timestamp){
-		return DateFormat.format.date(new Date(timestamp), "yyyy-MM-dd HH:mm:ss")
+	Vue.filter('dateTime', {
+		read: function(timestamp, type) {
+			var type = type;
+			switch (type) {
+			case 1:
+				if(timestamp){
+					return DateFormat.format.date(new Date(timestamp), "yyyy-MM-dd");
+				}
+				break;
+			default:
+				if(timestamp){
+					return DateFormat.format.date(new Date(timestamp), "yyyy-MM-dd HH:mm:ss");
+				}
+				break;
+			}
+			return '';
+		},
+		write: function(val) {
+			return val;
+		}
 	});
 	
 	Vue.filter('getFirstName', function(name) {
@@ -130,23 +155,26 @@
 			     { name: 'dashboard', active: true},
 			     { name: 'program', active: false},
 			     { name: 'assignment', active: false},
-			     { name: 'history', active: false}
+			     { name: 'history', active: false},
+			     { name: 'admin', active: false}
 			],
 			emails: [
 			     { text: '@capgemini.com' },
 			     { text: '@sogeti.com' },
 			     { text: '@prosodie.com' }
 			],
+			selectedType: {},
 			selectedEmailAddress: '',
 			currentIndex: 0,
 			errorMsg: "",
 			query: '',
-			currentSbu : '',
+			currentSbu : {},
 			currentCountry: {},
 			sbuId: 0,
 			swapSeatsCount: 0,
 			eventList:[],
 			allEvent: [],
+			adminProgramList: [],
 			countryCharts: [],
 			programList : [],
 			otherSbuSeatsList: [],
@@ -155,6 +183,8 @@
 			countrySeatsList: [],
 			nomineeList: [],
 			deleteNominee: {},
+			deleteSbu: {},
+			isDeleteNominee: true,
 			searchNomineeList: [],
 			searchNominee: {},
 			selectedProgram: null,
@@ -169,11 +199,27 @@
 			selectedSwapSbu: {},
 			selectedSwapEvent: {},
 			selectedSwapProgram: {},
+			selectedEvent: {},
 			isZero: false,
 			noSelectProgram: false,
 			noRecord: false,
 			wholeSbuInfo: {},
-			user: {}
+			user: {},
+			noSwapEvent: false,
+			typeList: [
+				{ text: 'All' },
+				{ index: 3, text: 'Upcoming' },
+				{ index: 2, text: 'Ongoing' },
+				{ index: 1, text: 'Closed' }
+			],
+			sbuList: [],
+			isEdit: false,
+			uploadFileName: '',
+			incorrectFile: false,
+			uploadType: '',
+			programDetail: {},
+			noSwapSeats: true,
+			newSbu: {}
 		},
 		ready : function() {
 			initModalPosition();
@@ -181,6 +227,7 @@
 			// Get Request
 			this.getCurrentSbu();
 			this.selectedEmailAddress = this.emails[0].text;
+			this.selectedType = this.typeList[1];
 		},
 		computed: {
 			countryRemainingSeats: {
@@ -199,6 +246,9 @@
 							result--; //For country level user
 						}
 					}
+					if(this.currentSbu.forSwapNumber !== undefined) {
+						result -= this.currentSbu.forSwapNumber;
+					}
 					return result;
 				}
 			},
@@ -207,6 +257,16 @@
 			}
 		},
 		methods : {
+			selectType: function(i) {
+				this.query = '';
+				this.selectedType = this.typeList[i];
+				this.getProgramList();
+			},
+			limitNumber: function() {
+				if(this.swapSeatsCount > this.currentSbu.forSwapNumber) {
+					this.swapSeatsCount = this.currentSbu.forSwapNumber;
+				}
+			},
 			gotoPage: function(index) {
 				// Init pagination
 				this.page = {};
@@ -215,6 +275,11 @@
 				// Init program page
 				this.selectedProgram = null;
 				this.selectedProgramIndex = -1;
+				this.selectedType = this.typeList[1];
+				// Init data
+				this.allEvent = [];
+				this.eventList = [];
+				this.noRecord = false;
 				// Module index --- 0: program; 1: assignment; 2: history
 				var modules = this.modules;
 				for (var i in modules) {
@@ -234,6 +299,11 @@
 				if(this.currentIndex === 3) { // History
 					this.getOperationList();
 				}
+				if(this.currentIndex === 4) { // Admin
+					refreshAdminPrograms = false;
+					this.getAdminProgramList();
+//					this.getSbuList();
+				}
 			},
 			getCurrentSbu: function () {
 				var options = {
@@ -248,33 +318,40 @@
 			        "success": function (resp) {
 			        	var data = resp.responseBody.result;
 			        	var sbuInfo = data.content;
-			        	var loginInfo = sbuInfo.lbps;
-			        	
-			        	vm.user = loginInfo;
-			        	vm.wholeSbuInfo = sbuInfo;
-			        	if(typeof sbuInfo === "string") {
-			        		// No permission
-			        		return;
+			        	if(sbuInfo && sbuInfo.length ===1) {
+			        		sbuInfo = sbuInfo[0];
+			        		var loginInfo = sbuInfo.lbps;
+				        	
+				        	vm.user = loginInfo;
+				        	vm.wholeSbuInfo = sbuInfo;
+				        	if(typeof sbuInfo === "string") {
+				        		// No permission
+				        		return;
+				        	}
+				        	var parentId = sbuInfo.parentId;
+				        	if(parentId === 0) { // First level
+				        		vm.noLimitation = true;
+				        		vm.currentSbu = sbuInfo;
+				        		vm.$set('currentSbu.parentSbuId', parentId);
+				        	}else{ // Second level
+				        		vm.noLimitation = false;
+				        		var parentInfo = sbuInfo.parentSbu;
+				        		vm.currentSbu = parentInfo;
+				        		vm.currentCountry = {
+				        				id: sbuInfo.id,
+				        				countryName: sbuInfo.subName,
+				        				parentSbuId: sbuInfo.parentId
+				        		};
+				        	}
+				        	vm.sbuId = sbuInfo.id;
+				        	
+//				        	vm.getProgramList();
+				        	vm.getSummary();
+				        	$("body").show();
+				        	$("body").scrollTop(0);
+			        	}else if(sbuInfo && sbuInfo.length > 1) {
+			        		// Multiple SBU owner
 			        	}
-			        	var parentId = sbuInfo.parentId;
-			        	if(parentId === 0) { // First level
-			        		vm.noLimitation = true;
-			        		vm.currentSbu = sbuInfo.subName;
-			        	}else{ // Second level
-			        		vm.noLimitation = false;
-			        		var parentInfo = sbuInfo.parentSbu;
-			        		vm.currentSbu = parentInfo.subName;
-			        		vm.currentCountry = {
-			        				id: sbuInfo.id,
-			        				countryName: sbuInfo.subName
-			        		};
-			        	}
-			        	vm.sbuId = sbuInfo.id;
-			        	
-//			        	vm.getProgramList();
-			        	vm.getSummary();
-			        	$("body").show();
-			        	$("body").scrollTop(0);
 			        },
 			        "error": function (resp) {
 			        	if(!resp.valid) {
@@ -284,11 +361,16 @@
 			        }
 			    };
 			},
-			getAllEvent: function() {
+			/**
+			 * two params
+			 * param 'admin' means if admin call the event list
+			 * param 'type' means get event list by type (all, upcoming, ongoing, closed)
+			 */
+			getAllEvent: function(isAdmin, type) {
 				var options = {
-						method: "POST",
 						url: envConfig.apis.getAllEvent.url,
-						callback: this.getAllEventCallback
+						data: {type: type?type:''}, // 1: Closed; 2: Ongoing; 3: Upcoming
+						callback: isAdmin ? this.getAllEventByAdminCallback : this.getAllEventCallback
 				};
 				utils.ajax(options);
 			},
@@ -298,20 +380,49 @@
 						var data = resp.responseBody.result;
 						var allEvent = data.content;
 						vm.allEvent = allEvent;
-						vm.selectedSwapEvent = vm.allEvent[0];
-						
-						vm.getProgramsByEvent(vm.selectedSwapEvent.eventName);
+						console.log(allEvent.length);
+						if(allEvent && allEvent.length>0) {
+							vm.noSwapEvent = false;
+							vm.selectedSwapEvent = vm.allEvent[0];
+//							if(vm.selectedEvent) {
+								vm.getProgramsByEvent(vm.selectedSwapEvent.event_name);
+//							}
+						}else{
+							vm.noSwapEvent = true;
+							vm.swapSeatsCount = 0
+							vm.selectedSwapProgram = {};
+							$("#swapModal").modal("show");
+						}
 					},
 					"error": function() {
 						console.log(resp);
 					}
 				}
 			},
-			getProgramsByEvent: function(ename) {
+			getAllEventByAdminCallback: function() {
+				return {
+					"success": function(resp) {
+						var data = resp.responseBody.result;
+						var allEvent = data.content;
+						vm.allEvent = allEvent;
+						console.log(allEvent.length);
+						if(allEvent && allEvent.length>0) {
+							vm.noRecord = false;
+							vm.getProgramsByEvent(vm.selectedSwapEvent.event_name, true);
+						}else {
+							vm.noRecord = true;
+						}
+					},
+					"error": function() {
+						console.log(resp);
+					}
+				}
+			},
+			getProgramsByEvent: function(ename, isAdmin) {
 				var options = {
 						url: envConfig.apis.getProgramListByEvent.url,
-						data:{ eventName: ename },
-						callback: this.getProgramListByEventCallback
+						data:{ eventName: ename ? ename : '' },
+						callback: isAdmin ? this.getProgramListByEventByAdminCallback : this.getProgramListByEventCallback
 				};
 				utils.ajax(options);
 			},
@@ -360,21 +471,36 @@
 					}
 				};
 			},
-			getProgramList: function(max) {
+			getProgramListByEventByAdminCallback: function() {
+				return {
+					"success": function(resp) {
+						var data = resp.responseBody.result;
+						var programList = data.content;
+						
+					},
+					"error": function(resp) {
+						console.log(resp);
+					}
+				}
+			},
+			getProgramList: function() {
 				var options = {
 						method: "POST",
 						url: envConfig.apis.getProgramList.url,
 						dummyPath: "dummy/getProgramList.json",
-						data: this.getProgramListData(max),
+						data: this.getProgramListData(),
 						callback: this.getProgramListCallback
 				};
 				utils.ajax(options);
 			},
-			getProgramListData: function(max) {
+			getProgramListData: function() {
 				var obj = {};
 				var sbuId = this.sbuId;
-				var pageSize = max ? 500 : this.pageSize;
+				var pageSize = this.pageSize;
+				var type = this.selectedType.index;
+				var typeNumber = type ? type : '';
 				obj = {
+						type: typeNumber,
 						sbuId: sbuId,
 						currentPage: this.currentPage,
 						pageSize: pageSize,
@@ -459,14 +585,18 @@
 					"success": function(resp) {
 						var data = resp.responseBody.result;
 						var dataList = data.content;
+						var forSwapSeatNum = dataList.forSwap;
+						vm.$set('currentSbu.forSwapNumber', forSwapSeatNum);
 						var otherSbuSeatsList = [];
 						var countrySeatsList = [];
-						if(dataList.otherCourseList) {
-							otherSbuSeatsList = dataList.otherCourseList;
+						vm.noSwapSeats = true;
+						if(dataList.otherSbuSwapList && dataList.otherSbuSwapList.length>0) {
+							vm.noSwapSeats = false;
+							otherSbuSeatsList = dataList.otherSbuSwapList;
 						}
 						vm.otherSbuSeatsList = otherSbuSeatsList;
-						if(dataList.subSbuCourList) {
-							countrySeatsList = dataList.subSbuCourList;
+						if(dataList.subSbuList) {
+							countrySeatsList = dataList.subSbuList;
 						}
 						vm.countrySeatsList = countrySeatsList;
 						
@@ -490,23 +620,33 @@
 			swapSeats: function(index) {
 				this.selectedSwapSbu = this.otherSbuSeatsList[index];
 //				var targetSbuId = this.selectedSwapSbu.id;
-				this.getAllEvent();
+				this.getAllEvent(false, "3");
 //				this.getProgramList(targetSbuId, true);
 			},
 			minusCount: function(obj) {
-				if(obj.seats != 0) {
+				if(obj.seats !== undefined && obj.seats != 0) {
 					if(obj.seats === obj.participantList.length) {
 						this.showError('Please remove nominee firstly', true);
 						return;
 					}
 					obj.seats--;
 					this.assignSeats(obj);
+				}else if(obj.forSwapNumber !== undefined && obj.forSwapNumber != 0) {
+					obj.forSwapNumber--;
+					// Update swap number
+					this.updateSwapSeats();
 				}
 			},
 			plusCount: function(obj) {
 				if(this.countryRemainingSeats != 0) {
-					obj.seats++;
-					this.assignSeats(obj);
+					if(obj.seats !== undefined){
+						obj.seats++;
+						this.assignSeats(obj);
+					}else{
+						obj.forSwapNumber++;
+						// update swap number
+						this.updateSwapSeats();
+					}
 				}
 			},
 			assignSeats: function(obj) {
@@ -543,16 +683,55 @@
 					}
 				};
 			},
+			updateSwapSeats: function() {
+				var options = {
+						method: "POST",
+						url: envConfig.apis.updateSwapSeats.url,
+						data: this.updateSwapSeatsData,
+						callback: this.updateSwapSeatsCallback
+				};
+				utils.ajax(options);
+			},
+			updateSwapSeatsData: function() {
+				var obj = {};
+				var sbuId = this.currentSbu.id;
+				var courseId = this.selectedProgram.courseId;
+				var swapSeatsNumber = this.currentSbu.forSwapNumber;
+				obj = {
+						sbuId: sbuId,
+						courseId: courseId,
+						swapSeats: swapSeatsNumber
+				};
+				return obj;
+			},
+			updateSwapSeatsCallback: function() {
+				return {
+					"success": function(resp) {
+						var returnInfo = resp.responseBody.info;
+						var statusCode = Number(returnInfo.code);
+						if(statusCode === 200) {
+							console.log(returnInfo.msg);
+						}
+					},
+					"error": function(resp){
+						console.log(resp)
+					}
+				};
+			},
 			addNominee: function(countryInfo) {
-				vm.currentCountry = countryInfo;
+				this.currentCountry = countryInfo;
 				/**
 				 * If need to display already exist user in the search modal, uncomment the below two line code
 				 */
 //				var searchMonimeeList = countryInfo.participantList.slice(0, countryInfo.participantList.length);
 //				vm.searchNomineeList = searchMonimeeList;
-				vm.employeeSearch = '';
-				vm.searchNomineeList = [];
+				this.employeeSearch = '';
+				this.searchNomineeList = [];
 	        	$("#addNomineeModal").modal("show");
+			},
+			addSbu: function() {
+				this.newSbu = {};
+				$("#addSbuModal").modal("show");
 			},
 			getOperationList: function() {
 				var options = {
@@ -674,7 +853,7 @@
 			},
 			selectSwapEvent: function(index) {
 				this.selectedSwapEvent = this.allEvent[index];
-				this.getProgramsByEvent(this.selectedSwapEvent.eventName);
+				this.getProgramsByEvent(this.selectedSwapEvent.event_name);
 			},
 			selectSwapProgram : function(id, name) {
 				selectItem = true;
@@ -733,6 +912,9 @@
         		}else{
         			if(!$("#errorToast").is(":animated")) {
         				$("#errorToast").fadeIn('fast').fadeOut(3000);
+					}
+        			if(!$("#errorSbuToast").is(":animated")) {
+        				$("#errorSbuToast").fadeIn('fast').fadeOut(3000);
 					}
         		}
         	},
@@ -815,12 +997,11 @@
         	confirmSwapData: function(action) {
         		var obj = {};
         		obj = {
-        				courseId1: this.selectedProgram.courseId,
-        				fromSbuId: this.sbuId,
-        				toSbuId: this.selectedSwapSbu.id,
-        				action: action,
-						seats: this.swapSeatsCount,
-						courseId2: this.selectedSwapProgram.courseId
+        				mySbuId: this.currentSbu.id,
+        				giveoutCourseId: this.selectedSwapProgram.courseId,
+        				swapSbuId: this.selectedSwapSbu.sbu_id,
+    					swapCourseId: this.selectedProgram.courseId, 
+    					swapSeats: this.swapSeatsCount
         		};
         		return obj;
         	},
@@ -838,17 +1019,22 @@
 			        "error": function (resp) {
 			        	if(!resp.valid) {
 			        		// error handler
-			        		vm.showError('SBU for program avaliable seats is not enough.', 1008);
+			        		vm.showError('You have no seats to swap with other SBUs', 1008);
 			        	}
 			        }
 			    };
         	},
         	removeNominee: function(nominee) {
         		this.deleteNominee = nominee;
+        		this.isDeleteNominee = true;
         		$("#confirmModal").modal("show");
         	},
         	doAction: function() {
-        		this.deleteCountryNominee();
+        		if(this.isDeleteNominee) {
+        			this.deleteCountryNominee();
+        		}else{
+        			this.deleteTopSbu();
+        		}
         	},
         	deleteCountryNominee: function() {
         		var options = {
@@ -887,6 +1073,32 @@
 			        }
 			    };
         	},
+        	deleteTopSbu: function() {
+				var options = {
+						method: "POST",
+						url: envConfig.apis.deleteSbu.url,
+						dummyPath: "dummy/deleteSbu.json",
+						data: { id: this.deleteSbu.id },
+						callback: this.deleteTopSbuCallback
+				};
+				utils.ajax(options);
+			},
+			deleteTopSbuCallback: function() {
+				return {
+					"success": function(resp) {
+						var returnInfo = resp.responseBody.info;
+						var statusCode = Number(returnInfo.code);
+						if(statusCode === 200) {
+							console.log(returnInfo.msg);
+							$("#confirmModal").modal("hide");
+							vm.getSbuList(true);
+						}
+					},
+					"error": function(resp) {
+						console.log(resp);
+					}
+				}
+			},
         	selectEmailSuffix: function(index) {
         		this.selectedEmailAddress = this.emails[index].text;
         	},
@@ -1002,7 +1214,268 @@
 			        	console.log(resp);
 			        }
 			    };
-        	}
+        	},
+        	getAdminProgramList: function() {
+        		var options = {
+        				method: "POST",
+        				data: { 
+        					currentPage: this.currentPage,
+        					pageSize: 20
+        				},
+						url: envConfig.apis.getAdminProgramList.url,
+						callback: this.getAdminProgramListCallback
+				};
+				utils.ajax(options);
+        	},
+        	getAdminProgramListCallback: function() {
+				return {
+					"success": function(resp) {
+						var data = resp.responseBody.result.content;
+			        	if(!data) {
+			        		// No record
+			        		vm.pagination = false;
+			        		vm.adminProgramList = [];
+			        		return;
+			        	}else{
+			        		var pageObj = data.page;
+				        	vm.$set('page', pageObj);
+				        	if(pageObj.totalPageNum>1) {
+				        		vm.pagination = true;
+				        	}else{
+				        		vm.pagination = false;
+				        	}
+				        	var adminProgramList = data.result;
+				        	vm.adminProgramList = adminProgramList;
+				        	if(!refreshAdminPrograms) {
+								vm.getSbuList(true);
+							}
+			        	}
+					},
+					"error": function(resp) {
+						console.log(resp);
+					}
+				}
+			},
+        	getSbuList: function (isAdmin) {
+				var options = {
+						method: "POST",
+						url: envConfig.apis.getSbuList.url,
+						data: { parentSbuId: isAdmin ? 0 : this.currentCountry.parentSbuId },
+						dummyPath: "dummy/getSbuList.json",
+						callback: this.getSbuListCallback
+				};
+				utils.ajax(options);
+			},
+			getSbuListCallback: function() {
+				return {
+					"success": function(resp) {
+						var data = resp.responseBody.result;
+						var sbuList = data.content;
+						vm.sbuList = sbuList;
+						
+						vm.getAllEvent(true);
+					},
+					"error": function(resp) {
+						console.log(resp);
+					}
+				}
+			},
+			renameMode: function(index) {
+				this.isEdit = true;
+			},
+			exitRenameMode: function() {
+				this.isEdit = false;
+			},
+			removeSbu: function(index){
+				this.isDeleteNominee = false;
+				this.deleteSbu = this.sbuList[index];
+				$("#confirmModal").modal("show");				
+			},
+			showUploadModal: function() {
+				var uploadFileNode = document.getElementsByClassName('file');
+				if(uploadFileNode.length === 1) {
+					var cloneNode = uploadFileNode[0].cloneNode(true);
+					cloneNode.onchange = this.selectFile;
+					uploadFileNode[0].parentNode.replaceChild(cloneNode, uploadFileNode[0]);
+				}
+				
+				this.uploadFileName = "";
+				$("#uploadModal").modal("show");
+			},
+			selectFile: function(e) {
+				this.uploadFileName = e.target.value;
+			},
+			uploadFile: function() {
+				var isExcel = this.uploadFileName && 
+									(/.xls$/i.test(this.uploadFileName) || 
+									/.xlsx$/i.test(this.uploadFileName));
+				if(isExcel) {
+					this.incorrectFile = false;
+					// Upload excel file
+					$.ajaxFileUpload({
+						url : envConfig.prefix + envConfig.apis.uploadPrograms.url,
+						data: {append: this.uploadType},
+						secureuri : false,
+						fileElementId : 'file',
+						dataType : 'json',
+						success : function(data, status){
+							try{
+								var returnInfo = data.info;
+								var statusCode = Number(returnInfo.code);
+								if(statusCode === 200) {
+									var type = this.uploadType;
+									if(Number(type) === 1) { // override
+										this.adminProgramList = [];
+										// get program list again
+										refreshAdminPrograms = true;
+										this.getAdminProgramList();
+									}else { // append
+									}
+									$('#uploadModal').modal('hide');
+								}else {
+									console.log('Error Format Excel');
+								}
+							}catch(e){
+								console.log(e);
+							}
+						}.bind(this),
+						error : function(response, status, e){
+							console.log('ERROR');
+							console.log(response);
+							$('#file').trigger('change');
+						},
+						complete : function(){
+							$('#file').trigger('change');
+						}
+					});
+				}else {
+					this.incorrectFile = true;
+					setTimeout(function(){
+        				vm.incorrectFile = false;
+        			}, 500);
+				}
+			},
+			editProgram: function(index) {
+				// Set value for program detail modal
+				var programDetail = this.adminProgramList[index];
+				var cloneObj = clone(programDetail); // clone a new obj
+				this.programDetail = cloneObj;
+//				Vue.nextTick(function() {
+//					$("#startTime").datepicker({
+//						format: "yyyy-mm-dd",
+//						todayHighlight: true,
+////						minViewMode: 0,
+//						autoclose: true
+//					});
+//					
+//					$("#endTime").datepicker({
+//						format: "yyyy-mm-dd",
+//						todayHighlight: true,
+////						minViewMode: 0,
+//						autoclose: true
+//					});
+//					
+//					$("#startTime").on("changeDate", function(){
+//						$("#endTime").datepicker('setStartDate', $('#startTime').val());
+//					});
+//					
+//					$("#endTime").on("changeDate", function(){
+//						$("#startTime").datepicker('setEndDate', $('#endTime').val());
+//					});
+//				});
+				$("#programDetailModal").modal("show");
+			},
+			submitEditProgram: function() {
+				// updateProgram
+				var options = {
+						method: "POST",
+						url: envConfig.apis.updateProgram.url,
+						data: this.submitEditProgramData,
+						callback: this.submitEditProgramCallback
+				};
+				utils.ajax(options);
+			},
+			submitEditProgramData: function(){
+				var obj = {};
+				var submitProgramDetail = this.programDetail;
+				obj = {
+						id: submitProgramDetail.id,
+						eventName: submitProgramDetail.eventName,
+						name: submitProgramDetail.name,
+						url: submitProgramDetail.url,
+						startTime: submitProgramDetail.startTime,
+						endTime: submitProgramDetail.endTime,
+						duration: submitProgramDetail.duration
+				};
+				return obj;
+			},
+			submitEditProgramCallback: function() {
+				return {
+					"success": function(resp) {
+						var returnInfo = resp.responseBody.info;
+						var statusCode = Number(returnInfo.code);
+						if(statusCode === 200) {
+							console.log(returnInfo.msg);
+							vm.getAdminProgramList();
+							$("#programDetailModal").modal("hide");
+						}
+					},
+					"error": function(resp) {
+						console.log(resp);
+					}
+				}
+			},
+			submitAddSbu: function() {
+				if(!$.trim(this.newSbu.name)) {
+					vm.$set('newSbu.noValue', true);
+					setTimeout(function(){
+						vm.$set('newSbu.noValue', false);
+        			}, 500);
+					return;
+				}
+				// check duplicated with current sbu list
+				var input = this.newSbu.name.trim();
+				var duplicateExists = 0;
+				for (var i in vm.sbuList) {
+					if(input.toLowerCase() === vm.sbuList[i].subName.toLowerCase()) {
+						duplicateExists++;
+					}
+				}
+				if(duplicateExists>0){
+					vm.showError('The sbu already exist');
+				}else{
+					vm.$set('newSbu.noValue', false);
+					this.addNewSbu(true);
+				}
+			},
+			addNewSbu: function(isAdmin) {
+				var options = {
+						method: 'POST',
+						url: envConfig.apis.addSbu.url,
+						data: {
+							parentId: isAdmin ? 0 : this.currentCountry.parentSbuId,
+							subName: this.newSbu.name
+						},
+						callback: this.addNewSbuCallback
+				};
+				utils.ajax(options);
+			},
+			addNewSbuCallback: function() {
+				return {
+					"success": function(resp) {
+						var returnInfo = resp.responseBody.info;
+						var statusCode = Number(returnInfo.code);
+						if(statusCode === 200) {
+							console.log(returnInfo.msg);
+							$("#addSbuModal").modal("hide");
+							vm.getSbuList(true);
+						}
+					},
+					"error": function(resp) {
+						console.log(resp);
+					}
+				}
+			}
 		}
 	});
 	
@@ -1011,9 +1484,6 @@
 		window.localStorage.clear();
 		location.href = "j_spring_security_logout";
 	}
-	
-	$('#swapModal').on('hide.bs.modal', function (e) {
-	});
 	
 	function initModalPosition() {
 		$(".modal").on("show.bs.modal", reposition);
@@ -1039,6 +1509,47 @@
 		}
 	}
 	
+	var datePicker = {
+			format: 'yyyy-mm-dd',
+			orientation: 'bottom right',
+			autoclose: true,
+			keyboardNavigation: false,
+			todayHighlight: true
+	};
+	
+	var dpStart = $('#startTime').datepicker(datePicker)
+	.on('changeDate', function(e){
+		vm.programDetail.startTime = $(e.target).val();
+		dpEnd.datepicker('setStartDate', vm.programDetail.startTime);
+		dpEnd.trigger('changeDate');
+	});
+	var dpEnd = $('#endTime').datepicker(datePicker)
+	.on('changeDate', function(e) {
+		if(vm.programDetail.startTime>vm.programDetail.endTime) {
+			vm.programDetail.endTime = vm.programDetail.startTime
+		}
+	});
+	
+	$('#programDetailModal').on('shown.bs.modal', function () {
+		var formatedStartTime = DateFormat.format.date(new Date(vm.programDetail.startTime), "yyyy-MM-dd");
+		var formatedEndTime = DateFormat.format.date(new Date(vm.programDetail.endTime), "yyyy-MM-dd");
+		dpStart.datepicker('setDate', formatedStartTime);
+		dpEnd.datepicker('setDate', formatedEndTime);
+	});
+	
+	function clone(fromObj){  
+		if (typeof (fromObj) != 'object'){
+			return fromObj;
+		}
+		if (fromObj == null){
+			return fromObj;
+		}
+		var toObj = new Object();
+		for ( var i in fromObj)
+			toObj[i] = clone(fromObj[i]);
+		return toObj;
+	}
+	
 	$(window).scroll(function() {
 		var isProgramPage = !$('#program').hasClass("hidden");
 		if(isProgramPage) {
@@ -1049,5 +1560,4 @@
 			}
 		}
 	});
-	
 })()

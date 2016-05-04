@@ -26,9 +26,10 @@
 
 .modal-footer > button {
 	color: #fff;
-	height: 48px;
 	font-weight: bold;
 	text-transform: uppercase;
+    width: 112px;
+    height: 40px;
 }
 
 .modal-footer.add-nominee-footer, .modal-footer.swap-seats-footer {
@@ -95,10 +96,61 @@
 	color: #000;
 	font-weight: normal;
 	margin-right: 10px;
+	background: #bcc9d5;
+    color: #fff;
+    outline: 0;
 }
 
-.modal-footer .btn-confirm {
-	background-color: #359df3;
+.btn-cancel:hover  {
+    background-color: #d2d8de;
+    border: 0;
+}
+
+.btn-cancel:active, .btn-cancel:active:focus {
+	background-color: #a3aeb9;
+	outline: 0;
+}
+
+.modal-footer .btn-confirm, .modal-footer .btn-submit {
+	color: #fff;
+	background-color: #369cf3;
 	border: 0;
 	font-weight: normal;
+	outline: 0;
+}
+
+.btn-confirm:hover, .btn-submit:hover {
+	background-color: #5cadf2;
+	border: 0;
+}
+
+.btn-confirm:active, .btn-confirm:active:focus, .btn-submit:active, .btn-submit:active:focus {
+	background-color: #3b86c5;
+	outline: 0;
+}
+
+/* Upload Button */
+.btn-upload {
+	margin-bottom: 30px;
+}
+
+.uploadSelector {
+	position: relative;
+    background: #c2ccd5;
+    line-height: 46px;
+    top: -47px;
+    border-radius: 0 2px 2px 0;
+    width: 52px;
+    text-align: center;
+    cursor: pointer;
+    float: right;
+}
+
+.uploadSelector .file {
+	position: absolute;
+    height: 46px;
+    top: 0;
+    right: 1px;
+    width: 52px;
+    opacity: 0;
 }

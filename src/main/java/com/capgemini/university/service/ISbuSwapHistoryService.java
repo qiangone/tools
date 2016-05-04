@@ -29,6 +29,8 @@ public interface ISbuSwapHistoryService {
 	
 
 	public PageResults<Map> getSbuSwapHistory(Map map, Pagination page);
+	
+	public PageResults<Map> getAllSbuSwapHistory(Map map, Pagination page);
   
 
 }

@@ -26,6 +26,24 @@ public class Lbps {
     private String email;
     
     private String logo;
+    
+    private int role;
+    
+    
+
+	/**
+	 * @return the role
+	 */
+	public int getRole() {
+		return role;
+	}
+
+	/**
+	 * @param role the role to set
+	 */
+	public void setRole(int role) {
+		this.role = role;
+	}
 
 	/**
 	 * @return the id

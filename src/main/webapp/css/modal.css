@@ -1,12 +1,18 @@
+.modal-open {
+	position: relative;	
+}
+
 .modal-dialog {
 	width: 1000px;	
 }
 
-#addNomineeModal .modal-dialog {
+#addNomineeModal .modal-dialog, #addSbuModal .modal-dialog {
 	width: 525px;
 }
 
-#confirmModal .modal-dialog {
+#confirmModal .modal-dialog, 
+#uploadModal .modal-dialog, 
+#programDetailModal .modal-dialog {
 	width: 600px
 }
 
@@ -44,6 +50,10 @@
     font-size: 16px;
 }
 
+#uploadModal .modal-body {
+	margin-top: 30px;
+}
+
 .select-row-container {
 	position: relative;
 	width: 100%;
@@ -67,6 +77,10 @@ div.select-btn.no-border > span {
     overflow: auto;
     width: 100%;
     max-height: 215px;
+}
+
+#targetProgramList {
+	top: 100%;	
 }
 
 .select-row-container .dropdown-menu a{
@@ -111,7 +125,7 @@ div.select-btn.no-border > span {
 }
 
 .select-name {
-    min-width: 110px;
+    min-width: 126px;
     color: #7f919f;
     font-size: 13px;
     text-transform: uppercase;
@@ -124,16 +138,105 @@ div.select-btn.no-border > span {
     overflow: hidden;
     white-space: nowrap;
 	height: 100%;
-    width: 318px;
+    width: 302px;
     color: #3F495C;
     border: 0;
     border-radius: 4px;
+    outline: 0;
 }
 
 .modal-footer {
+	position: relative;
 	padding: 28px;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
     border-top: none;
     margin-top: 30px;
 }
+
+/* Upload file in modal */
+.modalUploadInput {
+	border: 1px solid #d9d9d9;
+    border-radius: 2px;
+    height: 48px;
+    line-height: 48px;
+    width: 100%;
+    padding: 0 72px 0 20px;
+}
+
+/* Admin Modal Detail Style */
+.info-container {
+	color: #7f909c;
+    text-transform: uppercase;
+    font-size: 13px;
+    margin: 20px 0;
+}
+
+.info-sub-title {
+	font-family: opensans-bold;
+    color: #7f909c;
+}
+
+.info-list {
+    border: 1px solid #dfe3e6;
+    border-radius: 4px;
+    width: 100%;
+    margin-top: 12px
+}
+
+.detail-list {
+	height: 40px;
+    line-height: 40px;
+    border-bottom: 1px solid #dfe3e6;
+    padding: 0 24px;
+}
+
+.detail-list:last-child {
+	border-bottom: 0;
+}
+
+.detail-list-title {
+    margin-bottom: 0;
+    font-size: 13px;
+    font-weight: normal;
+    color: #7f909c;
+    min-width: 100px;
+    text-transform: uppercase;
+}
+
+.detail-list-title.left-part {
+	float: left;
+    text-align: left;
+}
+
+.detail-list-content {
+	display: inline-block;
+    width: 75%;
+    border: none;
+    box-shadow: none;
+    font-size: 14px;
+    color: #3f495c;
+    outline: 0;
+    float: right;
+    text-align: right;
+    height: 100%;
+    padding: 0;
+}
+
+.detail-list-content.right-part {
+    min-width: 200px;
+    text-align: right;
+}
+
+.list-select-btn {
+    border: 0;
+    border-radius: 4px;
+    background: #fff;
+    height: 100%;
+    outline: none;
+    position: relative;
+    width: 100%;
+    padding: 0;
+}
+
+/* Admin Modal Detail Style */

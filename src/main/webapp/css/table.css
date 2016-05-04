@@ -12,6 +12,10 @@ thead {
     color: #fff;
 }
 
+.datepicker thead {
+	color: #333;
+}
+
 .table>thead>tr {
     background-color: #a8b8c2;
 }
@@ -30,6 +34,15 @@ thead {
     text-transform: uppercase;
 }
 
+.th-width-l2, .td-width-l2 {
+	width: 135px;
+    text-align: center;
+}
+
+.td-width-l1 {
+	width: 400px;
+}
+
 .table>tbody>tr>td {
 	font-size: 14px;
 	height: 52px;
@@ -45,7 +58,31 @@ thead {
     min-width: 10px;
 }
 
+.table>tbody>tr>td .rename-wrap{
+	display: block;
+}
+
+.rename-wrap * {
+	display: inline-block;
+}
+
 .table>tbody>tr:nth-child(odd)>td {
 /* 	border-bottom: 0; */
 }
 
+.event-table {
+	border: none;
+}
+
+.icon-view-detail {
+    background: url("../images/btn_view_detail.png") center no-repeat;
+    width: 13px;
+    height: 19px;
+    background-size: 13px;
+    -webkit-appearance: none;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    margin: auto;
+    cursor: pointer;
+}

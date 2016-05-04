@@ -16,6 +16,7 @@ function myLoad() {
 
 		$("#login-form").on("submit", function() {
 			var username = $('#username').val().trim();
+			
 			var password = $('#password').val().trim();
 //			utils.sessionData("username", username);
 //			var userFounded = $.inArray(username.toLowerCase(), testUserArr);

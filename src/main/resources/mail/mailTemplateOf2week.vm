@@ -1,0 +1,30 @@
+<span style="font-size: 11.0pt; font-family: Calibri">
+
+	
+	Good Morning, <br /> <br />
+	We are two weeks before a Learning Event. 	<br /> 
+	All your not allocated seats have been converted to free seats and are available to all SBUs on first requested, first served basis.<br /> <br /> <br /> 
+	What just became available: <br /> <br /> 
+	<ul>
+		 #foreach($mail in $courseList)
+		<li>
+		${mail.name} and number of places ${mail.remainning_seats}  
+	   </li>
+		 #end
+    </ul>
+ 
+ 	Before registering participant, please note that: Region have to cover costs of transport and the time of participants, but no PMDs, tuition fee or accommodation will be charged. <br/>
+	
+	Please use University Registration tool to submit your nominations  <LINK>  <br/><br/>
+	
+	Note: Course description and duration – please use ISC http://talent.capgemini.com/university/<br/><br/>
+	
+	University hopes you can make good use of those places. <br/>
+	Kind regards, <br/>
+	Our University <br/>
+	
+	
+	
+ 
+
+	

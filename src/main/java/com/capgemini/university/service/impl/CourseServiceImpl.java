@@ -4,8 +4,10 @@
  */
 package com.capgemini.university.service.impl;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,9 +17,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -68,7 +78,7 @@ public class CourseServiceImpl implements ICourseService {
 
 	@Autowired
 	private CourseDao cpDao;
-	
+
 	@Autowired
 	private SbuSwapHistoryDao historyDao;
 	@Autowired
@@ -83,15 +93,15 @@ public class CourseServiceImpl implements ICourseService {
 		// DistinguishedName dn = new DistinguishedName();
 		// dn.append("OU", "Resources").append("OU", "Conference Rooms");
 		// String baseDN = "dc=corp,dc=capgemini,dc=com";
-//		AndFilter filter = new AndFilter();
+		// AndFilter filter = new AndFilter();
 		OrFilter filter2 = new OrFilter();
 		// filter.and(new EqualsFilter("objectClass", "user"));
-//		filter.and(new EqualsFilter("cn", name));
-		
-		
+		// filter.and(new EqualsFilter("cn", name));
+
 		filter2.append((new LikeFilter("mail", name)));
-		
+
 		filter2.append((new EqualsFilter("cn", name)));
+//		filter2.append((new EqualsFilter("displayName", name)));
 		
 		System.out.println(filter2.encode());
 
@@ -101,34 +111,35 @@ public class CourseServiceImpl implements ICourseService {
 
 		return ldapTemplate.search("", filter2.encode(), mapper);
 	}
-	
-	public List<Participant> queryParticipantList(Integer sbuId, Integer courseId){
+
+	public List<Participant> queryParticipantList(Integer sbuId,
+			Integer courseId) {
 		Map map = new HashMap();
 		map.put("courseId", courseId);
 		map.put("sbuId", sbuId);
 		return cpDao.queryParticipantList(map);
 	}
-	
-	public void removeParticipant(Integer sbuId, Integer courseId, String email){
-		
+
+	public void removeParticipant(Integer sbuId, Integer courseId, String email) {
+
 		Map map = new HashMap();
 		map.put("courseId", courseId);
 		map.put("sbuId", sbuId);
 		map.put("email", email);
 		cpDao.removeParticipant(map);
-		
+
 		SbuCourse self = getSbuCourse(sbuId, courseId);
 		Float duration = self.getDuration();
-		int assignSeats = self.getAssignSeats(); 
-		int assignPmds = self.getAssignPmds(); 
-		self.setAssignSeats(assignSeats-1);
-		self.setAssignPmds((int)(assignPmds - duration));
+		int assignSeats = self.getAssignSeats();
+		int assignPmds = self.getAssignPmds();
+		self.setAssignSeats(assignSeats - 1);
+		self.setAssignPmds((int)Math.ceil((assignPmds - duration)));
 		cpDao.updateSbuCourse(self);
 	}
-	
-	public int addParticipantList(List<Participant> list){
-		if(list != null && list.size()>0){
-			for(Participant p : list){
+
+	public int addParticipantList(List<Participant> list) {
+		if (list != null && list.size() > 0) {
+			for (Participant p : list) {
 				addParticipant(p);
 			}
 		}
@@ -136,50 +147,80 @@ public class CourseServiceImpl implements ICourseService {
 	}
 
 	public int addParticipant(Participant part) {
-		
+
 		int sbuId = part.getSbuId();
 		int courseId = part.getCourseId();
-		
-		
+
 		SbuCourse self = getSbuCourse(sbuId, courseId);
-		if(self != null){
+		if (self != null) {
 			int leftSeats = self.getSeats() - self.getAssignSeats();
-			if(leftSeats<=0){
+			if (leftSeats <= 0) {
 				throw new DataAccessDeniedException("seats not enough.");
 			}
 		}
-		
-		
+
 		Float duration = self.getDuration();
-		int assignSeats = self.getAssignSeats(); 
-		int assignPmds = self.getAssignPmds(); 
-		self.setAssignSeats(assignSeats+1);
-		self.setAssignPmds((int)(assignPmds + duration));
+		int assignSeats = self.getAssignSeats();
+		int assignPmds = self.getAssignPmds();
+		self.setAssignSeats(assignSeats + 1);
+		self.setAssignPmds((int)Math.ceil( (assignPmds + duration)));
 		cpDao.updateSbuCourse(self);
-		
-		
-//		List<Sbu> list = sbuService.getAllParentSbuList(sbuId);
-//		if(list != null && list.size()>0){
-//			for(Sbu sbu : list){
-//				SbuCourse course = getSbuCourse(sbu.getId(), courseId);
-//				if(course != null){
-//					Float duration = course.getDuration();
-//					int assignSeats = course.getAssignSeats(); 
-//					int assignPmds = course.getAssignPmds(); 
-//					course.setAssignSeats(assignSeats+1);
-//					course.setAssignPmds((int)(assignPmds + duration));
-//					cpDao.updateSbuCourse(course);
-//				}
-//			}
-//		}
-		
+
+		// List<Sbu> list = sbuService.getAllParentSbuList(sbuId);
+		// if(list != null && list.size()>0){
+		// for(Sbu sbu : list){
+		// SbuCourse course = getSbuCourse(sbu.getId(), courseId);
+		// if(course != null){
+		// Float duration = course.getDuration();
+		// int assignSeats = course.getAssignSeats();
+		// int assignPmds = course.getAssignPmds();
+		// course.setAssignSeats(assignSeats+1);
+		// course.setAssignPmds((int)(assignPmds + duration));
+		// cpDao.updateSbuCourse(course);
+		// }
+		// }
+		// }
+
 		// record ..
 		cpDao.addParticipant(part);
-		
+
 		return 0;
 	}
-	
-	
+
+	public Course getAdminCourse(Integer id) {
+		Map map = new HashMap();
+		map.put("id", id);
+		List<Course> list = cpDao.getAdminCourseListByPage(map);
+		if (list != null && list.size() > 0) {
+			return list.get(0);
+		}
+		return null;
+	}
+
+	public PageResults<Course> getAdminCourseListByPage(Map map, Pagination page) {
+		if (null == page || !page.isValidPage()) {
+			return null;
+		}
+
+		// get counts
+		List<Course> list = cpDao.getAdminCourseListByPage(map);
+		if (list == null || list.size() == 0) {
+			return null;
+		}
+
+		int totalCount = list.size();
+		page.setTotalCount(totalCount);
+
+		map.put("showpage", 1);
+		map.put(Pagination.STARTINDEX, page.getStartIndex());
+		map.put(Pagination.PAGESIZE, page.getPageSize());
+
+		List<Course> list2 = cpDao.getAdminCourseListByPage(map);
+		PageResults<Course> result = new PageResults<Course>(page, list2);
+
+		return result;
+	}
+
 	public PageResults<Map> getCourseListByPage(Map map, Pagination page) {
 		if (null == page || !page.isValidPage()) {
 			return null;
@@ -200,7 +241,7 @@ public class CourseServiceImpl implements ICourseService {
 
 		List<Map> retList = new ArrayList<Map>();
 		List<Map> list2 = cpDao.getCourseListByPage(map);
-		
+
 		Map groupMap = groupEvent(list2);
 		retList.add(groupMap);
 
@@ -208,239 +249,237 @@ public class CourseServiceImpl implements ICourseService {
 
 		return result;
 	}
-	
-	private String getEventRangeTime(String eventName){
+
+	private String getEventRangeTime(String eventName) {
 		List<Course> list = getCourseListByEvent(eventName);
-		Date compStart = null;;
+		Date compStart = null;
+		;
 		Date compEnd = null;
-		if(list != null && list.size()>0){
-			int i=0;
-			for(Course c : list){
+		if (list != null && list.size() > 0) {
+			int i = 0;
+			for (Course c : list) {
 				Date start = c.getStartTime();
 				Date end = c.getEndTime();
-				if(i ==0){
+				if (i == 0) {
 					compStart = start;
 					compEnd = end;
 				}
-				
-				if(compStart.after(start)){
+
+				if (compStart.after(start)) {
 					compStart = start;
 				}
-				if(compEnd.before(end)){
+				if (compEnd.before(end)) {
 					compEnd = end;
 				}
-				
+
 				i++;
 			}
-			
-			return DateUtil.dateFormat(compStart) + "|" +DateUtil.dateFormat(compEnd);
-			
-			
+
+			return DateUtil.dateFormat(compStart) + "|"
+					+ DateUtil.dateFormat(compEnd);
+
 		}
-		
+
 		return "";
-		
+
 	}
-	
-	private Map groupEvent(List<Map> map){
+
+	private Map groupEvent(List<Map> map) {
 		Map map3 = new LinkedHashMap();
 		List<Map> retList = new ArrayList<Map>();
-		if(map != null && map.size()>0){
-			for(Map map2 : map){
+		if (map != null && map.size() > 0) {
+			for (Map map2 : map) {
 				Object eventName = map2.get("event_name");
 				Object eventLogo = map2.get("event_logo");
-				
+
 				GroupCourse gc = new GroupCourse();
 				gc.setEventName(eventName);
-				
+
 				gc.setEventLogo(eventLogo);
-				
+
 				String rangTime = getEventRangeTime(eventName.toString());
-				if(rangTime != ""){
+				if (rangTime != "") {
 					String[] str = rangTime.split("\\|");
 					gc.setStartTime(str[0]);
 					gc.setEndTime(str[1]);
 				}
-				
-				
-				if(map3.get(eventName) == null){//not exist
+
+				if (map3.get(eventName) == null) {// not exist
 					List list = new ArrayList();
 					list.add(map2);
 					gc.setResults(list);
-					
-					map3.put(eventName , gc);
-					
-					
-					
-				}else{
-					GroupCourse group = (GroupCourse)map3.get(eventName);
+
+					map3.put(eventName, gc);
+
+				} else {
+					GroupCourse group = (GroupCourse) map3.get(eventName);
 					List list4 = group.getResults();
 					list4.add(map2);
 					map3.put(eventName, group);
 				}
-						
+
 			}
 		}
-		
+
 		return map3;
 	}
-	
-	public SbuCourse getSbuCourse(Integer sbuId, Integer courseId){
+
+	public SbuCourse getSbuCourse(Integer sbuId, Integer courseId) {
 		Map map = new HashMap();
 		map.put("sbuId", sbuId);
 		map.put("courseId", courseId);
 		List<SbuCourse> list = cpDao.getSbuCourse(map);
-		if(list != null && list.size()>0){
+		if (list != null && list.size() > 0) {
 			return list.get(0);
 		}
 		return null;
 	}
-	
-
 
 	public int saveOrUpdateSbuCourse(SbuCourse sc) {
 
 		int courseId = sc.getCourseId();
 		int sbuId = sc.getSbuId();
-		int seats = sc.getSeats();//to do seats
-		
+		int seats = sc.getSeats();// to do seats
+
 		Sbu self = sbuService.getSbuById(sbuId);
 		SbuCourse parentSc = getSbuCourse(self.getParentId(), courseId);
 		Course cou = getCourseById(courseId);
 		float duration = cou.getDuration();
-		
+
 		SbuCourse scour = getSbuCourse(sbuId, courseId);
-		if(scour != null){//update
+		if (scour != null) {// update
 			int origiSeats = scour.getSeats();
-			if(seats<origiSeats){//delete
-				if(parentSc !=null){
-					List<Participant> list = queryParticipantList(sbuId, courseId);
-					if(list != null && list.size()>0){
-						if(list.size()>seats){
-							throw new DataAccessDeniedException("please remove participant firstly.");
+			if (seats < origiSeats) {// delete
+				if (parentSc != null) {
+					List<Participant> list = queryParticipantList(sbuId,
+							courseId);
+					if (list != null && list.size() > 0) {
+						if (list.size() > seats) {
+							throw new DataAccessDeniedException(
+									"please remove participant firstly.");
 						}
 					}
-					
-					int assignSeat = parentSc.getAssignSeats() - (origiSeats-seats);
-					int assignPmd = (int)(assignSeat * duration);
+
+					int assignSeat = parentSc.getAssignSeats()
+							- (origiSeats - seats);
+					int assignPmd = (int) Math.ceil((assignSeat * duration));
 					parentSc.setAssignSeats(assignSeat);
 					parentSc.setAssignPmds(assignPmd);
 					cpDao.updateSbuCourse(parentSc);
 				}
-			}else if(seats>origiSeats){//add
-				if(parentSc !=null){
+			} else if (seats > origiSeats) {// add
+				if (parentSc != null) {
 					int addSeats = seats - origiSeats;
-					int leftSeats = parentSc.getSeats() - parentSc.getAssignSeats();
-					if(addSeats > leftSeats){
+					int leftSeats = parentSc.getSeats()
+							- parentSc.getAssignSeats();
+					if (addSeats > leftSeats) {
 						throw new DataAccessDeniedException("seats not enough.");
 					}
-					
+
 					int assignSeat = parentSc.getAssignSeats() + addSeats;
-					int assignPmd = (int)(assignSeat * duration);
+					int assignPmd = (int) Math.ceil((assignSeat * duration));
 					parentSc.setAssignSeats(assignSeat);
 					parentSc.setAssignPmds(assignPmd);
 					cpDao.updateSbuCourse(parentSc);
-					
+
 				}
 			}
-			
+
 			scour.setSeats(sc.getSeats());
-			scour.setPmds((int)(scour.getSeats() * scour.getDuration()));
-			cpDao.updateSbuCourse(scour);//update
-			
-		}else{//insert
-		
-			if(parentSc !=null){
+			scour.setPmds((int) Math.ceil((scour.getSeats() * scour.getDuration())));
+			cpDao.updateSbuCourse(scour);// update
+
+		} else {// insert
+
+			if (parentSc != null) {
 				int avaiSeats = parentSc.getSeats() - parentSc.getAssignSeats();
-				if(sc.getSeats()>avaiSeats){
+				if (sc.getSeats() > avaiSeats) {
 					throw new DataAccessDeniedException("seats not enough.");
 				}
-				
-				parentSc.setAssignSeats(parentSc.getAssignSeats()+sc.getSeats());
-				parentSc.setAssignPmds((int)(parentSc.getAssignPmds() + sc.getSeats() * parentSc.getDuration()));
+
+				parentSc.setAssignSeats(parentSc.getAssignSeats()
+						+ sc.getSeats());
+				parentSc.setAssignPmds((int)Math.ceil( (parentSc.getAssignPmds() + sc
+						.getSeats() * parentSc.getDuration())));
 				cpDao.updateSbuCourse(parentSc);
 			}
-			
+
 			sc.setDuration(duration);
-			sc.setPmds((int)(sc.getSeats() * duration));
+			sc.setPmds((int) Math.ceil((sc.getSeats() * duration)));
 			cpDao.addSbuCourse(sc);
-		
+
 		}
-		
-		
-		
-		
-		
-//		Course cou = getCourseById(courseId);
-//		float duration = cou.getDuration();
-//		if(scour != null){//update
-//			scour.setSeats(sc.getSeats());
-//			scour.setPmds((int)(sc.getSeats() * duration));
-//			cpDao.updateSbuCourse(scour);
-//			
-//		}else{//insert
-//			
-//			sc.setDuration(duration);
-//			sc.setPmds((int)(sc.getSeats() * duration));
-//			cpDao.addSbuCourse(sc);
-//		}
-//		
-		
-		
+
+		// Course cou = getCourseById(courseId);
+		// float duration = cou.getDuration();
+		// if(scour != null){//update
+		// scour.setSeats(sc.getSeats());
+		// scour.setPmds((int)(sc.getSeats() * duration));
+		// cpDao.updateSbuCourse(scour);
+		//
+		// }else{//insert
+		//
+		// sc.setDuration(duration);
+		// sc.setPmds((int)(sc.getSeats() * duration));
+		// cpDao.addSbuCourse(sc);
+		// }
+		//
 
 		return 0;
 	}
-	
+
 	public int updateSbuCourse(SbuCourse sc) {
 
 		return cpDao.updateSbuCourse(sc);
 	}
-	
-	public List<Course> getAllEvent(int type){
+
+	public List<Map> getEventList(String type) {
 		Map map = new HashMap();
 		map.put("type", type);
-		
-		List<Course> list = cpDao.getCourse(map);
+
+		List<Map> list = cpDao.getEventList(map);
 		return list;
 	}
-	
-	public List<Course> getCourseListByEvent(String eventName){
+
+	public List<Course> getCourseListByEvent(String eventName) {
 		Map map = new HashMap();
 		map.put("eventName", eventName);
-		
+
 		List<Course> list = cpDao.getCourse(map);
 		return list;
 	}
-	
-	public Course getCourseById(Integer id){
+
+	public Course getCourseById(Integer id) {
 		Map map = new HashMap();
 		map.put("id", id);
-		
+
 		List<Course> list = cpDao.getCourse(map);
-		if(list != null && list.size()>0){
+		if (list != null && list.size() > 0) {
 			return list.get(0);
 		}
 		return null;
 	}
-	
-	public void swap(Integer course1, Integer fromSbuId, Integer toSbuId, Integer action, Integer seats, Integer course2) throws DataAccessDeniedException{
-		UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		
+
+	public void swap_bak(Integer course1, Integer fromSbuId, Integer toSbuId,
+			Integer action, Integer seats, Integer course2)
+			throws DataAccessDeniedException {
+		UserDetails detail = (UserDetails) SecurityContextHolder.getContext()
+				.getAuthentication().getPrincipal();
+
 		String loginName = detail.getUsername();
-		
-		
-		if(action == 0){//lend-
-			//lend
+
+		if (action == 0) {// lend-
+			// lend
 			SbuCourse fromSbu1 = getSbuCourse(fromSbuId, course1);
 			SbuCourse toSbu1 = getSbuCourse(toSbuId, course1);
-			
-			//return
+
+			// return
 			SbuCourse fromSbu2 = getSbuCourse(toSbuId, course2);
 			SbuCourse toSbu2 = getSbuCourse(fromSbuId, course2);
-			
+
 			lendCourse(fromSbu1, toSbu1, seats);
 			lendCourse(fromSbu2, toSbu2, seats);
-			
+
 			SbuSwapHistory his = new SbuSwapHistory();
 			his.setFromSbuId(fromSbuId);
 			his.setToSbuId(toSbuId);
@@ -449,26 +488,24 @@ public class CourseServiceImpl implements ICourseService {
 			his.setGiveoutDuration(fromSbu1.getDuration());
 			his.setTakeinDuration(fromSbu2.getDuration());
 			his.setSeats(seats);
-			
+
 			his.setActionBy(loginName);
 			his.setActionTime(new Date());
-			
+
 			historyDao.addSbuSwapHistory(his);
-			
-			
-		}else{//return +
-			//lend
+
+		} else {// return +
+				// lend
 			SbuCourse fromSbu1 = getSbuCourse(toSbuId, course1);
 			SbuCourse toSbu1 = getSbuCourse(fromSbuId, course1);
-			
-			//return
+
+			// return
 			SbuCourse fromSbu2 = getSbuCourse(fromSbuId, course2);
 			SbuCourse toSbu2 = getSbuCourse(toSbuId, course2);
-			
+
 			lendCourse(fromSbu1, toSbu1, seats);
 			lendCourse(fromSbu2, toSbu2, seats);
-			
-			
+
 			SbuSwapHistory his = new SbuSwapHistory();
 			his.setFromSbuId(fromSbuId);
 			his.setToSbuId(toSbuId);
@@ -477,335 +514,462 @@ public class CourseServiceImpl implements ICourseService {
 			his.setGiveoutDuration(fromSbu2.getDuration());
 			his.setTakeinDuration(fromSbu1.getDuration());
 			his.setSeats(seats);
-			
+
 			his.setActionBy(loginName);
 			his.setActionTime(new Date());
-			
+
 			historyDao.addSbuSwapHistory(his);
-			
+
 		}
-		
+
 	}
 	
 	
-	private void lendCourse(SbuCourse fromSbu, SbuCourse toSbu, int seats){
+	public void swap(Integer mySbuId , Integer giveoutCourseId, Integer swapSbuId,
+			         Integer swapCourseId, Integer swapSeats)
+			throws DataAccessDeniedException {
+			UserDetails detail = (UserDetails) SecurityContextHolder.getContext()
+					.getAuthentication().getPrincipal();
+	
+			String loginName = detail.getUsername();
 		
-		int leftSeats = fromSbu.getSeats()-fromSbu.getAssignSeats();
-		int leftSeats2 = toSbu.getSeats()-toSbu.getAssignSeats();
-		if(leftSeats<seats){
+		
+			// lend
+			SbuCourse fromSbu1 = getSbuCourse(mySbuId, giveoutCourseId);
+			SbuCourse toSbu1 = getSbuCourse(swapSbuId, giveoutCourseId);
+			lendNormalSeats(fromSbu1, toSbu1, swapSeats);
 			
-//			Course c1 = getCourseById(fromSbu.getSbuId());
-			throw new DataAccessDeniedException("sbu" + fromSbu.getSbuId()+ "for course" +fromSbu.getCourseId()+ " avaliable seats is not enough.");
+			
+			// return
+			SbuCourse fromSbu2 = getSbuCourse(swapSbuId, swapCourseId);
+			SbuCourse toSbu2 = getSbuCourse(mySbuId, swapCourseId);
+			lendSwapSeats(fromSbu2, toSbu2, swapSeats);
+			
+
+			SbuSwapHistory his = new SbuSwapHistory();
+			his.setFromSbuId(mySbuId);
+			his.setToSbuId(swapSbuId);
+			his.setGiveoutCourseId(giveoutCourseId);
+			his.setTakeinCourseId(swapCourseId);
+			his.setGiveoutDuration(fromSbu1.getDuration());
+			his.setTakeinDuration(fromSbu2.getDuration());
+			his.setSeats(swapSeats);
+			his.setActionBy(loginName);
+			his.setActionTime(new Date());
+
+			historyDao.addSbuSwapHistory(his);
+
+	}
+	
+	private void lendNormalSeats(SbuCourse fromSbu, SbuCourse toSbu, int seats) {
+
+		int leftSeats = fromSbu.getSeats() - fromSbu.getAssignSeats();
+		if (leftSeats < seats) {
+
+			// Course c1 = getCourseById(fromSbu.getSbuId());
+			throw new DataAccessDeniedException("sbu" + fromSbu.getSbuId()
+					+ "for course" + fromSbu.getCourseId()
+					+ " avaliable seats is not enough.");
 		}
-//		if(leftSeats2<seats){
-//			throw new DataAccessDeniedException("sbu" + toSbu.getSbuId()+ "for course" +toSbu.getCourseId()+ " avaliable seats is not enough.");
-//		}
 		
-		//fromSbu.setSeats(fromSbu.getSeats() - seats);
-		//fromSbu.setPmds(fromSbu.getPmds() - fromSbu.getDuration() * seats);
-		//cpDao.updateSbuCourse(fromSbu);
+		//lend
+		fromSbu.setSeats(fromSbu.getSeats() - seats);
+		fromSbu.setPmds((int) Math.ceil((fromSbu.getSeats() * fromSbu.getDuration())));
+		cpDao.updateSbuCourse(fromSbu);
 		
+		//to
+		toSbu.setSeats(toSbu.getSeats() + seats);
+		toSbu.setPmds((int) Math.ceil((toSbu.getSeats() * toSbu.getDuration())));
+		cpDao.updateSbuCourse(toSbu);
+		
+	}
+	
+	private void lendSwapSeats(SbuCourse fromSbu, SbuCourse toSbu, int swapSeats) {
+
+		int leftSeats = fromSbu.getSwapSeats();
+		if (leftSeats < swapSeats) {
+
+			// Course c1 = getCourseById(fromSbu.getSbuId());
+			throw new DataAccessDeniedException("sbu:" + fromSbu.getSbuId()
+					+ "for course:" + fromSbu.getCourseId()
+					+ " swap seats is not enough.");
+		}
+		
+		//lend
+		fromSbu.setSwapSeats(fromSbu.getSwapSeats() - swapSeats);
+		cpDao.updateSbuCourse(fromSbu);
+		
+		//to
+		toSbu.setSeats(toSbu.getSeats() + swapSeats);
+		toSbu.setPmds((int) Math.ceil((toSbu.getSeats() * toSbu.getDuration())));
+		cpDao.updateSbuCourse(toSbu);
+		
+	}
+
+	private void lendCourse(SbuCourse fromSbu, SbuCourse toSbu, int seats) {
+
+		int leftSeats = fromSbu.getSeats() - fromSbu.getAssignSeats();
+		int leftSeats2 = toSbu.getSeats() - toSbu.getAssignSeats();
+		if (leftSeats < seats) {
+
+			// Course c1 = getCourseById(fromSbu.getSbuId());
+			throw new DataAccessDeniedException("sbu" + fromSbu.getSbuId()
+					+ "for course" + fromSbu.getCourseId()
+					+ " avaliable seats is not enough.");
+		}
+		// if(leftSeats2<seats){
+		// throw new DataAccessDeniedException("sbu" + toSbu.getSbuId()+
+		// "for course" +toSbu.getCourseId()+
+		// " avaliable seats is not enough.");
+		// }
+
+		// fromSbu.setSeats(fromSbu.getSeats() - seats);
+		// fromSbu.setPmds(fromSbu.getPmds() - fromSbu.getDuration() * seats);
+		// cpDao.updateSbuCourse(fromSbu);
+
 		// update parent sbu_course seats and pmds
 		List<Sbu> list = sbuService.getAllParentSbuList(fromSbu.getSbuId());
-		if(list != null && list.size()>0){
-			for(Sbu sbu : list){
-				SbuCourse course = getSbuCourse(sbu.getId(), fromSbu.getCourseId());
-				if(course != null){
+		if (list != null && list.size() > 0) {
+			for (Sbu sbu : list) {
+				SbuCourse course = getSbuCourse(sbu.getId(),
+						fromSbu.getCourseId());
+				if (course != null) {
 					course.setSeats(course.getSeats() - seats);
-					course.setPmds((int)(course.getPmds() - course.getDuration() * seats));
+					course.setPmds((int) Math.ceil((course.getPmds() - course
+							.getDuration() * seats)));
 					cpDao.updateSbuCourse(course);
 				}
 			}
-		}//end
-		
-//		toSbu.setSeats(toSbu.getSeats() + seats);
-//		toSbu.setPmds(toSbu.getPmds() + toSbu.getDuration() * seats);
-//		cpDao.updateSbuCourse(toSbu);
-		
-		
+		}// end
+
+		// toSbu.setSeats(toSbu.getSeats() + seats);
+		// toSbu.setPmds(toSbu.getPmds() + toSbu.getDuration() * seats);
+		// cpDao.updateSbuCourse(toSbu);
+
 		// update parent sbu_course seats and pmds
 		List<Sbu> list2 = sbuService.getAllParentSbuList(toSbu.getSbuId());
-		if(list2 != null && list2.size()>0){
-			for(Sbu sbu : list2){
-				SbuCourse course = getSbuCourse(sbu.getId(), toSbu.getCourseId());
-				if(course != null){
+		if (list2 != null && list2.size() > 0) {
+			for (Sbu sbu : list2) {
+				SbuCourse course = getSbuCourse(sbu.getId(),
+						toSbu.getCourseId());
+				if (course != null) {
 					course.setSeats(course.getSeats() + seats);
-					course.setPmds((int)(course.getPmds() + course.getDuration() * seats));
+					course.setPmds((int)Math.ceil( (course.getPmds() + course
+							.getDuration() * seats)));
 					cpDao.updateSbuCourse(course);
 				}
 			}
-		}//end
-		
-		
-//		// record history
-//		SbuSwapHistory his1 = new SbuSwapHistory();
-//		his1.setCourseId(fromSbu.getCourseId());
-//		his1.setFromSbuId(fromSbu.getSbuId());
-//		his1.setToSbuId(toSbu.getSbuId());
-//		his1.setAction(0);//lend
-//		his1.setSeats(seats);
-//		his1.setDuration(fromSbu.getDuration());
-//		//UserDetails detail = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//		his1.setActionBy("admin");
-//		his1.setActionTime(new Date());
-//		
-//		historyDao.addSbuSwapHistory(his1);
+		}// end
+
+		// // record history
+		// SbuSwapHistory his1 = new SbuSwapHistory();
+		// his1.setCourseId(fromSbu.getCourseId());
+		// his1.setFromSbuId(fromSbu.getSbuId());
+		// his1.setToSbuId(toSbu.getSbuId());
+		// his1.setAction(0);//lend
+		// his1.setSeats(seats);
+		// his1.setDuration(fromSbu.getDuration());
+		// //UserDetails detail = (UserDetails)
+		// SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		// his1.setActionBy("admin");
+		// his1.setActionTime(new Date());
+		//
+		// historyDao.addSbuSwapHistory(his1);
+	}
+
+	public List<CourseMail> getAllCourseBeforeStarting(int week){
+		Map map = new HashMap();
+		map.put("week", week);
+		return cpDao.getAllCourseToBegin(map);
+	}
+	
+	 public void updatedAttend(int participantId, int attend){
+		 Participant pa = new Participant();
+		 pa.setId(participantId);
+		 pa.setAttend(attend);
+		 cpDao.updateParticipant(pa);
+	 }
+
+	/**
+	 * upload course
+	 */
+	public void uploadCourse(InputStream in, boolean append)
+			throws DataAccessDeniedException {
+
+		Workbook wb = null;
+		List<Course> list = new ArrayList<Course>();
+
+		try {
+
+			wb = new XSSFWorkbook(in);
+			Sheet st = wb.getSheetAt(0);
+			Row rw;
+			// Cell cl;
+			for (int rowNum = 0; rowNum < st.getLastRowNum(); rowNum++) {
+
+				String cellValue = "";
+				int asciicode = 10;
+				char newLine = (char) asciicode;
+
+				rw = st.getRow(rowNum + 2);
+				if (rw == null) {
+					continue;
+				}
+
+				Course c = new Course();
+				String eventName = getStringCellValue(rw.getCell(0));
+				String courseName = getStringCellValue(rw.getCell(1));
+				String courseUrl = getStringCellValue(rw.getCell(2));
+				String startTime = getStringCellValue(rw.getCell(3));
+				String endTime = getStringCellValue(rw.getCell(4));
+				String duration = getStringCellValue(rw.getCell(5));
+
+				String app1 = getStringCellValue(rw.getCell(6));
+				String app2 = getStringCellValue(rw.getCell(7));
+				String bpo = getStringCellValue(rw.getCell(8));
+				String cc = getStringCellValue(rw.getCell(9));
+				String infra = getStringCellValue(rw.getCell(10));
+				String latam = getStringCellValue(rw.getCell(11));
+				String iandd = getStringCellValue(rw.getCell(12));
+				String sogeti = getStringCellValue(rw.getCell(13));
+				String fs = getStringCellValue(rw.getCell(14));
+				String other = getStringCellValue(rw.getCell(15));
+				// String swap = getStringCellValue(rw.getCell(16));
+
+				if (StringUtils.isEmpty(eventName)) {
+					continue;
+				}
+
+				c.setEventName(eventName);
+				c.setName(courseName);
+				c.setUrl(courseUrl);
+				if (!StringUtils.isEmpty(startTime)) {
+					c.setStartTime(DateUtil.formatDate(startTime));
+				}
+				if (!StringUtils.isEmpty(endTime)) {
+					c.setEndTime(DateUtil.formatDate(endTime));
+				}
+				if(StringUtils.isEmpty(duration)){
+					throw new DataAccessDeniedException("eventName:"+eventName +" courseName:" + courseName + " duration is null.");
+
+				}
+
+				c.setDuration(Float.parseFloat(duration));
+
+				List<SbuCourse> sbuCourseList = new ArrayList<SbuCourse>();
+
+				if (!StringUtils.isEmpty(app1)) {
+					SbuCourse sc = new SbuCourse();
+					sc.setSbuId(UTConstant.SBUID_APP1);
+					sc.setDuration(Float.parseFloat(duration));
+					sc.setSeats((int) Float.parseFloat(app1));
+					sc.setPmds((int) Math.ceil(sc.getDuration() * sc.getSeats()));
+					sbuCourseList.add(sc);
+				}
+				if (!StringUtils.isEmpty(app2)) {
+					SbuCourse sc = new SbuCourse();
+					sc.setSbuId(UTConstant.SBUID_APP2);
+					sc.setDuration(Float.parseFloat(duration));
+					sc.setSeats((int) Float.parseFloat(app2));
+					sc.setPmds((int) Math.ceil(sc.getDuration() * sc.getSeats()));
+					sbuCourseList.add(sc);
+				}
+				if (!StringUtils.isEmpty(bpo)) {
+					SbuCourse sc = new SbuCourse();
+					sc.setSbuId(UTConstant.SBUID_BPO);
+					sc.setDuration(Float.parseFloat(duration));
+					sc.setSeats((int) Float.parseFloat(bpo));
+					sc.setPmds((int) Math.ceil(sc.getDuration() * sc.getSeats()));
+					sbuCourseList.add(sc);
+				}
+				if (!StringUtils.isEmpty(cc)) {
+					SbuCourse sc = new SbuCourse();
+					sc.setSbuId(UTConstant.SBUID_CC);
+					sc.setDuration(Float.parseFloat(duration));
+					sc.setSeats((int) Float.parseFloat(cc));
+					sc.setPmds((int) Math.ceil(sc.getDuration() * sc.getSeats()));
+					sbuCourseList.add(sc);
+				}
+
+				if (!StringUtils.isEmpty(infra)) {
+					SbuCourse sc = new SbuCourse();
+					sc.setSbuId(UTConstant.SBUID_INFRA);
+					sc.setDuration(Float.parseFloat(duration));
+					sc.setSeats((int) Float.parseFloat(infra));
+					sc.setPmds((int) Math.ceil(sc.getDuration() * sc.getSeats()));
+					sbuCourseList.add(sc);
+				}
+
+				if (!StringUtils.isEmpty(latam)) {
+					SbuCourse sc = new SbuCourse();
+					sc.setSbuId(UTConstant.SBUID_LATAM);
+					sc.setDuration(Float.parseFloat(duration));
+					sc.setSeats((int) Float.parseFloat(latam));
+					sc.setPmds((int) Math.ceil(sc.getDuration() * sc.getSeats()));
+					sbuCourseList.add(sc);
+				}
+
+				if (!StringUtils.isEmpty(iandd)) {
+					SbuCourse sc = new SbuCourse();
+					sc.setSbuId(UTConstant.SBUID_IANDD);
+					sc.setDuration(Float.parseFloat(duration));
+					sc.setSeats((int) Float.parseFloat(iandd));
+					sc.setPmds((int) Math.ceil(sc.getDuration() * sc.getSeats()));
+					sbuCourseList.add(sc);
+				}
+
+				if (!StringUtils.isEmpty(sogeti)) {
+					SbuCourse sc = new SbuCourse();
+					sc.setSbuId(UTConstant.SBUID_SOGETI);
+					sc.setDuration(Float.parseFloat(duration));
+					sc.setSeats((int) Float.parseFloat(sogeti));
+					sc.setPmds((int) Math.ceil(sc.getDuration() * sc.getSeats()));
+					sbuCourseList.add(sc);
+				}
+
+				if (!StringUtils.isEmpty(fs)) {
+					SbuCourse sc = new SbuCourse();
+					sc.setSbuId(UTConstant.SBUID_FS);
+					sc.setDuration(Float.parseFloat(duration));
+					sc.setSeats((int) Float.parseFloat(fs));
+					sc.setPmds((int) Math.ceil(sc.getDuration() * sc.getSeats()));
+					sbuCourseList.add(sc);
+				}
+
+				if (!StringUtils.isEmpty(other)) {
+					SbuCourse sc = new SbuCourse();
+					sc.setSbuId(UTConstant.SBUID_OTHER);
+					sc.setDuration(Float.parseFloat(duration));
+					sc.setSeats((int) Float.parseFloat(other));
+					sc.setPmds((int) Math.ceil(sc.getDuration() * sc.getSeats()));
+					sbuCourseList.add(sc);
+				}
+
+				// if(!StringUtils.isEmpty(swap)){
+				// SbuCourse sc = new SbuCourse();
+				// sc.setSbuId(UTConstant.SBUID_SWAP);
+				// sc.setDuration(Float.parseFloat(duration));
+				// sc.setSeats((int)Float.parseFloat(swap));
+				// sc.setPmds((int)Math.ceil(sc.getDuration() * sc.getSeats()));
+				// sbuCourseList.add(sc);
+				// }
+				//
+				c.setSbuList(sbuCourseList);
+				list.add(c);
+
+			}
+
+			if (list.size() == 0) {
+				throw new DataAccessDeniedException(
+						"There is no valid data in excel.");
+
+			}
+
+			saveCourse(list);
+
+		} catch (Exception e) {
+			logger.error("Read Excel File Error Message : " , e);
+			throw new DataAccessDeniedException(
+					"Read Excel File Error Message ");
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					logger.error("The Method Read Excel File Error Message : "
+							,e);
+				}
+			}
+			if (wb != null) {
+				try {
+					wb.close();
+				} catch (IOException e) {
+					logger.error("The Method Read Excel File Error Message : "
+							, e);
+				}
+			}
+		}
+
 	}
 	
 	
-	  public List<CourseMail> getAllCourseToBegin(){
-		  Map map = new HashMap();
-		  return cpDao.getAllCourseToBegin(map);
-	  }
-	  
-	  
-	  /**
-	   * upload course
-	   */
-	  public void uploadCourse(InputStream in, boolean append) throws DataAccessDeniedException{
-		  
-			Workbook wb = null;
-			List<Course> list = new ArrayList<Course>();
-			
-			try {
-				
-				wb  = new XSSFWorkbook(in);
-				Sheet st = wb.getSheetAt(0);
-				Row rw;
-//				Cell cl;
-				for (int rowNum = 0; rowNum < st.getLastRowNum(); rowNum++) {
-					
-					String cellValue = "";
-					int asciicode = 10;
-					char newLine = (char) asciicode;
-					
-					rw = st.getRow(rowNum+2);
-					if(rw == null){
-					continue;
-					}
-					
-					Course c = new Course();
-					String eventName = getStringCellValue(rw.getCell(0));
-					String courseName = getStringCellValue(rw.getCell(1));
-					String courseUrl = getStringCellValue(rw.getCell(2));
-					String startTime = getStringCellValue(rw.getCell(3));
-					String endTime = getStringCellValue(rw.getCell(4));
-					String duration = getStringCellValue(rw.getCell(5));
-					
-					String app1 = getStringCellValue(rw.getCell(6));
-					String app2 = getStringCellValue(rw.getCell(7));
-					String bpo = getStringCellValue(rw.getCell(8));
-					String cc = getStringCellValue(rw.getCell(9));
-					String infra = getStringCellValue(rw.getCell(10));
-					String latam = getStringCellValue(rw.getCell(11));
-					String iandd = getStringCellValue(rw.getCell(12));
-					String sogeti = getStringCellValue(rw.getCell(13));
-					String fs = getStringCellValue(rw.getCell(14));
-					String other = getStringCellValue(rw.getCell(15));
-					String swap = getStringCellValue(rw.getCell(16));
-					
-					if(StringUtils.isEmpty(eventName)){
-						continue;
-						}
-					
-					c.setEventName(eventName);
-					c.setName(courseName);
-					c.setUrl(courseUrl);
-					if(!StringUtils.isEmpty(startTime)){
-						c.setStartTime(DateUtil.formatDate(startTime));
-					}	
-					if(!StringUtils.isEmpty(endTime)){
-						c.setEndTime(DateUtil.formatDate(endTime));
-					}
-					
-					
-					c.setDuration(Float.parseFloat(duration));
-					
-					List<SbuCourse> sbuCourseList = new ArrayList<SbuCourse>();
-					
-					if(!StringUtils.isEmpty(app1)){
-						SbuCourse sc = new SbuCourse();
-						sc.setSbuId(UTConstant.SBUID_APP1);
-						sc.setDuration(Float.parseFloat(duration));
-						sc.setSeats((int)Float.parseFloat(app1));
-						sc.setPmds((int)Math.ceil(sc.getDuration() * sc.getSeats()));
-						sbuCourseList.add(sc);
-					}
-					if(!StringUtils.isEmpty(app2)){
-						SbuCourse sc = new SbuCourse();
-						sc.setSbuId(UTConstant.SBUID_APP2);
-						sc.setDuration(Float.parseFloat(duration));
-						sc.setSeats((int)Float.parseFloat(app2));
-						sc.setPmds((int)Math.ceil(sc.getDuration() * sc.getSeats()));
-						sbuCourseList.add(sc);
-					}
-					if(!StringUtils.isEmpty(bpo)){
-						SbuCourse sc = new SbuCourse();
-						sc.setSbuId(UTConstant.SBUID_BPO);
-						sc.setDuration(Float.parseFloat(duration));
-						sc.setSeats((int)Float.parseFloat(bpo));
-						sc.setPmds((int)Math.ceil(sc.getDuration() * sc.getSeats()));
-						sbuCourseList.add(sc);
-					}
-					if(!StringUtils.isEmpty(cc)){
-						SbuCourse sc = new SbuCourse();
-						sc.setSbuId(UTConstant.SBUID_CC);
-						sc.setDuration(Float.parseFloat(duration));
-						sc.setSeats((int)Float.parseFloat(cc));
-						sc.setPmds((int)Math.ceil(sc.getDuration() * sc.getSeats()));
-						sbuCourseList.add(sc);
-					}
-					
-					if(!StringUtils.isEmpty(infra)){
-						SbuCourse sc = new SbuCourse();
-						sc.setSbuId(UTConstant.SBUID_INFRA);
-						sc.setDuration(Float.parseFloat(duration));
-						sc.setSeats((int)Float.parseFloat(infra));
-						sc.setPmds((int)Math.ceil(sc.getDuration() * sc.getSeats()));
-						sbuCourseList.add(sc);
-					}
-					
-					if(!StringUtils.isEmpty(latam)){
-						SbuCourse sc = new SbuCourse();
-						sc.setSbuId(UTConstant.SBUID_LATAM);
-						sc.setDuration(Float.parseFloat(duration));
-						sc.setSeats((int)Float.parseFloat(latam));
-						sc.setPmds((int)Math.ceil(sc.getDuration() * sc.getSeats()));
-						sbuCourseList.add(sc);
-					}
-					
-					if(!StringUtils.isEmpty(iandd)){
-						SbuCourse sc = new SbuCourse();
-						sc.setSbuId(UTConstant.SBUID_IANDD);
-						sc.setDuration(Float.parseFloat(duration));
-						sc.setSeats((int)Float.parseFloat(iandd));
-						sc.setPmds((int)Math.ceil(sc.getDuration() * sc.getSeats()));
-						sbuCourseList.add(sc);
-					}
-					
-					if(!StringUtils.isEmpty(sogeti)){
-						SbuCourse sc = new SbuCourse();
-						sc.setSbuId(UTConstant.SBUID_SOGETI);
-						sc.setDuration(Float.parseFloat(duration));
-						sc.setSeats((int)Float.parseFloat(sogeti));
-						sc.setPmds((int)Math.ceil(sc.getDuration() * sc.getSeats()));
-						sbuCourseList.add(sc);
-					}
-					
-					if(!StringUtils.isEmpty(fs)){
-						SbuCourse sc = new SbuCourse();
-						sc.setSbuId(UTConstant.SBUID_FS);
-						sc.setDuration(Float.parseFloat(duration));
-						sc.setSeats((int)Float.parseFloat(fs));
-						sc.setPmds((int)Math.ceil(sc.getDuration() * sc.getSeats()));
-						sbuCourseList.add(sc);
-					}
-					
-					if(!StringUtils.isEmpty(other)){
-						SbuCourse sc = new SbuCourse();
-						sc.setSbuId(UTConstant.SBUID_OTHER);
-						sc.setDuration(Float.parseFloat(duration));
-						sc.setSeats((int)Float.parseFloat(other));
-						sc.setPmds((int)Math.ceil(sc.getDuration() * sc.getSeats()));
-						sbuCourseList.add(sc);
-					}
-					
-					if(!StringUtils.isEmpty(swap)){
-						SbuCourse sc = new SbuCourse();
-						sc.setSbuId(UTConstant.SBUID_SWAP);
-						sc.setDuration(Float.parseFloat(duration));
-						sc.setSeats((int)Float.parseFloat(swap));
-						sc.setPmds((int)Math.ceil(sc.getDuration() * sc.getSeats()));
-						sbuCourseList.add(sc);
-					}
-					
-					c.setSbuList(sbuCourseList);
-					list.add(c);
-					
-					
+
+	public void updateCourse(Course c) {
+		cpDao.updateCourse(c);
+		List<SbuCourse> list = c.getSbuList();
+		if (list != null && list.size() > 0) {
+			for (SbuCourse sc : list) {
+				int seats = sc.getSeats();
+				if (!StringUtils.isEmpty(c.getDuration())) {
+					float duration = c.getDuration();
+					sc.setPmds((int) Math.ceil((seats * duration)));
+					sc.setDuration(duration);
 				}
-				
-				if(list.size() == 0){
-					throw new DataAccessDeniedException("There is no valid data in excel.");
-					
-				}
-				
-				saveCourse(list);
-				
-			}  catch (Exception e) {
-				logger.error("Read Excel File Error Message : " + e);
-				throw new DataAccessDeniedException("Read Excel File Error Message ");
-			} finally {
-				if (in != null) {
-					try {
-						in.close();
-					} catch (IOException e) {
-						logger.error("The Method Read Excel File Error Message : " + e);
-						e.printStackTrace();
-					}
-				}
-				if (wb != null) {
-					try {
-						wb.close();
-					} catch (IOException e) {
-						logger.error("The Method Read Excel File Error Message : " + e);
-					}
-				}
+
+				cpDao.updateSbuCourse(sc);
 			}
-		  
-	  }
-	  
-	  
-	  public void saveCourse(List<Course> list){
-		  for(Course c : list){
-			  cpDao.addCourse(c);
-			  List<SbuCourse> sbuList = c.getSbuList();
-			  for(SbuCourse sbu : sbuList){
-				  sbu.setCourseId(c.getId());
-			  }
-			  
-			  cpDao.addSbuCourseList(sbuList);
-		  }
-	  }
-	  
-	  /**
-	     * get the value of Excel cell then transform them to String type
-	     * 
-	     * @param cell cell
-	     * @return String value of Cell
-	     */
-	    private String getStringCellValue(Cell cell) {
-	    	if(cell == null){
-	    		return "";
-	    	}
-	        String strCell = "";
-	        switch (cell.getCellType()) {
-	        case Cell.CELL_TYPE_STRING:
-	            strCell = cell.getStringCellValue();
-	            break;
-	        case Cell.CELL_TYPE_NUMERIC:
-	        	if (HSSFDateUtil.isCellDateFormatted(cell)){
-	        		Date date = cell.getDateCellValue();
-	        		DateFormat formater = new SimpleDateFormat("MM/dd/yyyy");
-	        		strCell = formater.format(date);
-	        		break;
-	        	}
-	            strCell = String.valueOf(cell.getNumericCellValue());//Note! cast data from Double type to Integer type
-	            break;
-	        case Cell.CELL_TYPE_BOOLEAN:
-	            strCell = String.valueOf(cell.getBooleanCellValue());
-	            break;
-	        case Cell.CELL_TYPE_BLANK:
-	            strCell = "";
-	            break;
-	        default:
-	            strCell = "";
-	            break;
-	        }
-	       
-	        return strCell;
-	    }
-	    
-	   
+
+		}
+
+	}
+
+	public void saveCourse(List<Course> list) {
+		for (Course c : list) {
+			cpDao.addCourse(c);
+			List<SbuCourse> sbuList = c.getSbuList();
+			for (SbuCourse sbu : sbuList) {
+				sbu.setCourseId(c.getId());
+			}
+
+			if (sbuList != null && sbuList.size() != 0) {
+				cpDao.addSbuCourseList(sbuList);
+			}
+
+		}
+	}
+
+	/**
+	 * get the value of Excel cell then transform them to String type
+	 * 
+	 * @param cell
+	 *            cell
+	 * @return String value of Cell
+	 */
+	private String getStringCellValue(Cell cell) {
+		if (cell == null) {
+			return "";
+		}
+		String strCell = "";
+		switch (cell.getCellType()) {
+		case Cell.CELL_TYPE_STRING:
+			strCell = cell.getStringCellValue();
+			break;
+		case Cell.CELL_TYPE_NUMERIC:
+			if (HSSFDateUtil.isCellDateFormatted(cell)) {
+				Date date = cell.getDateCellValue();
+				DateFormat formater = new SimpleDateFormat("MM/dd/yyyy");
+				strCell = formater.format(date);
+				break;
+			}
+			strCell = String.valueOf(cell.getNumericCellValue());// Note! cast
+																	// data from
+																	// Double
+																	// type to
+																	// Integer
+																	// type
+			break;
+		case Cell.CELL_TYPE_BOOLEAN:
+			strCell = String.valueOf(cell.getBooleanCellValue());
+			break;
+		case Cell.CELL_TYPE_BLANK:
+			strCell = "";
+			break;
+		default:
+			strCell = "";
+			break;
+		}
+
+		return strCell;
+	}
 
 }

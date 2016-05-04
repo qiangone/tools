@@ -1,6 +1,6 @@
 var envConfig = {
 		dummy: false,
-		prefix: "http://10.61.213.114:8083/UniversityTool",
+		prefix: "http://10.61.213.168:8080/UniversityTool",
 		apis: {
 			'getCurrentSbu': {
 				url: '/getUserInfo',
@@ -43,6 +43,31 @@ var envConfig = {
 			'swapSeatsToSbu': {
 				url: '/api/sbu/swap',
 				dummyPath: ''
+			},
+			'getSbuList': {
+				url: '/api/sbu/sbuList',
+				dummyPath: ''
+			},
+			'deleteSbu': {
+				url:'/api/sbu/deleteSbu'
+			},
+			'uploadPrograms': {
+				url: '/api/course/upload'
+			},
+			'updateProgram': {
+				url: '/api/course/updateCourse'
+			},
+			'getAdminProgramList': {
+				url: '/api/course/adminCourseList'
+			},
+			'getProgramDetail': {
+				url: '/api/course/getCourseInfo'
+			},
+			'updateSwapSeats': {
+				url: '/api/sbu/updateSwapSeats'
+			},
+			'addSbu': {
+				url: '/api/sbu/addSbu'
 			}
 		}
 };
