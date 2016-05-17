@@ -15,6 +15,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -26,6 +27,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.capgemini.university.api.exception.DataAccessDeniedException;
 import com.capgemini.university.dao.SbuDao;
 import com.capgemini.university.model.Lbps;
 import com.capgemini.university.model.Participant;
@@ -58,6 +60,16 @@ public class SbuServiceImpl implements ISbuService {
 	public Sbu getSbuById(int sbuId){
 		Map map = new HashMap();
 		map.put("id", sbuId);
+		List<Sbu> list = sbuDao.getSbu(map);
+		if(list != null && list.size()>0){
+			return list.get(0);
+		}
+		return null;
+	}
+	
+	private Sbu getSbuByName(String sbuName){
+		Map map = new HashMap();
+		map.put("sbuName", sbuName);
 		List<Sbu> list = sbuDao.getSbu(map);
 		if(list != null && list.size()>0){
 			return list.get(0);
@@ -164,6 +176,19 @@ public class SbuServiceImpl implements ISbuService {
 		
 	}
 	
+	public List<Sbu> getSbuListByParentIdAndParticipant(int parentId, int courseId){
+		Map map = new HashMap();
+		map.put("parentId", parentId);
+		List<Sbu> list = sbuDao.getSbu(map);
+		if(list != null && list.size()>0){
+			for(Sbu sbu : list){
+				List<Participant> parList = courseService.queryParticipantList(sbu.getId(), courseId);
+				sbu.setParticipantList(parList);
+			}
+		}
+		return list;
+	}
+	
 	public List<Sbu> getSbuListByParentId(int parentId){
 		Map map = new HashMap();
 		map.put("parentId", parentId);
@@ -177,6 +202,10 @@ public class SbuServiceImpl implements ISbuService {
 	}
 	
 	public void addSbu(Sbu sbu){
+		Sbu tmpSbu = getSbuByName(sbu.getSubName());
+		if(tmpSbu != null){
+			throw new DataAccessDeniedException("Sbu Name exists!");
+		}
 		sbuDao.addSbu(sbu);
 	}
 	
@@ -191,15 +220,66 @@ public class SbuServiceImpl implements ISbuService {
 	
 	
 	public void addSbuLbps(int sbuId, String displayName, String email){
-		Lbps lbps = new Lbps();
-		lbps.setName(displayName);
-		lbps.setEmail(email);
-		sbuDao.addLbps(lbps);
+		
+		Lbps lbps = getLbpsByEmail(email);
+		if(lbps == null){
+			lbps = new Lbps();
+			lbps.setName(displayName);
+			lbps.setEmail(email);
+			sbuDao.addLbps(lbps);
+		}
 		
 		SbuLbps sb = new SbuLbps();
 		sb.setLbpsId(lbps.getId());
 		sb.setSbuId(sbuId);
 		sbuDao.addSbuLbps(sb);
+	}
+	
+	public SbuLbps getSbuLbpsById(int id){
+		Map map = new HashMap();
+		map.put("id",  id);
+		
+		List<SbuLbps> list = sbuDao.getSbuLbps(map);
+		if(list != null && list.size()>0){
+			return list.get(0);
+		}
+		return  null;
+	}
+	
+	public SbuLbps getSbuLbps(int sbuId, int lbpsId){
+		Map map = new HashMap();
+		map.put("sbuId",  sbuId);
+		map.put("lbpsId",  lbpsId);
+		
+		List<SbuLbps> list = sbuDao.getSbuLbps(map);
+		if(list != null && list.size()>0){
+			return list.get(0);
+		}
+		return  null;
+	}
+	
+	public void relateSbuLbps(int sbuId, String sbuLbpsId, String displayName, String email){
+		Lbps lbps = getLbpsByEmail(email);
+		if(lbps == null){
+			lbps = new Lbps();
+			lbps.setName(displayName);
+			lbps.setEmail(email);
+			sbuDao.addLbps(lbps);
+		}
+		
+		if(StringUtils.isNotEmpty(sbuLbpsId)){
+			SbuLbps sl = getSbuLbpsById(Integer.parseInt(sbuLbpsId));
+			sl.setLbpsId(lbps.getId());
+			sbuDao.updateSbuLbps(sl);
+		}else{
+			SbuLbps sb = new SbuLbps();
+			sb.setLbpsId(lbps.getId());
+			sb.setSbuId(sbuId);
+			sbuDao.addSbuLbps(sb);
+		}
+		
+		
+		
 	}
 	
 	public void updateLbps(Lbps lbps){
@@ -231,7 +311,7 @@ public class SbuServiceImpl implements ISbuService {
 	}
 	
 	public void exportNomination(List<Map> list, HttpServletResponse response) {
-		String[] titles= new String[]{"SBU NAME","COURSE NAME","EMAIL","DISPLAY NAME"};
+		String[] titles= new String[]{"SBU NAME","COURSE NAME","START_TIME","END_TIME","EMAIL","DISPLAY NAME"};
 		
 		int index = 0;
 		HSSFWorkbook wb = new HSSFWorkbook();  
@@ -254,11 +334,13 @@ public class SbuServiceImpl implements ISbuService {
         
         for(int i=0;i<list.size();i++){
         	Map map = list.get(i);
-        	Object[] values = new Object[4];
+        	Object[] values = new Object[6];
         	values[0] = map.get("sbu_name");
         	values[1] = map.get("course_name");
-        	values[2] = map.get("email");
-        	values[3] = map.get("display_name");
+        	values[2] = map.get("start_time");
+        	values[3] = map.get("end_time");
+        	values[4] = map.get("email");
+        	values[5] = map.get("display_name");
         	HSSFRow contentRow = sheet.createRow(index++); 
         	setCellValue(contentRow,values,contentStyle);
         }
@@ -285,10 +367,13 @@ public class SbuServiceImpl implements ISbuService {
 		
 	}
 	
-	public List<Map> countParticipantsOfSbu(int sbuId){
+	public List<Map> countParticipantsOfSbu(int sbuId, String eventName){
 		Map map = new HashMap();
 		if(sbuId != 0){
 			map.put("sbuId", sbuId);
+		}
+		if(StringUtils.isNotEmpty(eventName)){
+			map.put("eventName", eventName);
 		}
 		
 		return sbuDao.countParticipantsOfSbu(map);
@@ -303,6 +388,73 @@ public class SbuServiceImpl implements ISbuService {
 			return list.get(0);
 		}
 		return null;
+	}
+	
+	public List<Sbu> countParticipantsByCourse(int courseId){
+		Map map = new HashMap();
+		map.put("courseId", courseId);
+		return sbuDao.countParticipantsByCourse(map);
+	}
+	
+	public void convertToFreeSeats(){
+		sbuDao.convertToFreeSeats();
+	}
+	
+	
+	public Map countParticipantAndPmds(int sbuId){
+		Map ret = new HashMap();
+		List<Map> list2 = new ArrayList<Map>();
+		List<Sbu> list = getSbuListByParentId(sbuId);
+		int total_used_seats =0;
+		int total_used_pmds =0;
+		int total_avaliable_seats =0;
+		int total_avaliable_pmds =0;
+		int total_lost_seats =0;
+		int total_lost_pmds =0;
+		
+		if(list != null && list.size()>0){
+			
+			for(Sbu sbu : list){
+				Map map = new HashMap();
+				map.put("sbuId", sbu.getId());
+				Map map3 = sbuDao.countParticipantAndPmds(map);
+				if(map3 != null){
+					
+					int used_seats = (int)map3.get("used_seats");
+					int used_pmds = (int)map3.get("used_pmds");
+					int avaliable_seats = (int)map3.get("avaliable_seats");
+					int avaliable_pmds = (int)map3.get("avaliable_pmds");
+					int lost_seats = (int)map3.get("lost_seats");
+					int lost_pmds = (int)map3.get("lost_pmds");
+					
+					total_used_seats += used_seats;
+					total_used_pmds += used_pmds;
+					total_avaliable_seats += avaliable_seats;
+					total_avaliable_pmds += avaliable_pmds;
+					total_lost_seats += lost_seats;
+					total_lost_pmds += lost_pmds;
+						
+					
+				}
+				
+				Map map2 = new HashMap();
+				map2.put("sbuName", sbu.getSubName());
+				map2.put("detailMap", map3);
+				list2.add(map2);
+			}
+		}
+		
+		ret.put("sbuList", list2);
+		ret.put("total_used_seats", total_used_seats);
+		ret.put("total_used_pmds", total_used_pmds);
+		ret.put("total_avaliable_seats", total_avaliable_seats);
+		ret.put("total_avaliable_pmds", total_avaliable_pmds);
+		ret.put("total_lost_seats", total_lost_seats);
+		ret.put("total_used_seats", total_used_seats);
+		ret.put("total_lost_pmds", total_lost_pmds);
+		return ret;
+		
+		
 	}
 
 

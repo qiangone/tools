@@ -13,6 +13,8 @@ import com.capgemini.university.model.SbuLbps;
 public interface SbuDao {
 
 	public List<Sbu> getSbu(Map map);
+	
+	public List<SbuLbps> getSbuLbps(Map map);
 
 	public void updateSbu(Sbu sbu);
 
@@ -23,6 +25,10 @@ public interface SbuDao {
 	public void updateLbps(Lbps lbps);
 
 	public void addSbuLbps(SbuLbps sb);
+	
+	public void updateSbuLbps(SbuLbps sb);
+	
+	
 	
 	public List<Lbps> getLbps(Map map);
 	
@@ -35,5 +41,11 @@ public interface SbuDao {
 	public List<Map> countSeatsOfSubSbu(Map map);
 
 	public List<Map> countParticipantsOfSbu(Map map);
+	
+	public List<Sbu> countParticipantsByCourse(Map map);
+	
+	public Map countParticipantAndPmds(Map map);
+	
+	public void convertToFreeSeats();
 
 }

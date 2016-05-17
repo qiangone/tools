@@ -26,6 +26,10 @@ public class MailServiceImplTestCase {
 
 		mailService.notifyLbpsMail();
 	}
+	@Test
+	public void testSendSwapMail(){
+		mailService.sendSwapMail(1, 3, 2, 61, 3);
+	}
 	
 	
 

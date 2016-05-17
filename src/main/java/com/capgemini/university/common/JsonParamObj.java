@@ -13,11 +13,15 @@ public class JsonParamObj {
 	
 	private Integer sbuId;
 	
+	private Integer lbpsId;
+	
 	private Integer parentSbuId;
 	
 	private Integer courseId;
 	
 	private String sbuName;
+	
+	private String sbuLbpsId;
 	
 	private String loginName;
 	
@@ -63,6 +67,34 @@ public class JsonParamObj {
 	
 
 	
+
+	/**
+	 * @return the sbuLbpsId
+	 */
+	public String getSbuLbpsId() {
+		return sbuLbpsId;
+	}
+
+	/**
+	 * @param sbuLbpsId the sbuLbpsId to set
+	 */
+	public void setSbuLbpsId(String sbuLbpsId) {
+		this.sbuLbpsId = sbuLbpsId;
+	}
+
+	/**
+	 * @return the lbpsId
+	 */
+	public Integer getLbpsId() {
+		return lbpsId;
+	}
+
+	/**
+	 * @param lbpsId the lbpsId to set
+	 */
+	public void setLbpsId(Integer lbpsId) {
+		this.lbpsId = lbpsId;
+	}
 
 	/**
 	 * @return the logo

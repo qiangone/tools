@@ -34,6 +34,12 @@ thead {
     text-transform: uppercase;
 }
 
+.table>thead>tr>th.th-width-l1, .table>tbody>tr>td.td-width-l1{
+	width: 330px;
+    text-align: left;
+    padding-left: 80px;	
+}
+
 .th-width-l2, .td-width-l2 {
 	width: 135px;
     text-align: center;
@@ -41,6 +47,10 @@ thead {
 
 .td-width-l1 {
 	width: 400px;
+}
+
+.td-width-limit {
+	width: 300px;
 }
 
 .table>tbody>tr>td {
@@ -79,6 +89,26 @@ thead {
     width: 13px;
     height: 19px;
     background-size: 13px;
+    -webkit-appearance: none;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    margin: auto;
+    cursor: pointer;
+}
+
+.icon-user-edit {
+    background: url("../images/btn_useredit.png") left no-repeat;
+    cursor: pointer;
+    height: 22px;
+    width: 22px;
+}
+
+.icon-swap {
+	background: url(../images/btn_swap.png) no-repeat center;
+    width: 32px;
+    height: 32px;
+    background-size: cover;
     -webkit-appearance: none;
     border: none;
     outline: none;

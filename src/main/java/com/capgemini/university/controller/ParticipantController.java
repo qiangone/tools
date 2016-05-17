@@ -78,6 +78,26 @@ public class ParticipantController {
 	}
 	
 	
+	@RequestMapping(value = "/listParticipant", method = RequestMethod.GET)
+	public @ResponseBody WDResponse listParticipant(@RequestParam int sbuId, @RequestParam int courseId) {
+		if (sbuId == 0) {
+			return ResponseUtil.apiError("1002", "sbuId is null");
+		}
+		if (courseId == 0) {
+			return ResponseUtil.apiError("1003", "courseId is null");
+		}
+		
+		try {
+			List<Participant> parList = courseService.queryParticipantList(sbuId, courseId);
+
+			return ResponseUtil.apiSuccess(parList, "listParticipant successful");
+		} catch (Exception e) {
+			logger.error("listParticipant exception: ", e);
+			return ResponseUtil.apiError("1100", "未知错误");
+		}
+
+	}
+	
 	@RequestMapping(value = "/relateParticipant", method = RequestMethod.POST)
 	public @ResponseBody WDResponse relateParticipant(@RequestBody JsonParamObj param) {
 		if (param == null) {

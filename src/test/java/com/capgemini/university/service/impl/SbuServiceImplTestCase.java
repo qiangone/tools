@@ -2,6 +2,7 @@ package com.capgemini.university.service.impl;
 
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -21,6 +22,8 @@ public class SbuServiceImplTestCase {
 	private ISbuService sbuService;
 	
 	
+	
+
 	
 	@Test
 	public void testGetSbuByMail() {
@@ -63,8 +66,18 @@ public class SbuServiceImplTestCase {
 		sbuService.addSbuLbps(sbuId, name, email);
 	}
 	
+	@Test
+	public void testCountParticipantsByCourse(){
+		List<Sbu> list = sbuService.countParticipantsByCourse(2);
+		list.size();
+	}
+	
+	@Test
+	public void testCountParticipantAndPmds(){
+		Map map = sbuService.countParticipantAndPmds(1);
+		System.out.print("");
+	}
 	
 	
-
 	
 }

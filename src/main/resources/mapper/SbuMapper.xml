@@ -10,6 +10,7 @@
 		a.id,
 		a.sbu_name,
 		a.parent_id,
+		b.id sbu_lbps_id,
 		c.id l_id,
 		c.name l_name,
 		c.email l_email,
@@ -33,6 +34,10 @@
 
 		<if test="parentId != null">
 			and a.parent_id = #{parentId}
+		</if>
+		
+		<if test="sbuName != null">
+			and a.sbu_name = #{sbuName}
 		</if>
 		and a.tag=0
 	</select>
@@ -60,7 +65,31 @@
 
 		
 	</select>
+	
+	
+	
+	<select id="getSbuLbps" parameterType="map" resultMap="sbulbpsMap">
 
+		select
+		id,
+		sbu_id,
+		lbps_id
+		from sbu_lbps 
+		where 1=1
+		
+		<if test="id != null">
+			and id=#{id}
+		</if>
+		
+		<if test="sbuId != null">
+			and sbu_id=#{sbuId}
+		</if>
+		
+		<if test="lbpsId != null">
+			and lbps_id=#{lbpsId}
+		</if>
+
+	</select>
 
 
 	<select id="countSeatsOfOtherSbu" parameterType="map"
@@ -141,6 +170,8 @@
 		select
 		c.sbu_name,
 		d.name course_name,
+		d.start_time,
+		d.end_time,
 		b.participant_email email,
 		b.participant_dispaly_name display_name
 		from
@@ -153,13 +184,55 @@
 		<if test="sbuId != null">
 			and a.sbu_id=#{sbuId}
 		</if>
+		<if test="eventName != null">
+			and	d.event_name=#{eventName}
+			</if>
+		
 		order by a.sbu_id,a.course_id
 
 
 
 	</select>
+	
+	<select id="countParticipantsByCourse" parameterType="map" resultMap="sbuMapWithPartic">
+
+		select 
+		t.*,
+		c.id part_id,
+		c.participant_email,
+		c.participant_dispaly_name,
+		c.attend
+		from
+		(
+		select 
+		a.id,
+		a.sbu_name
+		from sbu a
+		where a.parent_id=0
+		and a.tag=0
+		)t left join sbu b on t.id = b.parent_id
+		left join course_participant c on b.id = c.sbu_id and c.course_id=#{courseId};
 
 
+
+	</select>
+	
+
+	<update id="updateSbuLbps" parameterType="com.capgemini.university.model.SbuLbps">
+		update sbu_lbps
+
+		<set>
+			<if test="lbpsId != null">
+				lbps_id=#{lbpsId},
+			</if>
+			
+		</set>
+
+		where id = #{id}
+
+
+
+	</update>
 
 	<update id="updateSbu" parameterType="com.capgemini.university.model.Sbu">
 		update sbu
@@ -253,7 +326,35 @@
 		</selectKey>
 
 	</insert>
-
+	
+	
+	 <select id="convertToFreeSeats"  statementType="CALLABLE"  > 
+	    {
+	     call sp_convert_to_free_seats()
+	    }
+	    
+	  </select>
+	
+	 <select id="countParticipantAndPmds" parameterType="java.util.Map" statementType="CALLABLE"  resultMap="seatsMap" > 
+	    {
+	     call sp_count_participant_pmds(
+	     #{sbuId,jdbcType=VARCHAR,mode=IN}
+	    
+	     
+	     )
+	     
+	    }
+	    
+	  </select>
+  
+    <resultMap type="java.util.HashMap" id="seatsMap">
+      <result column="used_seats" property="used_seats" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+      <result column="used_pmds" property="used_pmds" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+      <result column="avaliable_seats" property="avaliable_seats" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+      <result column="avaliable_pmds" property="avaliable_pmds" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+      <result column="lost_seats" property="lost_seats" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+      <result column="lost_pmds" property="lost_pmds" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+    </resultMap>
 
 
 
@@ -263,7 +364,7 @@
 		<!-- <result property="lbps" column="lbps" /> <result property="email" 
 			column="email" /> -->
 		<result property="parentId" column="parent_id" />
-
+<result property="sbuLbpsId" column="sbu_lbps_id" />
 		<association property="lbps"
 			javaType="com.capgemini.university.model.Lbps">
 			<result property="id" column="l_id" />
@@ -271,9 +372,31 @@
 			<result property="email" column="l_email" />
 			<result property="role" column="l_role" />
 		</association>
+		
+		
+		
 
 
 	</resultMap>
+	
+	
+	<resultMap id="sbuMapWithPartic" type="com.capgemini.university.model.Sbu">
+		<result property="id" column="id" />
+		<result property="subName" column="sbu_name" />
+		
+
+	
+		<collection property="participantList" ofType="com.capgemini.university.model.Participant">
+			<result property="id" column="part_id" />
+				<result property="email" column="participant_email" />
+			<result property="displayName" column="participant_dispaly_name" />
+			<result property="attend" column="attend" />
+			
+		</collection>
+
+
+	</resultMap>
+	
 
 
 
@@ -284,6 +407,14 @@
 			<result property="role" column="l_role" />
 
 	</resultMap>
+	
+		<resultMap id="sbulbpsMap" type="com.capgemini.university.model.SbuLbps">
+			<result property="id" column="id" />
+			<result property="sbuId" column="sbu_id" />
+			<result property="lbpsId" column="lbps_id" />
+
+	</resultMap>
+	
 
 
 

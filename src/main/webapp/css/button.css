@@ -124,13 +124,57 @@
 	border: 0;
 }
 
-.btn-confirm:active, .btn-confirm:active:focus, .btn-submit:active, .btn-submit:active:focus {
+.btn-confirm:active, .btn-confirm:active:focus, .btn-submit:active, .btn-submit:active:focus, .btn-confirm-edit:active, .btn-confirm-edit:active:focus {
 	background-color: #3b86c5;
+	outline: 0;
+}
+
+.btn-confirm-edit {
+	position: absolute;
+    bottom: 0;
+    right: 0;
+    text-align: center;
+    color: #fff;
+    height: 48px;
+    width: 60px;
+    margin-left: 15px;
+	background-color: #369cf3;
+}
+
+.btn-confirm-edit:hover {
+	background: #5cadf2;
+	color: #fff;
+}
+
+.btn-confirm-edit:focus {
+	color: #fff;
+}
+
+.modal-footer .btn-delete {
+	float: left;
+	color: #fff;
+    margin-left: 0;
+    width: 85px;
+    background-color: #EE885B;
+	font-weight: normal;
+	outline: 0;
+}
+
+.btn-delete:hover {
+    background-color: #F3A380;
+    color: #fff;
+}
+
+.btn-delete:active, .btn-delete:active:focus {
+	background-color: #d37b54;
+	color: #fff;
 	outline: 0;
 }
 
 /* Upload Button */
 .btn-upload {
+    height: 40px;
+    border: 0;
 	margin-bottom: 30px;
 }
 
@@ -153,4 +197,57 @@
     right: 1px;
     width: 52px;
     opacity: 0;
+}
+
+.btn-admin-head {
+    border: 0;
+    background: -webkit-gradient(linear, right bottom, left bottom, from(#344b65), to(#3b4f6f));
+    line-height: 30px;
+    padding: 0 10px;
+    text-transform: uppercase;
+	color: #8a9abb;
+    font-weight: bold;
+}
+
+.btn-admin-head:hover, .btn-admin-head:focus {
+	color: #8a9abb;
+}
+
+.btn-admin-head:active:focus {
+	outline: 0;
+	color: #8a9abb;
+}
+
+.btn-export {
+    display: inline-block;
+    background-color: #369bf3;
+/*     width: 174px; */
+    color: #fff;
+    float: right;
+    border-radius: 2px;
+    outline: 0;
+}
+
+.btn-export:hover {
+    color: #fff;
+    background-color: #369bf3;
+}
+
+.btn-export:focus {
+	color: #fff;
+	outline: 0;
+}
+
+.btn-export:active {
+	background-color: #2c72af;
+	outline: 0;
+}
+
+.export-disable {
+	opacity: .5;
+	cursor: no-drop;
+}
+
+.export-disable:active {
+	background-color: #369bf3;
 }

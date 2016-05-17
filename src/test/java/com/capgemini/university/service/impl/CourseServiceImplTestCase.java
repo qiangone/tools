@@ -1,9 +1,8 @@
 package com.capgemini.university.service.impl;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.capgemini.university.common.PageResults;
 import com.capgemini.university.common.Pagination;
 import com.capgemini.university.model.Course;
+import com.capgemini.university.model.FreeSeatPool;
 import com.capgemini.university.model.Participant;
 import com.capgemini.university.response.ResponseUtil;
 import com.capgemini.university.response.WDResponse;
@@ -124,14 +124,14 @@ public class CourseServiceImplTestCase {
 	
 	@Test
 	public void testGetAllEvent(){
-		List<Map> list = courseService.getEventList("1");
+		List<Map> list = courseService.getEventList("2","1");
 		WDResponse oa = ResponseUtil.apiSuccess(list, "query participant successful");
 		System.out.println(JsonUtil.toJson(oa));
 	}
 	
 	@Test
 	public void testGetCourseListByEvent(){
-		String eventName="Community (architects/EM)";
+		String eventName="Cloud & Cyber Event";
 		List<Course> list = courseService.getCourseListByEvent(eventName);
 		WDResponse oa = ResponseUtil.apiSuccess(list, "query participant successful");
 		System.out.println(JsonUtil.toJson(oa));
@@ -141,7 +141,7 @@ public class CourseServiceImplTestCase {
 	public void testUploadCourse(){
 		
 		try{
-			InputStream in = new FileInputStream("D:\\Project\\University Tool\\courseTemplate_data.xlsx");
+			InputStream in = new FileInputStream("D:\\Project\\University Tool\\courseTemplate-data.xlsx");
 			courseService.uploadCourse(in, true);
 			
 		}catch(Exception e){
@@ -156,6 +156,56 @@ public class CourseServiceImplTestCase {
 		
 		courseService.swap(1, 3, 2, 2, 3);
 	}
+	
+	@Test
+	public void testGetSbuCourseListByEvent(){
+		
+		List<Map> list = courseService.getSbuCourseListByEvent(null,"Cloud & Cyber Event","1");
+		WDResponse oa = ResponseUtil.apiSuccess(list, "query participant successful");
+		System.out.println(JsonUtil.toJson(oa));
+	}
+	
+	@Test
+	public void testDeleteCourse(){
+		
+		courseService.deleteCourse(2);
+	}
+	
+	
+	@Test
+	public void testTakeFreeParticipantList(){
+		
+		List<Participant> list = new ArrayList<Participant>();
+		
+		
+		Participant p1 = new Participant();
+		p1.setDisplayName("a6");
+		p1.setCnName("b6");
+		p1.setEmail("aaa6@qq.com");
+		list.add(p1);
+		
+		Participant p2 = new Participant();
+		p2.setDisplayName("a7");
+		p2.setCnName("b8");
+		p2.setEmail("aaa7@qq.com");
+		list.add(p2);
+		
+		for(Participant p: list){
+			p.setSbuId(75);
+			p.setCourseId(40);
+		}
+		courseService.takeFreeParticipantList(list);
+	}
+	
+	@Test
+	public void testGetFreeSeatPoolList(){
+		
+		List<FreeSeatPool> list = courseService.getFreeSeatPoolList();
+		System.out.print(list.size());
+	}
+	
+	
+	
 	
 	
 	

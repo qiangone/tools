@@ -17,6 +17,7 @@ import com.capgemini.university.common.PageResults;
 import com.capgemini.university.common.Pagination;
 import com.capgemini.university.model.Course;
 import com.capgemini.university.model.CourseMail;
+import com.capgemini.university.model.FreeSeatPool;
 import com.capgemini.university.model.Participant;
 import com.capgemini.university.model.SbuCourse;
 
@@ -37,6 +38,8 @@ public interface ICourseService {
   
   public int addParticipantList(List<Participant> list);
   
+  public void takeFreeParticipantList(List<Participant> list);
+  
   public int addParticipant(Participant part);
   
   public List<Participant> queryParticipantList(Integer sbuId, Integer courseId);
@@ -53,7 +56,9 @@ public interface ICourseService {
   
   public List<Course> getCourseListByEvent(String eventName);
   
-  public List<Map> getEventList(String type);
+  public List<Map> getSbuCourseListByEvent(String type,String eventName, String sbuId);
+  
+  public List<Map> getEventList(String type, String sbuId);
   
   public SbuCourse getSbuCourse(Integer sbuId, Integer courseId);
   
@@ -81,7 +86,13 @@ public interface ICourseService {
   
   public void updatedAttend(int participantId, int attend);
   
+  public List<Map> getAllOtherSwapCourseList(int sbuId) ;
   
+  public void deleteCourse(int courseId);
+  
+  public FreeSeatPool getFreeSeatPoolById(int courseId);
+  
+  public List<FreeSeatPool> getFreeSeatPoolList();
 	
 
 }

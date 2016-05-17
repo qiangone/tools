@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.capgemini.university.model.Lbps;
 import com.capgemini.university.model.Sbu;
-import com.capgemini.university.model.SbuCourse;
+import com.capgemini.university.model.SbuLbps;
 
 
 
@@ -44,21 +44,38 @@ public interface ISbuService {
 	
 	public List<Sbu> getSbuListByParentId(int parentId);
 	
+	public List<Sbu> getSbuListByParentIdAndParticipant(int parentId, int courseId);
+	
 	public void updateSbu(Sbu sbu);
 	
 	public void deleteSbu(int sbuId);
 	
 	public void addSbu(Sbu sbu);
 	
-	public void addSbuLbps(int sbuId, String displayName, String email);
+	public void addSbuLbps(int sbuId,String displayName, String email);
+	
+	public void relateSbuLbps(int sbuId,  String sbuLbpsId, String displayName, String email);
+	
+	public SbuLbps getSbuLbps(int sbuId, int lbpsId);
+	
+	public SbuLbps getSbuLbpsById(int id);
+	
 	
 	public void updateLbps(Lbps lbps);
 	
 	public void exportNomination(List<Map> list, HttpServletResponse response);
 	
-	public List<Map> countParticipantsOfSbu(int sbuId);
+	public List<Map> countParticipantsOfSbu(int sbuId, String eventName);
 	
 	public Lbps getLbpsByEmail(String email);
+	
+	
+	public List<Sbu> countParticipantsByCourse(int courseId);
+	
+	
+	public Map countParticipantAndPmds(int sbuId);
+	
+	public void convertToFreeSeats();
 	
 
 }

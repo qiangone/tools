@@ -25,6 +25,7 @@ import com.capgemini.university.common.JsonParamObj;
 import com.capgemini.university.common.PageResults;
 import com.capgemini.university.common.Pagination;
 import com.capgemini.university.model.Course;
+import com.capgemini.university.model.FreeSeatPool;
 import com.capgemini.university.model.Participant;
 import com.capgemini.university.model.SbuCourse;
 import com.capgemini.university.response.ResponseUtil;
@@ -78,10 +79,11 @@ public class CourseController {
 	
 	
 	@RequestMapping(value = "/getAllEvent", method = RequestMethod.GET)
-	public @ResponseBody WDResponse getAllEvent(@RequestParam String type) {
+	public @ResponseBody WDResponse getAllEvent(@RequestParam(required=false) String type,@RequestParam(required=false) String sbuId) {
 		
 		try {
-			List<Map> list = courseService.getEventList(type);
+			
+			List<Map> list = courseService.getEventList(type, sbuId);
 
 			return ResponseUtil.apiSuccess(list, "getAllEvent");
 		} catch(DataAccessDeniedException de){
@@ -93,10 +95,10 @@ public class CourseController {
 	}
 	
 	@RequestMapping(value = "/getCourseListByEvent", method = RequestMethod.GET)
-	public @ResponseBody WDResponse getCourseListByEvent(@RequestParam String eventName) {
+	public @ResponseBody WDResponse getCourseListByEvent(@RequestParam(required=false) String eventName, @RequestParam(required=false) String sbuId, @RequestParam(required=false) String type) {
 		
 		try {
-			List<Course> list = courseService.getCourseListByEvent(eventName);
+			List<Map> list = courseService.getSbuCourseListByEvent(type,eventName, sbuId);
 
 			return ResponseUtil.apiSuccess(list, "getCourseListByEvent");
 		} catch(DataAccessDeniedException de){
@@ -188,6 +190,89 @@ public class CourseController {
 
 	}
 	
+	
+	
+	@RequestMapping(value = "/takeFreeSeat", method = RequestMethod.POST)
+	public @ResponseBody WDResponse takeFreeSeat(@RequestBody JsonParamObj param) {
+		if (param == null) {
+			return ResponseUtil.apiError("1001", "Missing parameter!");
+		}
+		
+		if (param.getSbuId() == null) {
+			return ResponseUtil.apiError("1002", "sbuId is null");
+		}
+		if (param.getCourseId() == null) {
+			return ResponseUtil.apiError("1003", "courseId is null");
+		}
+		if (param.getParticipantList()== null || param.getParticipantList().size() ==0) {
+			return ResponseUtil.apiError("1004", "participantList is null");
+		}
+		try {
+			List<Participant> list = param.getParticipantList();
+			for(Participant p: list){
+				p.setSbuId(param.getSbuId());
+				p.setCourseId(param.getCourseId());
+			}
+			courseService.takeFreeParticipantList(list);
+
+			return ResponseUtil.apiSuccess(list, "swapList successful");
+		} catch (Exception e) {
+			logger.error("swapList exception: ", e);
+			return ResponseUtil.apiError("1100", "未知错误");
+		}
+
+	}
+	
+	@RequestMapping(value = "/swapList", method = RequestMethod.GET)
+	public @ResponseBody WDResponse swapList(@RequestParam String sbuId) {
+		if (sbuId == null) {
+			return ResponseUtil.apiError("1001", "sbuId is null");
+		}
+		
+		try {
+			List<Map> list = courseService.getAllOtherSwapCourseList(Integer.parseInt(sbuId));
+
+			return ResponseUtil.apiSuccess(list, "swapList successful");
+		} catch (Exception e) {
+			logger.error("swapList exception: ", e);
+			return ResponseUtil.apiError("1100", "未知错误");
+		}
+
+	}
+	@RequestMapping(value = "/freeSeatsList", method = RequestMethod.GET)
+	public @ResponseBody WDResponse freeSeatsList() {
+	
+		
+		try {
+			List<FreeSeatPool> list = courseService.getFreeSeatPoolList();
+
+			return ResponseUtil.apiSuccess(list, "freeSeatsList successful");
+		} catch (Exception e) {
+			logger.error("freeSeatsList exception: ", e);
+			return ResponseUtil.apiError("1100", "未知错误");
+		}
+
+	}
+	
+	
+	@RequestMapping(value = "/deleteCourse", method = RequestMethod.GET)
+	public @ResponseBody WDResponse deleteCourse(@RequestParam String courseId) {
+		if (courseId == null) {
+			return ResponseUtil.apiError("1001", "courseId is null");
+		}
+		
+		try {
+			courseService.deleteCourse(Integer.parseInt(courseId));
+
+			return ResponseUtil.apiSuccess("deleteCourse", "deleteCourse successful");
+		} catch (Exception e) {
+			logger.error("deleteCourse exception: ", e);
+			return ResponseUtil.apiError("1100", "未知错误");
+		}
+
+	}
+	
+	
 	@RequestMapping(value = "/updateCourse", method = RequestMethod.POST)
 	public @ResponseBody WDResponse updateCourse(@RequestBody Course course) {
 		if (course == null) {
@@ -220,9 +305,9 @@ public class CourseController {
 			return ResponseUtil.apiError("1002", "id is null");
 		}
 		
-		if(pa.getAttend() ==0){
-			return ResponseUtil.apiError("1003", "attend is null");
-		}
+//		if(pa.getAttend() ==0){
+//			return ResponseUtil.apiError("1003", "attend is null");
+//		}
 		
 		try {
 			 courseService.updatedAttend(pa.getId(), pa.getAttend());

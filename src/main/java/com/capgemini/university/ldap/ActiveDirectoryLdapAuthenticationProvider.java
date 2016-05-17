@@ -3,7 +3,10 @@ package com.capgemini.university.ldap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +18,8 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.ldap.InitialLdapContext;
 
+import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.DistinguishedName;
 import org.springframework.ldap.support.LdapUtils;
@@ -31,6 +36,13 @@ import org.springframework.security.ldap.SpringSecurityLdapTemplate;
 import org.springframework.security.ldap.authentication.AbstractLdapAuthenticationProvider;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import com.capgemini.university.model.Lbps;
+import com.capgemini.university.model.Participant;
+import com.capgemini.university.model.Sbu;
+import com.capgemini.university.response.ResponseUtil;
+import com.capgemini.university.service.ICourseService;
+import com.capgemini.university.service.ISbuService;
 
 
 /**
@@ -87,6 +99,13 @@ public final class ActiveDirectoryLdapAuthenticationProvider extends AbstractLda
     private final String rootDn;
     private final String url;
     private boolean convertSubErrorCodesToExceptions;
+    
+	@Autowired
+	private ICourseService participantService;
+	
+	@Autowired
+	private ISbuService sbuService;
+	
 
     // Only used to allow tests to substitute a mock LdapContext
     ContextFactory contextFactory = new ContextFactory();
@@ -134,6 +153,26 @@ public final class ActiveDirectoryLdapAuthenticationProvider extends AbstractLda
         DirContext ctx = bindAsUser(username, password);
 
         try {
+        	
+        	// have right to login?
+        	List<Participant> list = participantService.queryParticipantByName(username);
+			if(list != null && list.size()>0){
+				Participant part = list.get(0);
+				Map map = new HashMap();
+				Lbps lbps = sbuService.getLbpsByEmail(part.getEmail());
+				if(lbps == null){
+					 throw badCredentials("You have no persmisson to login.");
+				}
+				if(lbps.getRole()!=1){
+					List<Sbu> sbuList = sbuService.getSbuByMail(part.getEmail());
+					if(sbuList == null || sbuList.size()==0){
+						 throw badCredentials("You have no persmisson to login.");
+					}
+				}
+				
+				
+			}//end
+        	
             return searchForUser(ctx, username);
 
         } catch (NamingException e) {

@@ -21,6 +21,7 @@ CREATE TABLE course_participant (
   participant_email varchar(45) DEFAULT NULL,
   participant_dispaly_name varchar(45) DEFAULT NULL,
   attend int(11) DEFAULT '0' COMMENT '0:未参加\n1：参加',
+  source int(11) DEFAULT '0' COMMENT '0: default allocate by admin\n1: take from free seat pool',
   PRIMARY KEY (id)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
@@ -57,6 +58,7 @@ CREATE TABLE sbu_course (
   assign_seats int(11) DEFAULT '0',
   assign_pmds int(11) DEFAULT '0',
   swap_seats int(11) DEFAULT '0',
+   get_free_seats int(11) DEFAULT '0',
   PRIMARY KEY (id),
   UNIQUE KEY uniquekey_sbu_course (sbu_id,course_id)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
@@ -79,5 +81,15 @@ CREATE TABLE sbu_swap_history (
   seats int(11) DEFAULT NULL,
   action_by varchar(45) DEFAULT NULL,
   action_time datetime DEFAULT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE free_seat_pool (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  course_id int(11) NOT NULL,
+  duration float DEFAULT NULL,
+  seats int(11) DEFAULT NULL,
+  start_time date DEFAULT NULL,
+  end_time date DEFAULT NULL,
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

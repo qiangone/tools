@@ -28,6 +28,9 @@ var envConfig = {
 				url: '/api/sbu/getSwapHistory',
 				dummyPath: ''
 			},
+			'getOperationListByAdmin': {
+				url: '/api/sbu/getSwapHistoryForAdmin'
+			},
 			'searchNominee': {
 				url: '/api/participant/query',
 				dummyPath: ''
@@ -57,6 +60,12 @@ var envConfig = {
 			'updateProgram': {
 				url: '/api/course/updateCourse'
 			},
+			'deleteProgram': {
+				url: '/api/course/deleteCourse'
+			},
+			'updateSbu': {
+				url: '/api/sbu/updateSbu'
+			},
 			'getAdminProgramList': {
 				url: '/api/course/adminCourseList'
 			},
@@ -68,6 +77,33 @@ var envConfig = {
 			},
 			'addSbu': {
 				url: '/api/sbu/addSbu'
+			},
+			'relateSbuLbps': {
+				url: '/api/sbu/relateSbuLbps'
+			},
+			'exportData': {
+				url: '/api/sbu/exportNomination'
+			},
+			'getAttendees': {
+				url: '/api/sbu/countParticipantsByCourse'
+			},
+			'recordAttend': {
+				url: '/api/course/recordAttend'
+			},
+			'dashboard': {
+				url: '/api/sbu/dashboard'
+			},
+			'getSwapList': {
+				url: '/api/course/swapList'
+			},
+			'getFreeSeatProgramList': {
+				url: '/api/course/freeSeatsList'
+			},
+			'takeFreeSeat': {
+				url: '/api/course/takeFreeSeat'
+			},
+			'listParticipant': {
+				url: '/api/participant/listParticipant'
 			}
 		}
 };

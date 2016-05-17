@@ -23,6 +23,9 @@ public class Participant {
      */
     private String cnName;
     
+    
+    private String loginName;
+    
     /*
      * email
      */
@@ -39,6 +42,10 @@ public class Participant {
     
     private byte[] thumbnailPhoto;
     
+    private int source = 0;
+    
+    
+    
     
     
     
@@ -46,6 +53,41 @@ public class Participant {
 
 
 	
+
+
+	/**
+	 * @return the loginName
+	 */
+	public String getLoginName() {
+		return loginName;
+	}
+
+
+	/**
+	 * @param loginName the loginName to set
+	 */
+	public void setLoginName(String loginName) {
+		this.loginName = loginName;
+	}
+
+
+	
+
+
+	/**
+	 * @return the source
+	 */
+	public int getSource() {
+		return source;
+	}
+
+
+	/**
+	 * @param source the source to set
+	 */
+	public void setSource(int source) {
+		this.source = source;
+	}
 
 
 	/**

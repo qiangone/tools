@@ -33,6 +33,7 @@ import com.capgemini.university.model.SbuCourse;
 import com.capgemini.university.response.ResponseUtil;
 import com.capgemini.university.response.WDResponse;
 import com.capgemini.university.service.ICourseService;
+import com.capgemini.university.service.IMailService;
 import com.capgemini.university.service.ISbuService;
 import com.capgemini.university.service.ISbuSwapHistoryService;
 
@@ -48,6 +49,9 @@ public class SbuController {
 	private ISbuService sbuService;
 	@Autowired
 	private ISbuSwapHistoryService historyService;
+	
+	@Autowired
+	private IMailService mailServcie;
 
 	@RequestMapping(value = "/courseList", method = RequestMethod.POST)
 	public @ResponseBody WDResponse courseList(@RequestBody JsonParamObj query) {
@@ -115,7 +119,9 @@ public class SbuController {
 		
 
 		try {
-			courseService.swap(param.getMySbuId(),param.getGiveoutCourseId(),param.getSwapSbuId(),param.getSwapSbuId(),param.getSwapSeats());
+			courseService.swap(param.getMySbuId(),param.getGiveoutCourseId(),param.getSwapSbuId(),param.getSwapCourseId(),param.getSwapSeats());
+			
+			mailServcie.sendSwapMail(param.getMySbuId(),param.getGiveoutCourseId(),param.getSwapSbuId(),param.getSwapCourseId(),param.getSwapSeats());
 
 			return ResponseUtil.apiSuccess("swapSeats", "swapSeats successful");
 		} catch (DataAccessDeniedException de) {
@@ -280,10 +286,13 @@ public class SbuController {
 				return ResponseUtil.apiError("1002", "parentSbuId is null");
 			}
 			
+			List<Sbu> list = null;
+			if(param.getCourseId()!=null){
+				list = sbuService.getSbuListByParentIdAndParticipant(param.getParentSbuId(), param.getCourseId());
+			}else{
+				list = sbuService.getSbuListByParentId(param.getParentSbuId());
+			}
 			
-
-			List<Sbu> list = sbuService.getSbuListByParentId(param.getParentSbuId());
-
 			return ResponseUtil.apiSuccess(list, "sbuList successful");
 		} catch (Exception e) {
 			logger.error("sbuList exception: ", e);
@@ -367,6 +376,37 @@ public class SbuController {
 
 	}
 	
+	
+	@RequestMapping(value = "/relateSbuLbps", method = RequestMethod.POST)
+	public @ResponseBody WDResponse relateSbuLbps(@RequestBody JsonParamObj param) {
+		try {
+			
+			if (param == null) {
+				return ResponseUtil.apiError("1001", "Missing parameter!");
+			}
+			
+			if(param.getSbuId()==null){
+				return ResponseUtil.apiError("1002", "sbuId is null");
+			}
+			
+			if(param.getDisplayName()==null){
+				return ResponseUtil.apiError("1003", "displayName is null");
+			}
+			if(param.getEmail()==null){
+				return ResponseUtil.apiError("1004", "email is null");
+			}
+			
+			
+			sbuService.relateSbuLbps(param.getSbuId(), param.getSbuLbpsId(), param.getDisplayName(), param.getEmail());
+
+			return ResponseUtil.apiSuccess("addSbuLbps", "addSbuLbps successful");
+		} catch (Exception e) {
+			logger.error("addSbuLbps exception: ", e);
+			return ResponseUtil.apiError("1100", "未知错误");
+		}
+
+	}
+	
 	@RequestMapping(value = "/addSbuLbps", method = RequestMethod.POST)
 	public @ResponseBody WDResponse addSbuLbps(@RequestBody JsonParamObj param) {
 		try {
@@ -409,6 +449,7 @@ public class SbuController {
 			if(lbps.getId()==null){
 				return ResponseUtil.apiError("1002", "id is null");
 			}
+			
 			if(lbps.getName()==null){
 				return ResponseUtil.apiError("1003", "name is null");
 			}
@@ -427,18 +468,48 @@ public class SbuController {
 	}
 	
 	@RequestMapping(value="/exportNomination",method = RequestMethod.GET)
-    public void exportNomination(@RequestParam(required=false) String sbuId, HttpServletResponse response){
+    public void exportNomination(@RequestParam(required=false) String sbuId, @RequestParam(required=false) String eventName, HttpServletResponse response){
         try {
         	int i=0;
         	if(!StringUtils.isEmpty(sbuId)){
         		i = Integer.parseInt(sbuId);
         	}
 		
-        	List<Map> list = sbuService.countParticipantsOfSbu(i);
+        	List<Map> list = sbuService.countParticipantsOfSbu(i, eventName);
         	sbuService.exportNomination(list, response);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+	
+	@RequestMapping(value="/countParticipantsByCourse",method = RequestMethod.GET)
+    public @ResponseBody WDResponse  countParticipantsByCourse(@RequestParam(required=false) String courseId){
+        try {
+        	if (courseId == null) {
+				return ResponseUtil.apiError("1001", "courseId is null");
+			}
+        	List<Sbu> list = sbuService.countParticipantsByCourse(Integer.parseInt(courseId));
+        	return ResponseUtil.apiSuccess(list, "countParticipantsByCourse successful");
+        } catch (Exception e) {
+        	logger.error("addSbuLbps exception: ", e);
+			return ResponseUtil.apiError("1100", "未知错误");
+        }
+    }
+	
+	@RequestMapping(value="/dashboard",method = RequestMethod.GET)
+    public @ResponseBody WDResponse  dashboard(@RequestParam(required=false) String sbuId){
+        try {
+        	if (sbuId == null) {
+				return ResponseUtil.apiError("1001", "sbuId is null");
+			}
+        	Map map = sbuService.countParticipantAndPmds(Integer.parseInt(sbuId));
+        	return ResponseUtil.apiSuccess(map, "dashboard successful");
+        } catch (Exception e) {
+        	logger.error("dashboard exception: ", e);
+			return ResponseUtil.apiError("1100", "未知错误");
+        }
+    }
+	
+	
 
 }

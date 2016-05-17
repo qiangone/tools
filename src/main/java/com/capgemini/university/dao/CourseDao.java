@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.capgemini.university.model.Course;
 import com.capgemini.university.model.CourseMail;
+import com.capgemini.university.model.FreeSeatPool;
 import com.capgemini.university.model.Participant;
 import com.capgemini.university.model.SbuCourse;
 
@@ -39,6 +40,8 @@ public interface CourseDao {
 	
 	public List<Map> getCourseListByPage(Map map);
 	
+	public List<Map> getCourseListByEvent(Map map);
+	
 	public List<Course> getAdminCourseListByPage(Map map);
 	
 	
@@ -49,5 +52,13 @@ public interface CourseDao {
 	public int updateCourse(Course c);
 	
 	public List<Map> getCourseDetail(Map map);
+	
+	public int deleteCoursebyId(int id);
+	
+	public int deleteSbuCoursebyId(int id);
+	
+	public int updateFreeSeatPool(FreeSeatPool fsp);
+	
+	public List<FreeSeatPool> getFreeSeatPoolList(Map map);
 
 }

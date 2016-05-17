@@ -27,6 +27,11 @@ public class CourseMail {
     
     private String sbuName;
     
+    private String courseName;
+    private int seats;
+    private int pmds;
+    private String toSbuName;
+    
     
     private List<Map> courseList;
     
@@ -35,6 +40,70 @@ public class CourseMail {
 
 
     
+	/**
+	 * @return the courseName
+	 */
+	public String getCourseName() {
+		return courseName;
+	}
+
+
+	/**
+	 * @param courseName the courseName to set
+	 */
+	public void setCourseName(String courseName) {
+		this.courseName = courseName;
+	}
+
+
+	/**
+	 * @return the seats
+	 */
+	public int getSeats() {
+		return seats;
+	}
+
+
+	/**
+	 * @param seats the seats to set
+	 */
+	public void setSeats(int seats) {
+		this.seats = seats;
+	}
+
+
+	/**
+	 * @return the pmds
+	 */
+	public int getPmds() {
+		return pmds;
+	}
+
+
+	/**
+	 * @param pmds the pmds to set
+	 */
+	public void setPmds(int pmds) {
+		this.pmds = pmds;
+	}
+
+
+	/**
+	 * @return the toSbuName
+	 */
+	public String getToSbuName() {
+		return toSbuName;
+	}
+
+
+	/**
+	 * @param toSbuName the toSbuName to set
+	 */
+	public void setToSbuName(String toSbuName) {
+		this.toSbuName = toSbuName;
+	}
+
+
 	/**
 	 * @return the totalRemainSeats
 	 */

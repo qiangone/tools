@@ -24,15 +24,49 @@ public class Sbu {
     
     private Integer parentId;
     
+    private Integer sbuLbpsId;
+    
     private Sbu parentSbu;
     
     private Lbps lbps;
     
     private Integer tag;
     
+    private List<Participant> participantList;
     
     
     
+    
+
+	
+
+	/**
+	 * @return the sbuLbpsId
+	 */
+	public Integer getSbuLbpsId() {
+		return sbuLbpsId;
+	}
+
+	/**
+	 * @param sbuLbpsId the sbuLbpsId to set
+	 */
+	public void setSbuLbpsId(Integer sbuLbpsId) {
+		this.sbuLbpsId = sbuLbpsId;
+	}
+
+	/**
+	 * @return the participantList
+	 */
+	public List<Participant> getParticipantList() {
+		return participantList;
+	}
+
+	/**
+	 * @param participantList the participantList to set
+	 */
+	public void setParticipantList(List<Participant> participantList) {
+		this.participantList = participantList;
+	}
 
 	/**
 	 * @return the tag

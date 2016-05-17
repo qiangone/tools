@@ -112,11 +112,12 @@ if (!window.utils) {
 				}
 			}
 		}
+		var contentType = options.contentType || "application/json"; 
 		$.ajax({
 			type: options.method || "GET",
 			url: url,
 			dataType: "json",
-			contentType:"application/json",
+			contentType: contentType,
 			data: params,
 			success: function(result){
 				self._analyse.apply(self,[result, function(data){

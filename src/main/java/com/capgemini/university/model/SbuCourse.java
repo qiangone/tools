@@ -43,12 +43,28 @@ public class SbuCourse {
     
     private String sbuName;
     
+    private Integer getFreeSeats=0;
+    
     
     
 
     
     
 	
+
+	/**
+	 * @return the getFreeSeats
+	 */
+	public Integer getGetFreeSeats() {
+		return getFreeSeats;
+	}
+
+	/**
+	 * @param getFreeSeats the getFreeSeats to set
+	 */
+	public void setGetFreeSeats(Integer getFreeSeats) {
+		this.getFreeSeats = getFreeSeats;
+	}
 
 	/**
 	 * @return the swapSeats

@@ -4,10 +4,8 @@
  */
 package com.capgemini.university.service.impl;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,17 +15,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
-import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -51,6 +41,7 @@ import com.capgemini.university.dao.SbuSwapHistoryDao;
 import com.capgemini.university.ldap.ParticipantMapper;
 import com.capgemini.university.model.Course;
 import com.capgemini.university.model.CourseMail;
+import com.capgemini.university.model.FreeSeatPool;
 import com.capgemini.university.model.GroupCourse;
 import com.capgemini.university.model.Participant;
 import com.capgemini.university.model.Sbu;
@@ -81,8 +72,10 @@ public class CourseServiceImpl implements ICourseService {
 
 	@Autowired
 	private SbuSwapHistoryDao historyDao;
+	
 	@Autowired
 	private ISbuService sbuService;
+
 
 	public void setLdapTemplate(LdapTemplate ldapTemplate) {
 		this.ldapTemplate = ldapTemplate;
@@ -126,15 +119,99 @@ public class CourseServiceImpl implements ICourseService {
 		map.put("courseId", courseId);
 		map.put("sbuId", sbuId);
 		map.put("email", email);
-		cpDao.removeParticipant(map);
-
-		SbuCourse self = getSbuCourse(sbuId, courseId);
-		Float duration = self.getDuration();
-		int assignSeats = self.getAssignSeats();
-		int assignPmds = self.getAssignPmds();
-		self.setAssignSeats(assignSeats - 1);
-		self.setAssignPmds((int)Math.ceil((assignPmds - duration)));
-		cpDao.updateSbuCourse(self);
+		List<Participant> list = cpDao.queryParticipantList(map);
+		if(list != null && list.size()>0){
+			Participant p = list.get(0);
+			int source = p.getSource();
+			
+			// remove participant
+			cpDao.removeParticipant(map);
+			
+			if(source == 1){//free seats
+				SbuCourse self = getSbuCourse(sbuId, courseId);
+				
+				// update sbu course
+				int freeSeats = self.getGetFreeSeats();
+				self.setGetFreeSeats(freeSeats - 1);
+				cpDao.updateSbuCourse(self);
+				
+				//update free seat pool
+				FreeSeatPool fsp = getFreeSeatPoolById(courseId);
+			    fsp.setSeats(fsp.getSeats() + 1);
+			    cpDao.updateFreeSeatPool(fsp);
+				
+				
+			}else{
+				SbuCourse self = getSbuCourse(sbuId, courseId);
+				Float duration = self.getDuration();
+				int assignSeats = self.getAssignSeats();
+				int assignPmds = self.getAssignPmds();
+				self.setAssignSeats(assignSeats - 1);
+				self.setAssignPmds((int)Math.ceil((assignPmds - duration)));
+				cpDao.updateSbuCourse(self);
+			}
+		}
+		
+	}
+	
+	public void takeFreeParticipantList(List<Participant> list){
+		int sbuId=0;
+		int courseId=0;
+		for(Participant p : list){
+			sbuId = p.getSbuId();
+			courseId = p.getCourseId();
+			p.setSource(1);//from free seat
+			cpDao.addParticipant(p);
+		}
+		
+		SbuCourse sc = getSbuCourse(sbuId, courseId);
+		if(sc == null){
+			SbuCourse sco = new SbuCourse();
+			sco.setSbuId(sbuId);
+			sco.setCourseId(courseId);
+			Course c = getCourseById(courseId);
+			sco.setDuration(c.getDuration());
+			sco.setSeats(0);
+			sco.setPmds(0);
+			sco.setGetFreeSeats(list.size());
+			cpDao.addSbuCourse(sco);
+			
+		}else{
+			sc.setGetFreeSeats(sc.getGetFreeSeats() + list.size());
+			cpDao.updateSbuCourse(sc);
+		}
+		
+		
+		FreeSeatPool fsp = getFreeSeatPoolById(courseId);
+		if(fsp != null){
+			fsp.setSeats(fsp.getSeats() - list.size());
+			cpDao.updateFreeSeatPool(fsp);
+		}else{
+			throw new DataAccessDeniedException("takeFreeParticipantList Date exception.");
+		}
+		
+		
+		
+		
+		
+	}
+	
+	 public List<FreeSeatPool> getFreeSeatPoolList(){
+		Map map = new HashMap();
+		map.put("freeSeat", "true");
+		List<FreeSeatPool> list = cpDao.getFreeSeatPoolList(map);
+		return list;
+		 
+	 }
+	
+	public FreeSeatPool getFreeSeatPoolById(int courseId){
+		Map map = new HashMap();
+		map.put("courseId", courseId);
+		List<FreeSeatPool> list = cpDao.getFreeSeatPoolList(map);
+		if(list != null && list.size()>0){
+			return list.get(0);
+		}
+		return null;
 	}
 
 	public int addParticipantList(List<Participant> list) {
@@ -219,6 +296,14 @@ public class CourseServiceImpl implements ICourseService {
 		PageResults<Course> result = new PageResults<Course>(page, list2);
 
 		return result;
+	}
+	
+	public List<Map> getAllOtherSwapCourseList(int sbuId){
+		Map map = new HashMap();
+		map.put("swapSeats", "true");
+		map.put("sbuId", sbuId);
+		List<Map> list = cpDao.getCourseListByPage(map);
+		return list;
 	}
 
 	public PageResults<Map> getCourseListByPage(Map map, Pagination page) {
@@ -433,9 +518,10 @@ public class CourseServiceImpl implements ICourseService {
 		return cpDao.updateSbuCourse(sc);
 	}
 
-	public List<Map> getEventList(String type) {
+	public List<Map> getEventList(String type, String sbuId) {
 		Map map = new HashMap();
 		map.put("type", type);
+		map.put("sbuId", sbuId);
 
 		List<Map> list = cpDao.getEventList(map);
 		return list;
@@ -447,6 +533,14 @@ public class CourseServiceImpl implements ICourseService {
 
 		List<Course> list = cpDao.getCourse(map);
 		return list;
+	}
+	
+	public List<Map> getSbuCourseListByEvent(String type,String eventName, String sbuId){
+		Map map = new HashMap();
+		map.put("eventName", eventName);
+		map.put("sbuId", sbuId);
+		map.put("type", type);
+		return cpDao.getCourseListByEvent(map);
 	}
 
 	public Course getCourseById(Integer id) {
@@ -537,13 +631,13 @@ public class CourseServiceImpl implements ICourseService {
 			// lend
 			SbuCourse fromSbu1 = getSbuCourse(mySbuId, giveoutCourseId);
 			SbuCourse toSbu1 = getSbuCourse(swapSbuId, giveoutCourseId);
-			lendNormalSeats(fromSbu1, toSbu1, swapSeats);
+			lendNormalSeats(fromSbu1, toSbu1, swapSbuId, swapSeats);
 			
 			
 			// return
 			SbuCourse fromSbu2 = getSbuCourse(swapSbuId, swapCourseId);
 			SbuCourse toSbu2 = getSbuCourse(mySbuId, swapCourseId);
-			lendSwapSeats(fromSbu2, toSbu2, swapSeats);
+			lendSwapSeats(fromSbu2, toSbu2, mySbuId, swapSeats);
 			
 
 			SbuSwapHistory his = new SbuSwapHistory();
@@ -558,12 +652,14 @@ public class CourseServiceImpl implements ICourseService {
 			his.setActionTime(new Date());
 
 			historyDao.addSbuSwapHistory(his);
+			
+			
 
 	}
 	
-	private void lendNormalSeats(SbuCourse fromSbu, SbuCourse toSbu, int seats) {
+	private void lendNormalSeats(SbuCourse fromSbu, SbuCourse toSbu, int toSbuId, int seats) {
 
-		int leftSeats = fromSbu.getSeats() - fromSbu.getAssignSeats();
+		int leftSeats = fromSbu.getSeats() - fromSbu.getAssignSeats() - fromSbu.getSwapSeats();
 		if (leftSeats < seats) {
 
 			// Course c1 = getCourseById(fromSbu.getSbuId());
@@ -573,18 +669,38 @@ public class CourseServiceImpl implements ICourseService {
 		}
 		
 		//lend
-		fromSbu.setSeats(fromSbu.getSeats() - seats);
-		fromSbu.setPmds((int) Math.ceil((fromSbu.getSeats() * fromSbu.getDuration())));
+		int swapSeat = fromSbu.getSwapSeats();
+		if(seats<=swapSeat){
+			fromSbu.setSwapSeats(swapSeat-seats); //give out seat from swap firstly
+		}else{
+			fromSbu.setSwapSeats(0);//clear swap seat
+			fromSbu.setSeats(fromSbu.getSeats() -(seats -swapSeat));//if seat not enough,then take from remain seat
+			fromSbu.setPmds((int) Math.ceil((fromSbu.getSeats() * fromSbu.getDuration())));
+		}
+		
+		
 		cpDao.updateSbuCourse(fromSbu);
 		
+		
 		//to
-		toSbu.setSeats(toSbu.getSeats() + seats);
-		toSbu.setPmds((int) Math.ceil((toSbu.getSeats() * toSbu.getDuration())));
-		cpDao.updateSbuCourse(toSbu);
+		if(toSbu == null){//no have this course
+			SbuCourse sc = new SbuCourse();
+			sc.setSbuId(toSbuId);
+			sc.setCourseId(fromSbu.getCourseId());
+			sc.setDuration(fromSbu.getDuration());
+			sc.setSeats(seats);
+			sc.setPmds((int) Math.ceil((sc.getSeats() * sc.getDuration())));
+			cpDao.addSbuCourse(sc);
+		}else{
+			toSbu.setSeats(toSbu.getSeats() + seats);
+			toSbu.setPmds((int) Math.ceil((toSbu.getSeats() * toSbu.getDuration())));
+			cpDao.updateSbuCourse(toSbu);
+		}
+		
 		
 	}
 	
-	private void lendSwapSeats(SbuCourse fromSbu, SbuCourse toSbu, int swapSeats) {
+	private void lendSwapSeats(SbuCourse fromSbu, SbuCourse toSbu, int toSbuId, int swapSeats) {
 
 		int leftSeats = fromSbu.getSwapSeats();
 		if (leftSeats < swapSeats) {
@@ -600,9 +716,20 @@ public class CourseServiceImpl implements ICourseService {
 		cpDao.updateSbuCourse(fromSbu);
 		
 		//to
-		toSbu.setSeats(toSbu.getSeats() + swapSeats);
-		toSbu.setPmds((int) Math.ceil((toSbu.getSeats() * toSbu.getDuration())));
-		cpDao.updateSbuCourse(toSbu);
+		if(toSbu == null){//no have this course
+			SbuCourse sc = new SbuCourse();
+			sc.setSbuId(toSbuId);
+			sc.setCourseId(fromSbu.getCourseId());
+			sc.setDuration(fromSbu.getDuration());
+			sc.setSeats(swapSeats);
+			sc.setPmds((int) Math.ceil((sc.getSeats() * sc.getDuration())));
+			cpDao.addSbuCourse(sc);
+		}else{
+			toSbu.setSeats(toSbu.getSeats() + swapSeats);
+			toSbu.setPmds((int) Math.ceil((toSbu.getSeats() * toSbu.getDuration())));
+			cpDao.updateSbuCourse(toSbu);
+		}
+		
 		
 	}
 
@@ -681,6 +808,11 @@ public class CourseServiceImpl implements ICourseService {
 		Map map = new HashMap();
 		map.put("week", week);
 		return cpDao.getAllCourseToBegin(map);
+	}
+	
+	public void deleteCourse(int courseId){
+		cpDao.deleteCoursebyId(courseId);
+		cpDao.deleteSbuCoursebyId(courseId);
 	}
 	
 	 public void updatedAttend(int participantId, int attend){
@@ -891,6 +1023,8 @@ public class CourseServiceImpl implements ICourseService {
 		}
 
 	}
+	
+	
 	
 	
 

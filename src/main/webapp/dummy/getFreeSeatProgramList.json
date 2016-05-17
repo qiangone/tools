@@ -1,0 +1,49 @@
+{
+	"info": {
+        "code": "200",
+        "msg": "query participant successful"
+    },
+    "result": {
+        "content": [
+            {
+                "duration": 3,
+                "courseName": "O.N.E - Onboarding New Executives - (formerly known as CLO",
+                "sbuId": 1,
+                "remainedSeats": 2,
+                "remainedPmds": 6,
+                "pmds": 15,
+                "event_name": "BPW2",
+                "startTime": "2016-05-23",
+                "endTime": "2016-05-25",
+                "courseId": 46,
+                "seats": 5
+            },
+            {
+                "duration": 5,
+                "courseName": "LEAD (Changing the Game)",
+                "sbuId": 1,
+                "remainedSeats": 1,
+                "remainedPmds": 5,
+                "pmds": 10,
+                "event_name": "BPW2",
+                "startTime": "2016-05-23",
+                "endTime": "2016-05-27",
+                "courseId": 45,
+                "seats": 2
+            },
+            {
+                "duration": 5,
+                "courseName": "Collaborating with Clients",
+                "sbuId": 1,
+                "remainedSeats": 0,
+                "remainedPmds": 0,
+                "pmds": 20,
+                "event_name": "BPW2",
+                "startTime": "2016-05-23",
+                "endTime": "2016-05-27",
+                "courseId": 44,
+                "seats": 4
+            }
+        ]
+    }
+}

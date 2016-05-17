@@ -1,0 +1,20 @@
+<span style="font-size: 11.0pt; font-family: Calibri">
+
+	Dear <strong>${cm.name}</strong>,<br /> <br />
+	This is a confirmation email. <br/><br/>
+	SWAP has been successful. <br/><br/>
+	 
+    <strong>${cm.courseName}</strong> and number of places <strong>${cm.seats}</strong>  number of PMDs <strong>${cm.pmds}</strong>  have been moved to <strong>${cm.toSbuName}</strong><br/><br/>
+
+
+	Note: Course description and duration – please use ISC http://talent.capgemini.com/university/<br/><br/>
+	
+
+	Kind regards, <br/>
+	Our University <br/>
+	
+	
+	
+ 
+
+	

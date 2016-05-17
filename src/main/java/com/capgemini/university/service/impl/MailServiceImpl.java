@@ -16,9 +16,14 @@ import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.velocity.VelocityEngineUtils;
 
+import com.capgemini.university.api.exception.DataAccessDeniedException;
+import com.capgemini.university.model.Course;
 import com.capgemini.university.model.CourseMail;
+import com.capgemini.university.model.Lbps;
+import com.capgemini.university.model.Sbu;
 import com.capgemini.university.service.ICourseService;
 import com.capgemini.university.service.IMailService;
+import com.capgemini.university.service.ISbuService;
 import com.capgemini.university.util.ConfigUtil;
 
 
@@ -31,9 +36,12 @@ public class MailServiceImpl implements IMailService {
     private String from;
     private String mailTemplateOf3week;
     private String mailTemplateOf2week;
+    private String mailTemplateOfSwap;
     private VelocityEngine velocityEngine;
     @Autowired
     private ICourseService courseService;
+    @Autowired
+    private ISbuService sbuService;
     
   
     
@@ -81,8 +89,83 @@ public class MailServiceImpl implements IMailService {
     			sendMail(simulator, cm, mailTemplateOf2week, subject2week);
     		}
     	}
+    	
+    	//call sp to convert to free seats
+    	sbuService.convertToFreeSeats();
        
 	}
+    
+    public void sendSwapMail(Integer mySbuId , Integer giveoutCourseId, Integer swapSbuId,
+	         Integer swapCourseId, Integer swapSeats)throws DataAccessDeniedException{
+    	try{
+    		String simulatorTag = ConfigUtil.getPropertyValue("mail.simulator");
+        	String subject3Swap = ConfigUtil.getPropertyValue("mail.swap.subject");
+        	
+    		boolean simulator = simulatorTag != null && simulatorTag != "" && simulatorTag.equals("true")?true:false;
+    		
+    		Sbu sbu = sbuService.getSbuById(swapSbuId);
+    		Sbu mySbu = sbuService.getSbuById(mySbuId);
+    		Lbps lbps = sbu.getLbps();
+    		String toName = lbps.getName();
+    		String email = lbps.getEmail();
+    		
+    		Course cour = courseService.getCourseById(swapCourseId);
+    		String courseName = cour.getName();
+    		float duration = cour.getDuration();
+    		
+    		CourseMail cm = new CourseMail();
+    		cm.setName(toName);
+    		cm.setEmail(email);
+    		cm.setCourseName(courseName);
+    		cm.setSeats(swapSeats);
+    		cm.setPmds((int) Math.ceil(swapSeats * duration));
+    		cm.setToSbuName(mySbu.getSubName());
+    		
+    		//send email
+    		sendSwapMail(simulator, cm, mailTemplateOfSwap, subject3Swap);
+    	}catch(Exception e){
+    		logger.error("sendSwapMail error:",e);
+    		throw e;
+    	}
+    	
+    }
+    
+    private void sendSwapMail(boolean simulator, CourseMail cm,  String mailTemplate, String subject){
+    	MimeMessagePreparator preparator = new MimeMessagePreparator()
+        {
+            public void prepare(MimeMessage mimeMessage) throws Exception
+            {
+            	MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true);
+             
+            	String email = cm.getEmail();
+                
+                message.setSubject(subject);
+                if(simulator){
+                	message.setTo(from);
+                }else{
+                	message.setTo(email);
+                }
+                
+                message.setFrom(from);
+               
+                Map<String, Object> model = new HashMap<String, Object>();
+                model.put("cm", cm);
+               
+                
+//                model.put("content", getMailContent(cerFile, userFirstName, contextUrl));
+                
+                String encoding = "UTF-8";
+                
+                String text = VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, mailTemplate,
+            			encoding, model);
+                
+                message.setText(text,true);
+            }
+        };
+        
+        this.mailSender.send(preparator);
+    }
+    
     
     private void sendMail(boolean simulator, CourseMail cm, String mailTemplate, String subject){
     	MimeMessagePreparator preparator = new MimeMessagePreparator()
@@ -190,6 +273,20 @@ public class MailServiceImpl implements IMailService {
 	 */
 	public void setMailTemplateOf2week(String mailTemplateOf2week) {
 		this.mailTemplateOf2week = mailTemplateOf2week;
+	}
+
+	/**
+	 * @return the mailTemplateOfSwap
+	 */
+	public String getMailTemplateOfSwap() {
+		return mailTemplateOfSwap;
+	}
+
+	/**
+	 * @param mailTemplateOfSwap the mailTemplateOfSwap to set
+	 */
+	public void setMailTemplateOfSwap(String mailTemplateOfSwap) {
+		this.mailTemplateOfSwap = mailTemplateOfSwap;
 	}
 
    

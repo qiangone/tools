@@ -41,6 +41,8 @@
 			<tx:method name="saveOrUpdate*" timeout="300" propagation="REQUIRED" />
 			<tx:method name="remove*" timeout="300" propagation="REQUIRED" />
 			<tx:method name="upload*" timeout="300" propagation="REQUIRED" />
+			<tx:method name="takeFreeParticipantList" timeout="300" propagation="REQUIRED" />
+			
 			
 			
 		</tx:attributes>
